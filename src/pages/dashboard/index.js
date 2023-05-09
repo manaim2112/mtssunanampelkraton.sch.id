@@ -15,7 +15,7 @@ export function IndexDashboard() {
     return(
         <>
             <NavbarDashboard/>
-            <div className="px-12">
+            <div className="px-3 lg:px-12">
                 <Outlet/>   
 
             </div>

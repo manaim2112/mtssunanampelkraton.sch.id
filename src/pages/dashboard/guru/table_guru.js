@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { deleteGuru, getGuru, updateGuru } from "../../../service/dashboard/guru"
 import { Button, Card, CardBody, CardFooter, CardHeader, Checkbox, Dialog, Input, Option, Select, Typography } from "@material-tailwind/react"
 import { getKelasAll } from "../../../service/dashboard/kelas"
 import { useNavigate } from "react-router-dom"
+import { SkeletonTable } from "../../../elements/skeleton/table"
 
 export function TableGuruElement() {
     const [user, setUser] = useState([])
@@ -30,71 +31,74 @@ export function TableGuruElement() {
         }
     }
     return(
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th scope="col" className="px-6 py-3">
-                                Urutan
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                PegId
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Nama Guru
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Jabatan
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Wali Kelas 
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                <span className="sr-only">Edit</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {
-                        user.map((u, uk) => (
-                            <tr key={uk} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    {uk+1}
+        <Suspense fallback={<SkeletonTable/>}>
+            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" className="px-6 py-3">
+                                    Urutan
                                 </th>
-                                <td className="px-6 py-4">
-                                    {u.pegId}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {u.name}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {u.jabatan}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {u.walikelas ? u.walikelas : "TIDAK"}
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                    { u.jabatan === "operator" ? "" : (
-                                        <>
-                                            <span onClick={() => {
-                                                setData(u)
-                                                setOpen(true)
-                                            }} className="curson-pointer font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</span>
-                                            <span onClick={e => Handleremove(uk, u.id)} className="font-medium ml-4 text-red-600 dark:text-red-500 hover:underline cursor-pointer">{
-                                                actionRemove[uk] ? "Yakin ingin hapus ? klik lagi" : "Hapus"
-                                            }</span>
-                                        </>
-                                    )}
-                                </td>
+                                <th scope="col" className="px-6 py-3">
+                                    PegId
+                                </th>
+                                <th scope="col" className="px-6 py-3">
+                                    Nama Guru
+                                </th>
+                                <th scope="col" className="px-6 py-3">
+                                    Jabatan
+                                </th>
+                                <th scope="col" className="px-6 py-3">
+                                    Wali Kelas 
+                                </th>
+                                <th scope="col" className="px-6 py-3">
+                                    <span className="sr-only">Edit</span>
+                                </th>
                             </tr>
-                        ))
-                    }
+                        </thead>
+                        <tbody>
+                        {
+                            user.map((u, uk) => (
+                                <tr key={uk} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {uk+1}
+                                    </th>
+                                    <td className="px-6 py-4">
+                                        {u.pegId}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {u.name}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {u.jabatan}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {u.walikelas ? u.walikelas : "TIDAK"}
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        { u.jabatan === "operator" ? "" : (
+                                            <>
+                                                <span onClick={() => {
+                                                    setData(u)
+                                                    setOpen(true)
+                                                }} className="curson-pointer font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</span>
+                                                <span onClick={e => Handleremove(uk, u.id)} className="font-medium ml-4 text-red-600 dark:text-red-500 hover:underline cursor-pointer">{
+                                                    actionRemove[uk] ? "Yakin ingin hapus ? klik lagi" : "Hapus"
+                                                }</span>
+                                            </>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))
+                        }
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
 
-                <EditGuru data={data} opened={open} setOpened={setOpen}/>
-            </div>
+                    <EditGuru data={data} opened={open} setOpened={setOpen}/>
+                </div>
+
+        </Suspense>
     )
 }
 
@@ -121,7 +125,6 @@ export function EditGuru({data, opened, setOpened}) {
 
     useEffect(() => {
         getKelasAll().then(e => {
-            console.log(e)
             setKelas(e)
         })
     }, [])

@@ -19,7 +19,7 @@ export function IndexGuruDashboard() {
             <AddGuru/>
             <HrElement/>
             <div className="grid grid-cols-5 gap-2">
-                <div className="col-span-3">
+                <div className="col-span-5 lg:col-span-3">
                     <TableGuruElement/>
                 </div>
                 
@@ -43,16 +43,17 @@ export function AddGuru() {
         if(!checklist) return;
         setLoading(true)
         insertGuru({pegId, name, pass}).then(e => {
+            
             handleOpen();
             setLoading(false)
-            navigate(0)
+            // navigate(0)
         })
     }
     return(
         <>
             <Button onClick={handleOpen}>+ TAMBAH PEGAWAI</Button>
             <Dialog
-                size="xs"
+                size="xl"
                 open={open}
                 handler={handleOpen}
                 className="bg-transparent shadow-none"

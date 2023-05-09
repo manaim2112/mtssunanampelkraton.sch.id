@@ -29,6 +29,7 @@ export function insertGuru({pegId, name, pass}) {
             headers : {"Content-type" : "application/json"},
             body : JSON.stringify({pegId, name, pass})
         }).then(re => re.json()).then(e => {
+            console.log(e)
             resolve(e.status === 201)
         })
     })

@@ -54,7 +54,7 @@ export function IndexHomes() {
                     </figcaption>
                 </figure>
             </div>
-            <div className="grid grid-cols-2">
+            <div className="">
                 <BeritaElement/>
                 
             </div>
