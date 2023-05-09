@@ -31,7 +31,6 @@ export function changePriorityCBT_list(id, priority) {
             headers : {"Content-type" : "application/json"},
             body : JSON.stringify({id, priority})
         }).then(data => data.json()).then(d => {
-            console.log(d)
             resolve(d.status === 201)
         })
     })
@@ -71,6 +70,18 @@ export function getWithIdCBT(id) {
         } catch (error) {
             resolve(false)
         }
+    })
+}
+
+export function updateCBT_list({id, name, jenis, durasi, min_durasi, tokelas}) {
+    return new Promise((resolve, reject) => {
+        fetch(BASE_URL + "/cbt/list/update", {
+            method : "PUT",
+            headers : {"Content-Type" : "application/json"},
+            body : JSON.stringify({id, name, jenis, durasi, min_durasi, tokelas})
+        }).then(r => r.json()).then(r => {
+            resolve(r.status === 201)
+        })
     })
 }
 
@@ -156,7 +167,7 @@ export function saveWithUploadWordCBT(data, id) {
                 CBT_list_id : Number(id),
                 question : removeScriptag(e.soal),
                 tipe : e.tipe,
-                option : JSON.stringify(e.jawaban),
+                options : JSON.stringify(e.jawaban),
                 answer : JSON.stringify(e.kunci),
                 score : String(e.skor)
             })

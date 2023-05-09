@@ -71,15 +71,17 @@ export function uuidv4() {
 export function getDataStartCBT({start}) {
     try {
         const user = getAuthorizeUser();
-        const list = JSON.parse(atob(start).split("@")[0])
+        const [nisn, idlist] = atob(start).split("@")
 
-        const getSoal = JSON.parse(localStorage.getItem("refresh@"+ user.nisn + "@"+ list.id))
-        const getData = JSON.parse(localStorage.getItem("data@"+ user.nisn + "@"+ list.id))
-        const getTiming = atob(localStorage.getItem("timing@"+ user.nisn + "@"+ list.id))
+
+        const getSoal = JSON.parse(localStorage.getItem("refresh@"+ nisn + "@"+ idlist))
+        const getData = JSON.parse(localStorage.getItem("data@"+ nisn + "@"+ idlist))
+        const getTiming = new Date(localStorage.getItem("timing@"+ nisn + "@"+ idlist))
+        const getList = JSON.parse(localStorage.getItem("list@"+ nisn + "@"+ idlist))
 
         return {
             user,
-            list,
+            list : getList,
             soal : getSoal,
             data : getData,
             timing : getTiming

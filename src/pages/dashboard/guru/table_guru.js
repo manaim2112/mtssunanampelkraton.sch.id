@@ -174,7 +174,7 @@ export function EditGuru({data, opened, setOpened}) {
                             setWalikelas(null)
                         }
                     }} label="Jadikan walikelas ?" checked={walikelas} />
-                    <div className="mt-4">
+                    <div className="my-4">
                     <Select label="walikelas" hidden={!checklist} value={walikelas} size="lg">
                         {
                             kelas.map((e, k) => (
@@ -185,7 +185,7 @@ export function EditGuru({data, opened, setOpened}) {
 
                     </div>
                     <div className="mt-4">
-                        <Select label="Jabatan" size="lg" value={jabatan} className="mt-5">
+                        <Select label="Jabatan" size="lg" value={jabatan} className="">
                             <Option onClick={() => setJabatan("guru")}>guru</Option>
                             <Option onClick={() => setJabatan("bendahara")}>bendahara</Option>
                             <Option onClick={() => setJabatan("perpustakaan")}>perpustakaan</Option>

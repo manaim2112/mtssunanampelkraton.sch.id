@@ -58,7 +58,7 @@ export function AddNewCBTList() {
         
       <Button onClick={handleOpen}>+ Tambah Soal</Button>
       <Dialog
-        size="xs"
+        size="xl"
         open={open}
         handler={handleOpen}
         className="bg-transparent shadow-none"
@@ -82,8 +82,8 @@ export function AddNewCBTList() {
                 <Option onClick={() => setJenis("OLIMPIADE")}>OLIMPIADE</Option>
                 <Option onClick={() => setJenis("UN")}>UN</Option>
             </Select>
-            <Input label="Waktu pengerjaan (menit)" type="number" size="lg" onChange={(e) => setDurasi(e.target.value)} />
-            <Input label="Minimal waktu Pengerjakan (menit)" type="number" size="lg" onChange={(e) => setMinDurasi(e.target.value)} />
+            <Input label="Waktu (menit)" type="number" size="lg" onChange={(e) => setDurasi(e.target.value)} />
+            <Input label="Min waktu (menit)" type="number" size="lg" onChange={(e) => setMinDurasi(e.target.value)} />
             <Input label="Kelas" list="datalistKelas" placeholder=" " type="text" size="lg" onChange={(e) => setKelas(e.target.value)}/>
             <datalist id="datalistKelas">
                 {

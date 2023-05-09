@@ -2,38 +2,36 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { JSONParse, getDataStartCBT } from "../../service/constant";
-import { Button, Card, CardBody, Checkbox, Chip, Dialog, DialogBody, DialogFooter, Input, Radio, Textarea, Tooltip, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, Checkbox, Chip, Dialog, DialogBody, DialogFooter, IconButton, Input, Radio, Textarea, Tooltip, Typography } from "@material-tailwind/react";
 import { CheckIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { checkingResult, finishingCBT } from "../../service/cbt/result";
 import { Suspense } from "react";
+import { SkeletonTable } from "../../elements/skeleton/table";
+import useDocumentTitle from "../../elements/useDocumentTitle";
+import Countdown from "./element/countdown";
+import Swal from "sweetalert2";
 
 export function StartCBT() {
     const {start} = useParams()
     const nav = useNavigate();
-
+    useDocumentTitle("Selamat Mengerjakan soal")
+    
+    const [waitingLoad, setWaitingLoad] = useState(null)
+    
     const [user, setUser] = useState([])
     const [list, setList] = useState([])
     const [soal, setSoal] = useState([])
     const [timing, setTiming] = useState("")
     const [data, setData] = useState([])
+    
 
-    const [soalActive, setSoalActive] = useState("")
-    const [soalTipe, setSoalTipe] = useState("")
-    const [soalOption, setSoalOption] = useState([])
-    const [soalAnswer, setSoalAnswer] = useState([])
-    const [soalScore, setSoalScore] = useState(0)
-    const [soalId, setSoalId] = useState(null)
-
-    const [counter, setCounter] = useState(0)
+    
     const [active, setActive] = useState(0)
 
-    const [hour, setHour] = useState(0)
-    const [minute, setMinute] = useState(0)
-    const [second, setSecond] = useState(0)
-
+    
     const [textSizing, setTextSizing] = useState(16)
     const [open, setOpen] = useState(false)
-
+    
     useEffect(()=> {
         const get = getDataStartCBT({start})
         if(!get) return nav("/cbt")
@@ -45,95 +43,83 @@ export function StartCBT() {
             setUser(get.user)
             setList(get.list)
             setSoal(get.soal)
-            setTiming(get.timing)
             setData(get.data)
-    
-            setSoalActive(get.soal[active].question)
-            setSoalTipe(get.soal[active].tipe)
-            setSoalOption(JSONParse(get.soal[active].option))
-            setSoalAnswer(JSONParse(get.soal[active].answer))
-            setSoalScore(get.soal[active].score)
-            setSoalId(get.soal[active].id)
+            
 
             const timeNow = Date.now()
             const timeStart = Date.parse(new Date(get.timing))
             const durasi = get.list.durasi;
             const timeFlush = timeStart + durasi*60*1000;
-            let timeDifferent = timeFlush - timeNow;
-            if(timeDifferent < 0) {
-                return handleFinish()
-            }
-            
-            const inter = setInterval(() => {
-                getTimer(timeDifferent);
-                timeDifferent--;
-            }, 1000)
+            let timeDifferent = Math.floor((timeFlush - timeNow)/1000);
+            setTiming(timeDifferent)
 
+            setWaitingLoad(true)
         })
 
     }, [])
 
-    const setting = (h) => {
-        setActive(h)
-        setSoalActive(soal[h].question)
-        setSoalTipe(soal[h].tipe)
-        setSoalOption(JSONParse(soal[h].option))
-        setSoalAnswer(JSONParse(soal[h].answer))
-        setSoalScore(soal[h].score)
-        setSoalId(soal[h].id)
-    }
-
     const nextButton = () => {
         if(active < soal.length-1) {
-            const h = active+1;
-            setting(h)
-            
-
+            const N = active+1;
+            setActive(N)
         }
     }
 
     const backButton = () => {
         if(active > 0) {
-            const h = active-1;
-            setting(h)
+            const N = active-1;
+            setActive(N)
         }
     }
 
     const menuButton = (h) => {
-        setting(h)
+        setActive(h)
     }
 
     const savingData = (jj) => {
+        setData(jj)
         window.localStorage.setItem("data@"+ user.nisn + "@" + list.id, JSON.stringify(jj))
     }
 
     const handleFinish = () => {
+        const msg = [];
+        data.forEach((e,k) => {
+            if(e[1].length < 1) {
+                msg.push(k)
+            }
+        })
+        if(msg.length > 0) {
+            setActive(msg[0]);
+             return Swal.fire({
+                "title" : "Peringatan",
+                "icon" : "warning",
+                "text" : "ada beberapa soal belum di isi, segera lengkapi untuk dapat menyelesaikan soal"
+            })
+        }
+
         finishingCBT({idlist : list.id, iduser : user.id, answer : JSON.stringify(data)}).then(e => {
-            nav("cbt/finish/"+ start)
+            nav("/cbt/finish/"+ start)
         })
     }
 
-    const getTimer = (time) => {
-        setHour(Math.floor((time / (1000 * 60 * 60)) % 24));
-        setMinute(Math.floor((time / 1000 / 60) % 60));
-        setSecond(Math.floor((time / 1000) % 60));
+    if(!waitingLoad) {
+        return(
+            <SkeletonStart/>
+        )
     }
-
-    // useEffect(() => {
-        
-    //     const interval = setInterval(() => {
-    //         getTimer();
-    //         const sh = counter;
-    //         setCounter(sh - 1000);
-    //     }, 1000)
-
-    //     return () => clearInterval(interval)
-    // }, [])
 
     return(
         <Suspense fallback={"Sedang memproses data"}>
-            <div className="bg-white shadow-md p-4 text-center">
+            <div className="bg-white shadow-md p-4 flex place-items-center text-center">
                 {list.name}
+
+                { active === soal.length-1 ? (
+                                    <>
+                                        <IconButton onClick={handleFinish} ripple color="white">
+                                            <XCircleIcon className="w-6 h-6 mb-1 text-red-400"></XCircleIcon>
+                                        </IconButton>
+                                    </>
+                                ) : ""}
             </div>
 
             <Card className="md:w-3/4 lg:w-3/4 w-full mx-auto mt-8">
@@ -142,7 +128,7 @@ export function StartCBT() {
                                 <div className="grid grid-cols-5 gap-3 mb-5">
                                     <div className="col-span-5 md:col-span-3 lg:col-span-3">
                                         <Chip variant="gradient" className="mr-3" value={"Nomer Soal : "+ Number(active+1)}/> 
-                                        <Chip variant="gradient" color="indigo" value={"Score : "+ soalScore}/>
+                                        <Chip variant="gradient" color="indigo" value={"Score : "+ soal[active].score}/>
 
                                     </div>
                                     <div className="col-span-5 md:col-span-2 lg:col-span-2">
@@ -172,28 +158,25 @@ export function StartCBT() {
                                                                             />
                                     </div>
                                 </div>
-                                <span style={{"fontSize" : textSizing +"px"}} dangerouslySetInnerHTML={{__html: soalActive }}></span>
+                                <span style={{"fontSize" : textSizing +"px"}} dangerouslySetInnerHTML={{__html: soal[active].question }}></span>
                                 <div className="mt-4">
                                     {
-                                        soalTipe === "pilgan" ? (
+                                        soal[active].tipe === "pilgan" ? (
                                             <>
                                                 {
-                                                    soalAnswer.length > 1 ? (
+                                                    JSONParse(soal[active].answer).length > 1 ? (
                                                         <>
                                                             {
-                                                                soalOption.map((e,k) => (
+                                                                JSONParse(soal[active].options).map((e,k) => (
                                                                     <div className="mt-2" key={k}>
                                                                         <Checkbox label={e} onClick={() => {
                                                                             let jj = [...data]
                                                                             if(!jj[active]) {
-                                                                                jj[active] = [soalId, [k]]
-                                                                                
-                                                                                setData(jj)
+                                                                                jj[active] = [soal[active].id, [k]]
                                                                                 savingData(jj)
                                                                             } else {
                                                                                 if(!jj[active][1].includes(k)) {
                                                                                     jj[active][1].push(k)
-                                                                                    setData(jj)
                                                                                     savingData(jj)
                                                                                 }
                                                                             }
@@ -207,23 +190,26 @@ export function StartCBT() {
                                                     ) : (
                                                         <>
                                                             {
-                                                                soalOption.map((e,k) => (
-                                                                    <div className="mt-2" key={k}>
-                                                                        <Radio
-                                                                            
-                                                                            id={"option"+active + k}
-                                                                            name={"soal-"+ active}
-                                                                            label={e}
-                                                                            icon={
-                                                                                <CheckIcon className="h-6 w-6"></CheckIcon>
-                                                                            }
-                                                                            onClick={() => {
-                                                                                let jj = [...data]
-                                                                                jj[active] = [soalId, [k]]
-                                                                                setData(jj)
-                                                                                savingData(jj)
+                                                                JSONParse(soal[active].options).map((e,k) => (
+                                                                    
+                                                                    <div className="flex items-center mb-4" key={k}>
+                                                                        <input 
+                                                                            id={"options_key_"+ soal[active].id + "_key_"+ k} 
+                                                                            type="radio" 
+                                                                            value={data[active][1]}
+                                                                            name={"options_key_"+soal[active].id} 
+                                                                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" 
+                                                                            onChange={(event) => {
+                                                                                let jj = [...data];
+                                                                                if(event.target.checked) {
+                                                                                    jj[active] = [soal[active].id, [k]];
+                                                                                }
+                                                                                savingData(jj);
                                                                             }}
-                                                                        />
+                                                                            checked={data[active] && data[active][0] === soal[active].id && data[active][1].includes(k)}
+                                                                            />
+
+                                                                        <label htmlFor={"options_key_"+ soal[active].id + "_key_"+ k} className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{e}</label>
                                                                     </div>
                                                                 ))
                                                             }
@@ -231,25 +217,23 @@ export function StartCBT() {
                                                     )
                                                 }
                                             </>
-                                        ) : soalTipe === "isian_singkat" ? (
+                                        ) : soal[active].tipe === "isian_singkat" ? (
                                             <>
-                                                <Input variant="static" onKeyUp={(t) => {
+                                                <Input variant="static" onChange={(t) => {
                                                     let jj = [...data]
-                                                    jj[active] = [soalId, [t.target.value]]
-                                                    setData(jj)
+                                                    jj[active] = [soal[active].id, [t.target.value]]
                                                     savingData(jj);
-                                                }} label="Jawaban Singkat" placeholder="Jawaban anda..." />
+                                                }} value={data[active][1]} label="Jawaban Singkat" placeholder="Jawaban anda..." />
                                             </>
-                                        ) : soalTipe === "isian_panjang" ? (
+                                        ) : soal[active].tipe === "isian_panjang" ? (
                                             <>
-                                                <Textarea onKeyUp={(t) => {
+                                                <Textarea onChange={(t) => {
                                                     let jj = [...data]
-                                                    jj[active] = [soalId, [t.target.value]]
-                                                    setData(jj)
+                                                    jj[active] = [soal[active].id, [t.target.value]]
                                                     savingData(jj);
                                                 }} variant="static" label="Jawaban Panjang" placeholder="Jawaban anda..." />
                                             </>
-                                        ) : soalTipe === "menjodohkan" ? (
+                                        ) : soal[active].tipe === "menjodohkan" ? (
                                             <>
 
                                             </>
@@ -257,19 +241,17 @@ export function StartCBT() {
                                     }
 
                                 </div>
-
+                                
                             </div>
                 </CardBody>
             </Card>
             
             <div className="fixed bottom-0 z-50 w-full h-16 -translate-x-1/2 bg-white border-t border-gray-200 left-1/2 dark:bg-gray-700 dark:border-gray-600">
-                <div className="grid h-full max-w-lg grid-cols-6 mx-auto">
-                    <button type="button" onClick={() => setOpen(!open)} className="inline-flex col-span-2 flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
-                        <svg className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"></path>
-                        </svg>
-                        <span className="text-sm text-gray-500 hover:text-gray-900">List soal</span>
-                    </button>
+                <div className="grid h-full max-w-xl grid-cols-6 mx-auto items-center">
+                    <div className="col-span-2 text-center">
+                        <Countdown time={timing}/>
+                    </div>
+                    
 
                     <div className="flex items-center justify-center col-span-2">
                         <div className="flex items-center justify-between w-full text-gray-600 dark:text-gray-400 bg-gray-100 rounded-lg dark:bg-gray-600 max-w-[128px] mx-2">
@@ -288,10 +270,11 @@ export function StartCBT() {
                             </button>
                         </div>
                     </div>
-                    <button onClick={handleFinish} type="button" className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
-                        <XCircleIcon className="w-6 h-6 mb-1 text-red-400"></XCircleIcon>
-                        
-                        <span className="sr-only">Keluar</span>
+                    <button type="button" onClick={() => setOpen(!open)} className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
+                        <svg className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"></path>
+                        </svg>
+                        <span className="sr-only">List soal</span>
                     </button>
 
                     <Tooltip content={<UserInformation user={user}/>} animate={{
@@ -343,5 +326,65 @@ export function UserInformation(prop) {
             <Typography variant="h5">{user.name}</Typography>
             <div className="">{user.kelas}</div>
         </>
+    )
+}
+
+
+export function SkeletonStart() {
+    return(
+        <div className="animate-pulse">
+            <div className="bg-white shadow-md p-4 text-center h-11">
+
+
+            </div>
+            <Card className="md:w-3/4 lg:w-3/4 w-full mx-auto mt-8">
+                <CardBody>
+                    <SkeletonTable/>
+                </CardBody>
+            </Card>
+
+            <div className="fixed bottom-0 z-50 w-full h-16 -translate-x-1/2 bg-white border-t border-gray-200 left-1/2 dark:bg-gray-700 dark:border-gray-600">
+                <div className="grid h-full max-w-lg grid-cols-6 mx-auto">
+                    <button type="button" className="inline-flex col-span-2 flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
+                        <svg className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"></path>
+                        </svg>
+                        <span className="text-sm text-gray-500 hover:text-gray-900">List soal</span>
+                    </button>
+
+                    <div className="flex items-center justify-center col-span-2">
+                        <div className="flex items-center justify-between w-full text-gray-600 dark:text-gray-400 bg-gray-100 rounded-lg dark:bg-gray-600 max-w-[128px] mx-2">
+                            <button type="button" className="inline-flex items-center justify-center h-8 px-1 bg-gray-100 rounded-l-lg dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-800">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path clipRule="evenodd" fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"></path>
+                                </svg>
+                                <span className="sr-only">Previous page</span>
+                            </button>
+                            <span className="flex-shrink-0 mx-1 text-sm font-medium">Tunggu ...</span>
+                            <button type="button" className="inline-flex items-center justify-center h-8 px-1 bg-gray-100 rounded-r-lg dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-800">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path clipRule="evenodd" fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"></path>
+                                </svg>
+                                <span className="sr-only">Next page</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
+                        <XCircleIcon className="w-6 h-6 mb-1 text-red-400"></XCircleIcon>
+                        
+                        <span className="sr-only">Keluar</span>
+                    </button>
+
+                    
+                    <button type="button" className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
+                                        <svg className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path clipRule="evenodd" fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"></path>
+                                        </svg>
+                                        <span className="sr-only">Profile</span>
+                                    </button>
+
+                </div>
+            </div>
+        </div>
     )
 }

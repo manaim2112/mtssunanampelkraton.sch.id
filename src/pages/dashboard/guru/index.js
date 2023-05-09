@@ -46,7 +46,7 @@ export function AddGuru() {
             
             handleOpen();
             setLoading(false)
-            // navigate(0)
+            navigate(0)
         })
     }
     return(

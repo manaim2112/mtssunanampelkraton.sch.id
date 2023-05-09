@@ -32,7 +32,6 @@ export function startingCBT({idlist, iduser}) {
                 idlist, iduser, process : "start", score : 0, answer : "[]"
             })
         }).then(r => r.json()).then(e => {
-            console.log(e)
             resolve(e.status === 201)
         })
     })

@@ -11,11 +11,14 @@ import { useRef } from "react";
 import XLSX from 'xlsx';
 import useDocumentTitle from "../../../elements/useDocumentTitle"
 import Swal from "sweetalert2";
+import { SkeletonTable } from "../../../elements/skeleton/table";
+import { Suspense } from "react";
 export function IndexUsersDashboard() {
     useDocumentTitle(" Daftar Siswa")
     const [ckelas, setCkelas] = useState(0)
     const [kelas, setkelas] = useState([])
     const [user, setUser] = useState([])
+    const [loading, setLoading] = useState(true)
     const fileInputRef = useRef(null)
     const handleInputFile = () => {
         fileInputRef.current.click();
@@ -32,14 +35,16 @@ export function IndexUsersDashboard() {
             setkelas(e)
             getStudent(e[0].name).then(d => {
                 setUser(d)
+                setLoading(false)
             })
         })
     }, [])
 
     const getUser = (kelas) => {
+        setLoading(true)
         getStudent(kelas).then(d => {
-            console.log(d)
             setUser(d)
+            setLoading(false)
         })
     }
 
@@ -95,79 +100,84 @@ export function IndexUsersDashboard() {
         reader.readAsArrayBuffer(file);
       };
     return(
-        <>
+        <Suspense fallback={<SkeletonTable/>}>
             <JumbrotonElement to={"/"} badge={"tutorial"} title={"Beginilah cara mengelola data peserta didik pada Yami-sis"} desc={"Pastikan data sudah sesuai dengan data yang sebenarnya ya, tinggal klik tambah dan simpan, pastikan jabatan juga sudah disetting"} />
             <HrElement/>
             <Button value="Upload Via Excel" className="" onClick={handleInputFile}>Upload Via Excel</Button>
 
                     <input type="file" style={{ "display" : "none"}} ref={fileInputRef}  onChange={insertMany}/>
             <div className="grid grid-cols-5 gap-4 mt-8">
-                <div className="col-span-4">
-                <div className="w-72 flex mt-2">
-                    <Select label="Kelas">
-                        {
-                            kelas.map((e,k) => (
-                                <Option key={k} onClick={() => getUser(e.name)}>{e.name}</Option>
-                            ))
-                        }
-                    </Select>
-                    
+                <div className="lg:col-span-4 col-span-5 order-2 lg:order-1">
+                    <div className="w-72 flex mt-2 mb-2">
+                        <Select label="Kelas">
+                            {
+                                kelas.map((e,k) => (
+                                    <Option key={k} onClick={() => getUser(e.name)}>{e.name}</Option>
+                                ))
+                            }
+                        </Select>
+                        
+                    </div>
+                {
+                    loading ? (
+                        <SkeletonTable className="mt-2"/>
+                    ) : (
+                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-2">
+                            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" className="px-6 py-3">
+                                            Urutan
+                                        </th>
+                                        <th scope="col" className="px-6 py-3">
+                                            numId
+                                        </th>
+                                        <th scope="col" className="px-6 py-3">
+                                            Nama
+                                        </th>
+                                        <th scope="col" className="px-6 py-3">
+                                            Kelas
+                                        </th>
+                                        <th scope="col" className="px-6 py-3">
+                                            Sandi
+                                        </th>
+                                        <th scope="col" className="px-6 py-3">
+                                            <span className="sr-only">Edit</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {
+                                    user.map((u, uk) => (
+                                        <tr key={uk} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                {uk+1}
+                                            </th>
+                                            <td className="px-6 py-4">
+                                                {u.nisn}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {u.name}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {u.kelas}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {u.pass}
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <Link to="/" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</Link>
+                                            </td>
+                                        </tr>
+                                    ))
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    )
+                }
                 </div>
-
-                <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-2">
-                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                            <tr>
-                                <th scope="col" className="px-6 py-3">
-                                    Urutan
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    numId
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Nama
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Kelas
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Sandi
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    <span className="sr-only">Edit</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {
-                            user.map((u, uk) => (
-                                <tr key={uk} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        {uk+1}
-                                    </th>
-                                    <td className="px-6 py-4">
-                                        {u.nisn}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        {u.name}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        {u.kelas}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        {u.pass}
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <Link to="/" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</Link>
-                                    </td>
-                                </tr>
-                            ))
-                        }
-                        </tbody>
-                    </table>
-                </div>
-                </div>
-                <div className="col-span-1">
+                <div className="lg:col-span-1 col-span-5 order-1 lg:order-2">
                     Total ada {ckelas}
                     <hr></hr>
                     {
@@ -202,6 +212,6 @@ export function IndexUsersDashboard() {
                 </div>
                 
             </div>
-        </>
+        </Suspense>
     )
 }

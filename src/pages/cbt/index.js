@@ -1,4 +1,4 @@
-import { getAuthorizeUser } from "../../service/constant";
+import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 export function CBTIndex() {
     // const videoRef = useRef(null);
@@ -11,9 +11,13 @@ export function CBTIndex() {
     //     })
     //     .catch(error => console.error('Error accessing camera:', error));
     // }, []);
-    if(!getAuthorizeUser()) {
-        nav("/auth/login_user?redirect=/cbt")
-    }
+    useEffect(() => {
+        if(!window.sessionStorage.getItem("refresh-token")) {
+            nav("/auth/login_user?redirect=/cbt")
+            return;
+        }
+    }, [])
+    
 
     return(
         <>

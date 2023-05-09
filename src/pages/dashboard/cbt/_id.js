@@ -93,7 +93,7 @@ export function IdCBTDashboard() {
                     </div>
                 </div>
                 <div className="lg:col-span-2 xl:col-span-2 col-span-5 border-l-2 border-slate-300 p-4 order-1 lg:order-2">
-                    <ul className="sticky top-28 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <ul className="sticky top-28 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-md">
                         <li className="w-full px-4 py-2 border-b border-gray-200 rounded-t-lg dark:border-gray-600">
                             <span className="bg-slate-200 px-2 py-1 rounded-full mx-2">Nama</span> { xid.name ? xid.name : ""}
                         </li>
@@ -142,7 +142,7 @@ export function IdCBTDashboard() {
                         <span className="bg-slate-200 px-2 py-1 rounded-full mx-2">Kelas yang disetujui</span> {xid.tokelas ? xid.tokelas : ""}
 
                         </li>
-                        <li className="w-full px-4 py-2 rounded-b-lg bg-gradient-to-br from-blue-400 to-blue-100 text-center font-semibold text-white">Ubah Pengaturan</li>
+                        <li className="w-full px-4 py-2 rounded-b-lg font-semibold text-blue-400 hover:text-blue-500 hover:underline cursor-pointer">Lihat hasil Peserta didik</li>
                     </ul>
                 </div>
             </div>
@@ -178,7 +178,7 @@ export function DataIdCBTDashboardElement({xid}) {
         getDataWithIdCBT(xid).then(d => {
             setList(d)
         })
-    }, [xid, list])
+    }, [xid])
     const removeSoal = (id, k) => {
         if(!sureDelete[k]) {
             const hh = [...sureDelete]
@@ -187,8 +187,14 @@ export function DataIdCBTDashboardElement({xid}) {
         } else {
             RemoveSoalWithId(id).then(e => {
                 if(e) {
-                    setSureDelete(false)
-                    setList(list)
+                    const hh = [...sureDelete]
+                    hh[k] = false;
+                    setSureDelete(hh)
+                    const index = list.findIndex(Obj => Obj.id === id)
+                    const l = list;
+                    l.splice(index, 1)
+                    setList(l)
+
                     Myswal.fire({
                         "title" : "Berhasil",
                         "icon" : "success",
@@ -227,9 +233,9 @@ export function DataIdCBTDashboardElement({xid}) {
                         { e.tipe === "pilgan" ? (
                             <ol className="pl-5 mt-2 space-y-1 list-latin list-inside">
                                 {
-                                    JSONParse(e.option).map((t, ke) => (
+                                    JSONParse(e.options).map((t, ke) => (
                                         <li key={ke}>
-                                            { JSONParse(e.kunci).includes(ke) ? (
+                                            { JSONParse(e.answer).includes(ke) ? (
                                                 <span className="bg-green-100 text-green-700">
                                                     {t}
                                                 </span>
@@ -244,7 +250,7 @@ export function DataIdCBTDashboardElement({xid}) {
                             </>
                         ) : (
                             <div className="bg-green-200 px-4 py-2 text-green-700">
-                                {e.answer}
+                                {JSONParse(e.answer)[0]}
                             </div>
                         )
                         }
