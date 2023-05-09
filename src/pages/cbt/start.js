@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { JSONParse, dateParse, getDataStartCBT } from "../../service/constant";
+import { JSONParse, getDataStartCBT } from "../../service/constant";
 import { Button, Card, CardBody, Checkbox, Chip, Dialog, DialogBody, DialogFooter, Input, Radio, Textarea, Tooltip, Typography } from "@material-tailwind/react";
 import { CheckIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { checkingResult, finishingCBT } from "../../service/cbt/result";
+import { Suspense } from "react";
 
 export function StartCBT() {
     const {start} = useParams()
@@ -67,6 +68,7 @@ export function StartCBT() {
                 getTimer(timeDifferent);
                 timeDifferent--;
             }, 1000)
+
         })
 
     }, [])
@@ -111,24 +113,6 @@ export function StartCBT() {
         })
     }
 
-    useEffect(() => {
-        const timenow = dateParse();
-        const lasTime = dateParse(timing)
-        let sel = Number(list.durasi)*60*1000 + lasTime - timenow;
-        if(sel < 1000) {
-            finishingCBT({idlist : list.id, iduser:user.id, answer : JSON.stringify(data)}).then(e => {
-                if(e) {
-                    nav("/cbt/finish/"+ start)
-                }
-            })
-            setCounter(sel)
-        } else {
-
-            setCounter(sel)
-
-        }
-    }, [])
-
     const getTimer = (time) => {
         setHour(Math.floor((time / (1000 * 60 * 60)) % 24));
         setMinute(Math.floor((time / 1000 / 60) % 60));
@@ -147,9 +131,9 @@ export function StartCBT() {
     // }, [])
 
     return(
-        <>
+        <Suspense fallback={"Sedang memproses data"}>
             <div className="bg-white shadow-md p-4 text-center">
-                {hour} : {minute} : {second}
+                {list.name}
             </div>
 
             <Card className="md:w-3/4 lg:w-3/4 w-full mx-auto mt-8">
@@ -348,7 +332,7 @@ export function StartCBT() {
                     </DialogFooter>
             </Dialog>
 
-        </>
+        </Suspense>
     )
 }
 

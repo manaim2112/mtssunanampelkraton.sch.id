@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
 import { RemoveSoalWithId, changeCodeCBT_list, getDataWithIdCBT, getWithIdCBT, swithAcakCBT_list, updateStartEndCBT } from "../../../service/dashboard/cbt";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useSidebarActive } from "..";
+import {  useNavigate, useParams } from "react-router-dom";
 import { Button, Chip, IconButton, Input, Switch, Typography } from "@material-tailwind/react";
 import { ArrowPathIcon, CheckIcon, PencilIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import useDocumentTitle from "../../../elements/useDocumentTitle";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { JSONParse, randomText } from "../../../service/constant";
@@ -24,7 +21,7 @@ export function IdCBTDashboard() {
         getWithIdCBT(id).then(d => {
                 setXid(d)
         })
-    }, [xid])
+    }, [xid, id])
 
     const ChangeCode = (id) => {
         setCodeChange(true)

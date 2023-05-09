@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { changePriorityCBT_list, getCBT } from "../../../service/dashboard/cbt";
-import { Checkbox, Input } from "@material-tailwind/react";
+import { Checkbox, Chip } from "@material-tailwind/react";
+import { Suspense } from "react";
+import { SkeletonTable } from "../../../elements/skeleton/table";
 
 export function TableCBTElement({Live}) {
     const [live, setLive] = useState([])
@@ -18,7 +20,8 @@ export function TableCBTElement({Live}) {
         })
     }, [live])
     return(
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <Suspense fallback={<SkeletonTable/>}>
+            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
@@ -62,7 +65,7 @@ export function TableCBTElement({Live}) {
                             live.map((e,k) => (
                                 <tr key={k} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <th className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        <Checkbox onChange={(event) => ChangePriority(event, e.id)} checked={e.priority}/>
+                                        <Checkbox onChange={(event) => ChangePriority(event, e.id)} id={"chekedsoal"+ k} name={"chekedsoal"+ k} checked={e.priority}/>
                                     </th>
                                     <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                        {e.name}
@@ -83,11 +86,7 @@ export function TableCBTElement({Live}) {
                                         {e.berakhir}
                                     </td>
                                     <td className="px-6 py-4">
-                                        {e.acak ? (
-                                            <span className="bg-lime-300 rounded-lg py-1 px-2 text-lime-800"> YA </span>
-                                        ) : (
-                                            <span className="bg-red-500 rounded-lg py-1 px-2 text-white"> TIDAK </span>
-                                        )}
+                                        {e.acak ? <Chip variant="gradient" color="lime" value={"YA"}/> : <Chip variant="gradient" color="red" value={"TIDAK"}/>}
                                     </td>
                                     <td className="px-6 py-4">
                                         {e.code}
@@ -105,5 +104,6 @@ export function TableCBTElement({Live}) {
                     </tbody>
                 </table>
             </div>
+        </Suspense>
     )
 }

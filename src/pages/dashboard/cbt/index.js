@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
-import { useSidebarActive } from "..";
 import { HrElement } from "../../../elements/hr";
 import { JumbrotonElement } from "../../../elements/jumbroton";
 import useDocumentTitle from "../../../elements/useDocumentTitle";
 import { TableCBTElement } from "./table_cbt";
-import { Button, Card, CardBody, CardFooter, CardHeader, Checkbox, Dialog, Input, Option, Select, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, CardFooter, CardHeader, Dialog, Input, Option, Select, Typography } from "@material-tailwind/react";
 import { useState } from "react";
 import { insertCBT_list } from "../../../service/dashboard/cbt";
 import { randomText } from "../../../service/constant";
@@ -17,7 +16,7 @@ export function IndexCBTDashboard() {
         <>
             <JumbrotonElement badge={"Tutorial"} title={"Bagaimana cara membuat soal pada cbt"} desc={"Pastikan di isi seuai dengan petunjuk yang sudah disediakan, ketidak sesuaian dengan petunjuk mengakibatkan perbedaan hasil"} to={"https://youtube.com"}/>
 
-                <AddNewCBT_list/>
+                <AddNewCBTList/>
                 <HrElement/>
                 <TableCBTElement />
         </>
@@ -25,7 +24,7 @@ export function IndexCBTDashboard() {
 }
 
 
-export function AddNewCBT_list() {
+export function AddNewCBTList() {
     const [open, setOpen] = React.useState(false);
     const [name, setName] = useState("")
     const [jenis, setJenis] = useState("")

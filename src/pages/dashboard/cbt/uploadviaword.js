@@ -2,10 +2,10 @@ import { useState } from "react";
 import { saveWithUploadWordCBT } from "../../../service/dashboard/cbt";
 import { useNavigate, useParams } from "react-router-dom";
 import { BASE_URL, dataURLtoFile, uuidv4 } from "../../../service/constant";
-import Compressor from "compressorjs";
+// import Compressor from "compressorjs";
 import useDocumentTitle from "../../../elements/useDocumentTitle";
-// import mammoth from "https://cdn.jsdelivr.net/npm/mammoth@1.4.8/mammoth.browser.min.js"
 export function UploadWordCBTDashboard() {
+    
     useDocumentTitle("Upload Soal dengan Ms. Word")
     const {id} = useParams()
     const nav = useNavigate()
@@ -54,7 +54,7 @@ export function UploadWordCBTDashboard() {
             window.mammoth.convertToHtml({arrayBuffer: arrayBuffer}, options).then(function (resultObject) {
                 const element = document.createElement("div");
                 element.innerHTML = resultObject.value
-                const getIntable = element.querySelectorAll("table")[0].querySelectorAll("tr")
+                const getIntable = element.querySelector("table").querySelectorAll("tr")
                 const soal = []
                 const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
                 const firstNode = getIntable[0]
@@ -77,6 +77,7 @@ export function UploadWordCBTDashboard() {
                             jawaban.push(sub)
                         });
                     }
+                    console.log(td)
                     const item = {
                         id : td[0].innerText,
                         soal : td[1].innerHTML,
@@ -139,7 +140,7 @@ export function UploadWordCBTDashboard() {
                         </div>
                         
                         {k+1}. <span dangerouslySetInnerHTML={{__html: e.soal}}></span>
-                        { e.tipe === "pilgan" ? (
+                        { e.tipe.toLowerCase() === "pilgan" ? (
                             <ol className="pl-5 mt-2 space-y-1 list-latin list-inside">
                                 {
                                     e.jawaban.map((t, ke) => (
@@ -153,7 +154,7 @@ export function UploadWordCBTDashboard() {
                                     ))
                                 }
                             </ol>
-                        ) : e.tipe === "menjodohkan" ? (
+                        ) : e.tipe.toLowerCase() === "menjodohkan" ? (
                             <div className="grid grid-cols-2 gap-4">
                                 {
                                     e.jawaban.map((rr, rrk) => (

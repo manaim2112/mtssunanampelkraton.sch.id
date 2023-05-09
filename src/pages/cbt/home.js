@@ -44,7 +44,7 @@ export function HomeCBT() {
             if(l === -1) return;
             const act = list[l];
             if(e.code === code) {
-                const use = result.findIndex(O => O.idlist == active);
+                const use = result.findIndex(O => O.idlist === active);
                 if(use === -1) {
                     startingCBT({idlist : Number(active), iduser:Number(user.id)}).then(e => {
                         console.log(e)
@@ -107,7 +107,7 @@ export function HomeCBT() {
                                                 <>
                                                 
                                                     {
-                                                        result[result.findIndex(O => O.idlist == e.id)].process === "start" ? (         
+                                                        result[result.findIndex(O => O.idlist === e.id)].process === "start" ? (         
                                                             <div onClick={()=> handleStart(e.id)} className="text-green-300 text-center cursor-pointer px-2 hover:text-green-500 inline-block bg-green-100 rounded-lg">Lanjutkan mengerjakan 
                                                             </div>
                                                         ) : (

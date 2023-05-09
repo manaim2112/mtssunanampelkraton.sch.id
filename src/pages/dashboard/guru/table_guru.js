@@ -136,7 +136,7 @@ export function EditGuru({data, opened, setOpened}) {
             setChecklist(true)
         }
         
-    }, [opened])
+    }, [opened, data.pegId, data.name, data.pass, data.jabatan, data.walikelas])
 
     const handleOpen = () => {
         setOpen(!open)

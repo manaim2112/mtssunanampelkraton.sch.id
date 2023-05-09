@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NavbarElement } from "../../elements/navbar";
 import { LoginWithUser } from "../../service/authorize";
 import useDocumentTitle from "../../elements/useDocumentTitle";
@@ -10,7 +10,7 @@ export function IndexLoginUser() {
     const [sandi, setSandi] = useState("")
     const [isLoading, setLoading] = useState(false)
     const [alert, setAlert] = useState(false)
-    let [searchParams, setSearchParams] = useSearchParams();
+    let [searchParams] = useSearchParams();
     const nav = useNavigate()
     const getToken = window.sessionStorage.getItem("refresh-token")
     if(getToken) {
