@@ -249,7 +249,7 @@ export function StartCBT() {
             <div className="fixed bottom-0 z-50 w-full h-16 -translate-x-1/2 bg-white border-t border-gray-200 left-1/2 dark:bg-gray-700 dark:border-gray-600">
                 <div className="grid h-full max-w-xl grid-cols-6 mx-auto items-center">
                     <div className="col-span-2 text-center">
-                        <Countdown time={timing}/>
+                        <Countdown time={timing} data={data} user={user} list={list} start={start}/>
                     </div>
                     
 

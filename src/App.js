@@ -29,6 +29,7 @@ import { IndexUserWithNisn } from './pages/user/_nisn';
 import { Install } from './pages/instalation';
 import { StartCBT } from './pages/cbt/start';
 import { FinishCBT } from './pages/cbt/finish';
+import { ResultCBT } from './pages/dashboard/cbt/result';
 
 
 function App() {
@@ -83,6 +84,8 @@ function App() {
             <Route path='cbt' element={<IndexCBTDashboard/>}/>
 
             <Route path='cbt/id/:id' element={<IdCBTDashboard/>}/>
+            <Route path='cbt/id/:id/result' element={<ResultCBT/>}/>
+
             <Route path='cbt/id/:id/upload' element={<UploadWordCBTDashboard/>}/>
 
             <Route path='users' element={<IndexUsersDashboard/>}/>

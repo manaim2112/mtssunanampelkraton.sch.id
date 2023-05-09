@@ -142,7 +142,7 @@ export function IdCBTDashboard() {
                         <span className="bg-slate-200 px-2 py-1 rounded-full mx-2">Kelas yang disetujui</span> {xid.tokelas ? xid.tokelas : ""}
 
                         </li>
-                        <li className="w-full px-4 py-2 rounded-b-lg font-semibold text-blue-400 hover:text-blue-500 hover:underline cursor-pointer">Lihat hasil Peserta didik</li>
+                        <li onClick={() => nav("/dashboard/cbt/id/"+ id + "/result")} className="w-full px-4 py-2 rounded-b-lg font-semibold text-blue-400 hover:text-blue-500 hover:underline cursor-pointer">Lihat hasil Peserta didik</li>
                     </ul>
                 </div>
             </div>

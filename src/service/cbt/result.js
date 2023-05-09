@@ -60,3 +60,15 @@ export function checkingResult({iduser, idlist}) {
         })
     })
 }
+
+export function getCBTResultWIthListId(id) {
+    return new Promise((resolve, reject) => {
+        fetch(BASE_URL + "/cbt/result/list/"+ id).then(r => r.json()).then(r => {
+            if(r.status === 200) {
+                resolve(r.data)
+            } else {
+                resolve([])
+            }
+        })
+    })
+}
