@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import { SkeletonTable } from "../../elements/skeleton/table";
 import useDocumentTitle from "../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
+import "./start.css"
 
 export function StartCBT() {
     const {start} = useParams()
@@ -134,7 +135,8 @@ export function StartCBT() {
         })
     }
     const checkingButtonFinish = () => {
-        if(Number(list.min_durasi)*60 >= remainingTime) {
+        if(Number(list.durasi)*60 - remainingTime >= Number(list.min_durasi)*60) {
+            console.log(list.min_durasi)
             setShowExit(true);
         } else {
             setShowExit(false)
@@ -161,7 +163,7 @@ export function StartCBT() {
                                 ) : ""}
             </div>
 
-            <Card className="md:w-3/4 lg:w-3/4 w-full mx-auto mt-8">
+            <Card className="md:w-3/4 lg:w-3/4 w-full mx-auto mt-8 mb-12">
                 <CardBody>
                             <div className="">
                                 <div className="grid grid-cols-5 gap-3 mb-5">
@@ -270,7 +272,7 @@ export function StartCBT() {
                                                     let jj = [...data]
                                                     jj[active] = [soal[active].id, [t.target.value]]
                                                     savingData(jj);
-                                                }} variant="static" label="Jawaban Panjang" placeholder="Jawaban anda..." />
+                                                }} value={data[active][1]} variant="static" label="Jawaban Panjang" placeholder="Jawaban anda..." />
                                             </>
                                         ) : soal[active].tipe === "menjodohkan" ? (
                                             <>

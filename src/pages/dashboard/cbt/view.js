@@ -3,19 +3,24 @@ import { useParams } from "react-router-dom"
 import { getResultWithUserId } from "../../../service/cbt/result"
 import { useState } from "react"
 import { getUserWithId } from "../../../service/dashboard/users"
-import { getDataWithIdCBT, getWithIdCBT } from "../../../service/dashboard/cbt"
+import { UpdateResultAnswerWIthId, getDataWithIdCBT, getWithIdCBT } from "../../../service/dashboard/cbt"
 import { SkeletonTable } from "../../../elements/skeleton/table"
-import { Card, CardBody, Checkbox, Chip, Input, Textarea, Typography } from "@material-tailwind/react"
+import { Button, Card, CardBody, Checkbox, Chip, IconButton, Input, Textarea, Typography } from "@material-tailwind/react"
 import { JSONParse } from "../../../service/constant"
-import { XMarkIcon } from "@heroicons/react/24/outline"
+import { CheckIcon, SignalIcon, XMarkIcon } from "@heroicons/react/24/outline"
+import Swal from "sweetalert2"
 
 export function ViewResultCBT() {
     const {id, userid} = useParams()
     const [result, setResult] = useState([])
+    const [resultC, setResultC] = useState([])
     const [user, setUser] = useState([])
     const [list, setList] = useState({})
     const [soal, setSoal] = useState([])
     const [waiting, setWaiting] = useState(true)
+    const [score, setScore] = useState([])
+    const [ans, setAns] = useState([])
+    const [loading, setLoading] = useState(false)
     useEffect(() => {
         getResultWithUserId(userid).then(r => {
             setResult(r)
@@ -26,6 +31,42 @@ export function ViewResultCBT() {
                     setSoal(so)
                     getWithIdCBT(id).then(l => {
                         setList(l)
+                        const answer = new Array(so.length).fill(null);
+                        const poin = new Array(so.length).fill(0)
+                        so.forEach((res, key) => {
+                            const a = JSONParse(res.answer)
+                            const ranw = JSONParse(r[0].answer)
+                            const index = ranw.findIndex(Obj => Obj[0] === res.id);
+                            const yans = ranw[index][1].sort()
+                            if(res.tipe === "pilgan") {
+                                const act = a.sort()
+                                if(JSON.stringify(act) === JSON.stringify(yans)) {
+                                    answer[key] = true;
+                                    poin[key] = res.score;
+                                    
+                                } else {
+                                    answer[key] = false;
+
+                                }
+                            } else if(res.tipe === "isian_singkat") {
+                                if(a[0].toLowerCase() === yans[0].toLowerCase()) {
+                                    answer[key] = true;
+                                    poin[key] = res.score;
+                                } else {
+                                    answer[key] = false;
+                                }
+                            } else if(res.tipe === "isian_panjang") {
+                                answer[key] = ranw[index][2]
+                                if(ranw[index][2] === true) {
+                                    poin[key] = res.score;
+                                }
+                            }
+                        })
+
+                        setAns(answer)
+                        setScore(poin)
+
+
                         setWaiting(false)
                     })
                 })
@@ -48,6 +89,51 @@ export function ViewResultCBT() {
         }
     }
 
+    const handleFail = (key) => {
+        const a = [...ans]
+        a[key] = false;
+        const s = soal[key].id
+        const ranw = JSONParse(result[0].answer)
+        const index = ranw.findIndex(Obj => Obj[0] === s);
+        ranw[index][2] = false;
+        const sd = [...score]
+        sd[key] = 0;
+        setScore(sd)
+        setResultC(ranw)
+        setAns(a)
+
+    }
+
+    const  handleSucc = (key) => {
+        const a = [...ans]
+        a[key] = true;
+        const s = soal[key].id
+        const ranw = JSONParse(result[0].answer)
+        const index = ranw.findIndex(Obj => Obj[0] === s);
+        ranw[index][2] = true;
+        const sd = [...score]
+        sd[key] = soal[key].score;
+        setScore(sd)
+        setResultC(ranw)
+        setAns(a)
+    }
+
+    const handleUpdate = () => {
+        setLoading(true)
+        const id = result[0].id;
+        const answer = JSON.stringify(resultC)
+
+        UpdateResultAnswerWIthId({id, answer}).then(t => {
+            setLoading(false)
+           Swal.fire({
+            title : "Berhasil Update",
+            icon : "success",
+            showConfirmButton : false,
+            timer : 1000
+           })
+        })
+    }
+
     if(waiting) return (
         <>
             <SkeletonTable/>
@@ -57,13 +143,15 @@ export function ViewResultCBT() {
         <>
             <Typography variant="h3"> Hasil dari {user.name}</Typography> {user.nisn}
             <Typography variant="h4">{list.jenis} - {list.name}</Typography>
-
+            <Typography variant="h5">Nilai Sementara {score.reduce((a,b) => Number(a)+Number(b))}</Typography>
             {
                 soal.map((e,k) => (
-                    <Card key={k} className="my-1">
+                    <Card key={k} className={`my-2 ${(ans[k] === true) ? "bg-green-100" : (ans[k] === null) ? "bg-white" : "bg-red-100"}`}>
                         <CardBody>
                             <Chip color="blue" value={"Nomer "+ (k+1) } className="mx-1"/>
-                            {e.id} {typeof checkResult(e.id)[0]}
+                            {
+                                (ans[k] === true) ? "score +"+e.score : ""
+                            }
                             <div className="mt-4" dangerouslySetInnerHTML={{ __html: e.question }}></div>
                             {
                                 e.tipe === "pilgan" ? (
@@ -91,22 +179,47 @@ export function ViewResultCBT() {
                                 ) : e.tipe === "isian_singkat" ? (
                                     <div>
                                         <Input value={checkResult(e.id)} icon={<XMarkIcon className="w-4 h-4"/>} className={
-                                            checkResult(e.id)[0] === JSONParse(e.answer)[0] ? "disabled:bg-green-100" : "disabled:bg-red-100"
+                                            checkResult(e.id)[0] === JSONParse(e.answer)[0] ? "disabled:bg-green-700 text-white" : "disabled:bg-red-700 text-white"
                                         } disabled/>
-                                        <Input value={JSONParse(e.answer)[0]} color="green" className={"disabled:bg-green-100 mt-2"} disabled/>
+                                        <Input value={JSONParse(e.answer)[0]} color="green" className={"disabled:bg-green-700 disabled:text-white mt-2"} disabled/>
 
                                     </div>
                                 ) : e.tipe === "isian_panjang" ? (
-                                    <Textarea value={checkResult(e.id)} disabled/>
+                                    <>
+                                        <div className="flex gap-0">
+                                            <div>
+                                                
+                                                <IconButton onClick={() => handleSucc(k)} color="green" className="m-1">
+                                                    <CheckIcon className="w-5 h-5"></CheckIcon>
+                                                </IconButton>
+                                                <IconButton onClick={() => handleFail(k)} color="red" className="m-1">
+                                                    <XMarkIcon className="w-5 h-5"></XMarkIcon>
+                                                </IconButton>
+                                            </div>
+                                            <Textarea value={checkResult(e.id)} className="mb-2" disabled/>
+                                        </div>
+                                        <Textarea value={JSONParse(e.answer)[0]} className="disabled:bg-green-700 disabled:text-white mt-2" disabled/>
+                                    </>
                                 ) : (
                                     ""
                                 )
                             }
 
                         </CardBody>
+                       
                     </Card>
                 ))
             }
+            <Button size="lg" onClick={handleUpdate} color="orange" className="rounded-full">
+                {
+                    loading ? (
+                        <SignalIcon className="w-4 h-4 animate-spin"></SignalIcon>
+                    ) : (
+                        <span>Update</span>
+                    )
+                }
+            </Button>
+            
 
         </>
     )

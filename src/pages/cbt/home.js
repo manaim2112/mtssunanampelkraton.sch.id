@@ -46,16 +46,14 @@ export function HomeCBT() {
     const setNewStart = (act) => {
         getSoalWithIdList(Number(active)).then(e => {
             let sort = e;
-            let data = sort.map(y => [y.id, []]);
             if(act.acak) {
                 sort = e.sort((a,b) => Math.random() - .5);
-                data = sort.map(y => [y.id, []]);
             }
             window.localStorage.setItem("refresh@"+ user.nisn +"@"+ active, JSON.stringify(sort))
             window.localStorage.setItem("timing@"+ user.nisn + "@" + active, new Date())
             window.localStorage.setItem("list@"+ user.nisn + "@" + active, JSON.stringify(act))
             if(!window.localStorage.getItem("data@"+ user.nisn + "@" + active)) {
-                window.localStorage.setItem("data@"+ user.nisn + "@" + active, JSON.stringify(data))
+                window.localStorage.setItem("data@"+ user.nisn + "@" + active, JSON.stringify(sort.map(y => [y.id, []])))
             }
             nav("/cbt/start/"+ btoa(user.nisn+"@"+active))
         })
@@ -64,7 +62,7 @@ export function HomeCBT() {
     const newStart = (act) => {
         startingCBT({idlist : Number(active), iduser : Number(user.id)}).then(e => {
             if(!e) return setLoading(false)
-            setNewStart(act)
+            return setNewStart(act)
         })
     }
     const handleNext = () => {
@@ -76,7 +74,9 @@ export function HomeCBT() {
             const act = list[l];
             if(e.code !== code) return setLoading(false)
             const use = result.findIndex(O => O.idlist === active);
-            if(use === -1) newStart(act)
+            if(use === -1) {
+                return newStart(act)
+            } 
 
             return setNewStart(act) 
         })

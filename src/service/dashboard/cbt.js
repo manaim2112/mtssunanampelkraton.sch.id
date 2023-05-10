@@ -182,10 +182,20 @@ export function RemoveSoalWithId(id) {
 export function RemoveResultWithId(id) {
     return new Promise((resolve, reject) => {
         fetch(BASE_URL + "/cbt/result/id/"+ id, {
-            method : "DELETE",
-            headers : {"Content-Type" : "application/json"},
-            body : JSON.stringify({id})
+            method : "DELETE"
         }).then(r => r.json()).then(r => {
+            resolve(r.status === 201)
+        })
+    })
+}
+
+export function UpdateResultAnswerWIthId({id, answer}) {
+    return new Promise((resolve, reject) => {
+        fetch(BASE_URL + "/cbt/result/update/withId", {
+            method : "PUT",
+            headers : {"Content-Type" : "application/json"},
+            body : JSON.stringify({id, answer})
+        }).then(r =>r.json()).then(r => {
             resolve(r.status === 201)
         })
     })
