@@ -8,7 +8,6 @@ import { checkingResult, finishingCBT } from "../../service/cbt/result";
 import { Suspense } from "react";
 import { SkeletonTable } from "../../elements/skeleton/table";
 import useDocumentTitle from "../../elements/useDocumentTitle";
-import Countdown from "./element/countdown";
 import Swal from "sweetalert2";
 
 export function StartCBT() {

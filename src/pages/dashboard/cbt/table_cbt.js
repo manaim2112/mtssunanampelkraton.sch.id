@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { changePriorityCBT_list, getCBT, updateCBT_list, RemoveResultWIthListId, RemoveSoalWithListId, removeListWIthId } from "../../../service/dashboard/cbt";
+import { changePriorityCBT_list, getCBT, updateCBT_list, removeListWIthId } from "../../../service/dashboard/cbt";
 import { Button, Card, CardBody, CardFooter, CardHeader, Checkbox, Chip, Dialog, Input, Option, Select, Typography } from "@material-tailwind/react";
 import { Suspense } from "react";
 import { SkeletonTable } from "../../../elements/skeleton/table";
@@ -58,10 +58,10 @@ export function TableCBTElement({Live}) {
             cancelButtonText : "Tidak dulu"
         }).then(e => {
             if(!e.isConfirmed) return;
-            setTxtDelete("Sedang menghapus Ujian...")
+            setTxtDelete("")
             removeListWIthId(id).then(li => {
                 if(!li) return;
-                setTxtDelete("Berhasil Menghapus...")
+                setTxtDelete("Berhasil")
                 nav(0)
             })
         })
