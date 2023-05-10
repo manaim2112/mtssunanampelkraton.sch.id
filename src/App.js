@@ -30,6 +30,7 @@ import { Install } from './pages/instalation';
 import { StartCBT } from './pages/cbt/start';
 import { FinishCBT } from './pages/cbt/finish';
 import { ResultCBT } from './pages/dashboard/cbt/result';
+import { ViewResultCBT } from './pages/dashboard/cbt/view';
 
 
 function App() {
@@ -85,6 +86,7 @@ function App() {
 
             <Route path='cbt/id/:id' element={<IdCBTDashboard/>}/>
             <Route path='cbt/id/:id/result' element={<ResultCBT/>}/>
+            <Route path='cbt/id/:id/result/:userid/view' element={<ViewResultCBT/>}/>
 
             <Route path='cbt/id/:id/upload' element={<UploadWordCBTDashboard/>}/>
 

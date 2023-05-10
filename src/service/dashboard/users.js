@@ -69,12 +69,20 @@ export function getUser() {
     })
 }
 
+export function getUserWithId(id) {
+    return new Promise((resolve, reject) => {
+        fetch(BASE_URL + "/user/id/"+id).then(r => r.json()).then(r => {
+            if(r.status === 200) {
+                resolve(r.data)
+            }
+        })
+    })
+}
+
 export function getStudent(kelas) {
-    console.log(kelas)
     return new Promise((resolve, reject) => {
         try {
             fetch(BASE_URL + "/user/kelas/"+ kelas).then(r => r.json()).then(e => {
-                console.log(e)
                 if(e.status === 200) {
                     resolve(e.data)
                 } else {

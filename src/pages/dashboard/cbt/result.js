@@ -2,7 +2,6 @@ import { useState } from "react"
 import { useEffect } from "react"
 import { getCBTResultWIthListId } from "../../../service/cbt/result"
 import { Link, useParams } from "react-router-dom"
-import { getKelasAll } from "../../../service/dashboard/kelas"
 import { getStudent } from "../../../service/dashboard/users"
 import { RemoveResultWithId, getWithIdCBT } from "../../../service/dashboard/cbt"
 import { SkeletonTable } from "../../../elements/skeleton/table"
@@ -86,11 +85,11 @@ export function ResultCBT() {
             <div className="mt-5">
                 {
                     kelas.map((e,k)=> (
-                        <IconButton key={k} value={e.name} onClick={() => {
-                            getStudent(e.name).then(ruser => {
+                        <IconButton key={k} value={e} onClick={() => {
+                            getStudent(e).then(ruser => {
                                 setUser(ruser)
                             })
-                        }}/>
+                        }} className="mx-1">{e}</IconButton>
                     ))
                 }
             </div>
@@ -131,14 +130,14 @@ export function ResultCBT() {
                                         <Chip color="green" value={"Tuntas"}/>
                                     ) : (
                                         <>
-                                            <Chip color="black" value={"Belum Absen"}/>
+                                            <Chip color="gray" value={"Belum Absen"}/>
                                         </>
                                     )
                                 }</td>
                                 <td>
                                     {
                                         status(e.id) === "finish" ? (
-                                            <Link className="text-blue-400 hover:text-blue-600 hover:underline" to={"/dashboard/cbt/id/"+ id + "/result/view"}>Klik Ini</Link>
+                                            <Link className="text-blue-400 hover:text-blue-600 hover:underline" to={"/dashboard/cbt/id/"+ id + "/result/"+ e.id +"/view"}>Cek Hasil</Link>
                                         ) : "Cek Hasil"
                                     }
                                     <span className="ml-3 text-red-400 hover:text-red-600 hover:underline" onClick={() => resetResult(e.id)}> Reset </span>

@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { changePriorityCBT_list, getCBT, updateCBT_list, RemoveResultWIthListId, RemoveSoalWithListId, removeListWIthId } from "../../../service/dashboard/cbt";
 import { Button, Card, CardBody, CardFooter, CardHeader, Checkbox, Chip, Dialog, Input, Option, Select, Typography } from "@material-tailwind/react";
 import { Suspense } from "react";
 import { SkeletonTable } from "../../../elements/skeleton/table";
+import Swal from "sweetalert2";
+import { CubeTransparentIcon } from "@heroicons/react/24/outline"
 
 export function TableCBTElement({Live}) {
+    const nav = useNavigate()
     const [live, setLive] = useState([])
     const [priority, setPriority] = useState(false)
     const [open, setOpen] = useState(false)
@@ -16,6 +19,7 @@ export function TableCBTElement({Live}) {
     const [minDurasi, setMinDurasi] = useState(0)
     const [kelas, setKelas] = useState("")
     const [loading, setLoading] = useState(false)
+    const [txtDelete, setTxtDelete] = useState("Delete")
     const ChangePriority = (event, id) => {
         setPriority(true)
         changePriorityCBT_list(Number(id), event.target.checked).then(e => {
@@ -46,17 +50,19 @@ export function TableCBTElement({Live}) {
         })
     }
     const handlerListRemove = (id) => {
-        RemoveResultWIthListId(id).then(e=> {
-            if(!e) return;
-            RemoveSoalWithListId(id).then( r => {
-                if(!e) return;
-                removeListWIthId(id).then(r => {
-                    if(!e) return;
-                    const indexLive = live.findIndex(Obj => Obj.id === id)
-                    let l = live;
-                    l.splice(indexLive, 1)
-                    setLive(l)
-                })
+        Swal.fire({
+            title : "Comfirmation delete",
+            icon : "warning",
+            showCancelButton : true,
+            confirmButtonText : "Saya yakin, hapus saja",
+            cancelButtonText : "Tidak dulu"
+        }).then(e => {
+            if(!e.isConfirmed) return;
+            setTxtDelete("Sedang menghapus Ujian...")
+            removeListWIthId(id).then(li => {
+                if(!li) return;
+                setTxtDelete("Berhasil Menghapus...")
+                nav(0)
             })
         })
     }
@@ -141,7 +147,10 @@ export function TableCBTElement({Live}) {
                                         {e.tokelas}
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <span onClick={() => handlerListRemove(k)} className="font-medium cursor-pointer text-red-600 dark:text-red-500 hover:underline mr-3">Delete</span>
+                                        <span onClick={() => handlerListRemove(k)} className="font-medium cursor-pointer text-red-600 dark:text-red-500 hover:underline mr-3">
+                                            {txtDelete === "Delete" ? "" : <CubeTransparentIcon className="animate-spin w-5 h-5 mr-2"/> }
+                                            {txtDelete}
+                                        </span>
                                         <span onClick={() => handlerListChange(k)} className="font-medium cursor-pointer text-orange-600 dark:text-orange-500 hover:underline mr-3">Edit</span>
                                         <Link to={"/dashboard/cbt/id/" + e.id} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Open</Link>
                                     </td>

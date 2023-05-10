@@ -31,7 +31,9 @@ export function StartCBT() {
     
     const [textSizing, setTextSizing] = useState(16)
     const [open, setOpen] = useState(false)
-    
+    const [remainingTime, setRemainingTime] = useState(60); // waktu dalam detik
+    const [intervalId, setIntervalId] = useState(null);
+    const [showExit, setShowExit] = useState(false);
     useEffect(()=> {
         const get = getDataStartCBT({start})
         if(!get) return nav("/cbt")
@@ -52,11 +54,28 @@ export function StartCBT() {
             const timeFlush = timeStart + durasi*60*1000;
             let timeDifferent = Math.floor((timeFlush - timeNow)/1000);
             setTiming(timeDifferent)
+            setRemainingTime(timeDifferent)
 
             setWaitingLoad(true)
         })
 
     }, [])
+
+    useEffect(() => {
+        if (remainingTime <= 0) {
+            finishing()
+        clearInterval(intervalId);
+        return;
+        }
+
+        const id = setInterval(() => {
+            checkingButtonFinish()
+            setRemainingTime(prevTime => prevTime - 1);
+        }, 1000);   
+
+        setIntervalId(id);
+        return () => clearInterval(id);
+    }, [remainingTime]);
 
     const nextButton = () => {
         if(active < soal.length-1) {
@@ -108,9 +127,7 @@ export function StartCBT() {
         )
     }
 
-    const [remainingTime, setRemainingTime] = useState(timing); // waktu dalam detik
-    const [intervalId, setIntervalId] = useState(null);
-    const [showExit, setShowExit] = useState(false);
+    
     const finishing = () => {
 
         finishingCBT({idlist : list.id, iduser : user.id, answer : JSON.stringify(data)}).then(e => {
@@ -124,21 +141,7 @@ export function StartCBT() {
             setShowExit(false)
         }
     }
-    useEffect(() => {
-        if (remainingTime <= 0) {
-            finishing()
-        clearInterval(intervalId);
-        return;
-        }
-
-        const id = setInterval(() => {
-            checkingButtonFinish()
-            setRemainingTime(prevTime => prevTime - 1);
-        }, 1000);
-
-        setIntervalId(id);
-        return () => clearInterval(id);
-    }, [remainingTime]);
+    
 
     const hours = Math.floor(remainingTime / 3600);
     const minutes = Math.floor((remainingTime % 3600) / 60);
@@ -244,7 +247,7 @@ export function StartCBT() {
                                                                                 savingData(jj);
                                                                             }}
                                                                             checked={data[active] && data[active][0] === soal[active].id && data[active][1].includes(k)}
-                                                                            />
+                                                                            /> 
 
                                                                         <label htmlFor={"options_key_"+ soal[active].id + "_key_"+ k} className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{e}</label>
                                                                     </div>
@@ -286,12 +289,12 @@ export function StartCBT() {
             <div className="fixed bottom-0 z-50 w-full h-16 -translate-x-1/2 bg-white border-t border-gray-200 left-1/2 dark:bg-gray-700 dark:border-gray-600">
                 <div className="grid h-full max-w-xl grid-cols-6 mx-auto items-center">
                     <div className="col-span-2 text-center">
-                        <Typography color="red" variant="h3">{hours < 10 ? "0" : ""}{hours}:{minutes < 10 ? '0' : ''}{minutes}:{seconds < 10 ? '0' : ''}{seconds}</Typography>
+                        <Typography color="red" variant="h4">{hours < 10 ? "0" : ""}{hours}:{minutes < 10 ? '0' : ''}{minutes}:{seconds < 10 ? '0' : ''}{seconds}</Typography>
                     </div>
                     
 
                     <div className="flex items-center justify-center col-span-2">
-                        <div className="flex items-center justify-between w-full text-gray-600 dark:text-gray-400 bg-gray-100 rounded-lg dark:bg-gray-600 max-w-[128px] mx-2">
+                        <div className="flex items-center justify-between w-full hover:scale-125 transition-all ease-in-out text-gray-600 dark:text-gray-400 bg-gray-100 rounded-lg dark:bg-gray-600 max-w-[128px] mx-2">
                             <button type="button" onClick={backButton} className="inline-flex items-center justify-center h-8 px-1 bg-gray-100 rounded-l-lg dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-800">
                                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                     <path clipRule="evenodd" fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"></path>
