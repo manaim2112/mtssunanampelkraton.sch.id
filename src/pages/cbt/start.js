@@ -108,12 +108,49 @@ export function StartCBT() {
         )
     }
 
+    const [remainingTime, setRemainingTime] = useState(timing); // waktu dalam detik
+    const [intervalId, setIntervalId] = useState(null);
+    const [showExit, setShowExit] = useState(false);
+    const finishing = () => {
+
+        finishingCBT({idlist : list.id, iduser : user.id, answer : JSON.stringify(data)}).then(e => {
+            nav("/cbt/finish/"+ start)
+        })
+    }
+    const checkingButtonFinish = () => {
+        if(Number(list.min_durasi)*60 >= remainingTime) {
+            setShowExit(true);
+        } else {
+            setShowExit(false)
+        }
+    }
+    useEffect(() => {
+        if (remainingTime <= 0) {
+            finishing()
+        clearInterval(intervalId);
+        return;
+        }
+
+        const id = setInterval(() => {
+            checkingButtonFinish()
+            setRemainingTime(prevTime => prevTime - 1);
+        }, 1000);
+
+        setIntervalId(id);
+        return () => clearInterval(id);
+    }, [remainingTime]);
+
+    const hours = Math.floor(remainingTime / 3600);
+    const minutes = Math.floor((remainingTime % 3600) / 60);
+    const seconds = remainingTime % 60;
+
+
     return(
         <Suspense fallback={"Sedang memproses data"}>
             <div className="bg-white shadow-md p-4 flex place-items-center text-center">
                 {list.name}
 
-                { active === soal.length-1 ? (
+                { (active === soal.length-1) && showExit ? (
                                     <>
                                         <IconButton onClick={handleFinish} ripple color="white">
                                             <XCircleIcon className="w-6 h-6 mb-1 text-red-400"></XCircleIcon>
@@ -249,7 +286,7 @@ export function StartCBT() {
             <div className="fixed bottom-0 z-50 w-full h-16 -translate-x-1/2 bg-white border-t border-gray-200 left-1/2 dark:bg-gray-700 dark:border-gray-600">
                 <div className="grid h-full max-w-xl grid-cols-6 mx-auto items-center">
                     <div className="col-span-2 text-center">
-                        <Countdown time={timing} data={data} user={user} list={list} start={start}/>
+                        <Typography color="red" variant="h3">{hours < 10 ? "0" : ""}{hours}:{minutes < 10 ? '0' : ''}{minutes}:{seconds < 10 ? '0' : ''}{seconds}</Typography>
                     </div>
                     
 

@@ -45,14 +45,15 @@ export function HomeCBT() {
     }
     const setNewStart = (act) => {
         getSoalWithIdList(Number(active)).then(e => {
+            let sort = e;
             if(act.acak) {
-                e = e.sort((a,b) => Math.random() - .5);
+                sort = e.sort((a,b) => Math.random() - .5);
             }
-            window.localStorage.setItem("refresh@"+ user.nisn +"@"+ active, JSON.stringify(e))
+            window.localStorage.setItem("refresh@"+ user.nisn +"@"+ active, JSON.stringify(sort))
             window.localStorage.setItem("timing@"+ user.nisn + "@" + active, new Date())
             window.localStorage.setItem("list@"+ user.nisn + "@" + active, JSON.stringify(act))
             if(!window.localStorage.getItem("data@"+ user.nisn + "@" + active)) {
-                const data = e.map(y => [y.id, []]);
+                const data = sort.map(y => [y.id, []]);
                 
                 window.localStorage.setItem("data@"+ user.nisn + "@" + active, JSON.stringify(data))
             }

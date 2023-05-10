@@ -132,11 +132,58 @@ export function updateStartEndCBT({id, mulai, berakhir}) {
     })
 }
 
+export function RemoveSoalWithListId(id) {
+    return new Promise((resolve, reject) => {
+        fetch(BASE_URL + "/cbt/soal/withlist/id/"+ id, {
+            method : "DELETE",
+            headers : {"Content-Type" : "application/json"},
+            body : JSON.stringify({})
+        }).then(r => r.json()).then(r => {
+            resolve(r.status === 201)
+        })
+    })
+}
+
+export function removeListWIthId(id) {
+    return new Promise((resolve, reject) => {
+        fetch(BASE_URL + "/cbt/list/id/"+ id, {
+            method : "DELETE",
+            headers : {"Content-Type" : "application/json"},
+            body : JSON.stringify({})
+        }).then(r => r.json()).then(r => {
+            resolve(r.status === 201)
+        })
+    })
+}
+export function RemoveResultWIthListId(id) {
+    return new Promise((resolve, reject) => {
+        fetch(BASE_URL + "/cbt/result/withlist/id/"+ id, {
+            method : "DELETE",
+            headers : {"Content-Type" : "application/json"},
+            body : JSON.stringify({})
+        }).then(r => r.json()).then(r => {
+            resolve(r.status === 201)
+        })
+    })
+}
+
 export function RemoveSoalWithId(id) {
     return new Promise((resolve, reject) => {
         fetch(BASE_URL + "/cbt/soal/id/"+ id, {
             method : "DELETE",
             headers : {"Content-Type": "application/json"},
+            body : JSON.stringify({id})
+        }).then(r => r.json()).then(r => {
+            resolve(r.status === 201)
+        })
+    })
+}
+
+export function RemoveResultWithId(id) {
+    return new Promise((resolve, reject) => {
+        fetch(BASE_URL + "/cbt/result/id/"+ id, {
+            method : "DELETE",
+            headers : {"Content-Type" : "application/json"},
             body : JSON.stringify({id})
         }).then(r => r.json()).then(r => {
             resolve(r.status === 201)

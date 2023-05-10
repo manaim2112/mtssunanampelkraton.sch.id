@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { changePriorityCBT_list, getCBT, updateCBT_list } from "../../../service/dashboard/cbt";
+import { changePriorityCBT_list, getCBT, updateCBT_list, RemoveResultWIthListId, RemoveSoalWithListId, removeListWIthId } from "../../../service/dashboard/cbt";
 import { Button, Card, CardBody, CardFooter, CardHeader, Checkbox, Chip, Dialog, Input, Option, Select, Typography } from "@material-tailwind/react";
 import { Suspense } from "react";
 import { SkeletonTable } from "../../../elements/skeleton/table";
@@ -43,6 +43,21 @@ export function TableCBTElement({Live}) {
         updateCBT_list({id, name, jenis, durasi, min_durasi : minDurasi, tokelas : kelas}).then(r => {
             setLoading(false)
             handlerOpen()
+        })
+    }
+    const handlerListRemove = (id) => {
+        RemoveResultWIthListId(id).then(e=> {
+            if(!e) return;
+            RemoveSoalWithListId(id).then( r => {
+                if(!e) return;
+                removeListWIthId(id).then(r => {
+                    if(!e) return;
+                    const indexLive = live.findIndex(Obj => Obj.id === id)
+                    let l = live;
+                    l.splice(indexLive, 1)
+                    setLive(l)
+                })
+            })
         })
     }
     useEffect(() => {
@@ -126,7 +141,7 @@ export function TableCBTElement({Live}) {
                                         {e.tokelas}
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <span onClick={() => handlerListChange(k)} className="font-medium cursor-pointer text-red-600 dark:text-red-500 hover:underline mr-3">Delete</span>
+                                        <span onClick={() => handlerListRemove(k)} className="font-medium cursor-pointer text-red-600 dark:text-red-500 hover:underline mr-3">Delete</span>
                                         <span onClick={() => handlerListChange(k)} className="font-medium cursor-pointer text-orange-600 dark:text-orange-500 hover:underline mr-3">Edit</span>
                                         <Link to={"/dashboard/cbt/id/" + e.id} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Open</Link>
                                     </td>
