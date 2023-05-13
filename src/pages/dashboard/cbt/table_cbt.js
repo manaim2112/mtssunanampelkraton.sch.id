@@ -63,8 +63,6 @@ export function TableCBTElement({Live}) {
                 setTxtDelete("Berhasil")
                 let d = live;
                 const index = d.findIndex(Obj => Obj.id === id)
-                console.log(d)
-                console.log(id, index)
                 d.splice(index, 1);
                 setLive(d)
             })
@@ -74,7 +72,6 @@ export function TableCBTElement({Live}) {
         getCBT().then(d => {
             const l = d.map(e => "Delete")
             setTxtDelete(l)
-            console.log(d)
             setLive(d)
         })
     }, [])
