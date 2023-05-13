@@ -55,6 +55,8 @@ export function HomeCBT() {
             if(!window.localStorage.getItem("data@"+ user.nisn + "@" + active)) {
                 window.localStorage.setItem("data@"+ user.nisn + "@" + active, JSON.stringify(sort.map(y => [y.id, []])))
             }
+            
+            setLoading(false)
             nav("/cbt/start/"+ btoa(user.nisn+"@"+active))
         })
     }
@@ -69,8 +71,7 @@ export function HomeCBT() {
         setLoading(true)
         checkingCodeWithIdList(active).then(e => {
             const l = list.findIndex(O => O.id === active);
-            if(l === -1) return;
-            setLoading(false)
+            if(l === -1) return setLoading(false);
             const act = list[l];
             if(e.code !== code) return setLoading(false)
             const use = result.findIndex(O => O.idlist === active);

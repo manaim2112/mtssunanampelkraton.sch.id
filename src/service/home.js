@@ -5,8 +5,8 @@ export function getHomeDataService() {
             subtitle : "Fokus, integritas, level up Anak anda dengan karakter berakhlakul karimah, IPTEK maupun IMTAK",
             ceo : {
                 name : "RIF'AN NADHIFI, S.Si",
-                image : "https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gouch.png",
-                motto : "Kami Terus memberikan pelayanan terbaik untuk semua level keanggotaan pada sekolah, loyalitas dan integritas beserta level up peserta didik dengan berkarakter yang baik adalah motto kita",
+                image : "https://i.ibb.co/MMnXQqT/Whats-App-Image-2023-05-09-at-11-38-41.jpg",
+                motto : "Dengan memiliki ilmu kita dapat menggenggam dunia, dan mengejar mimpi besar yang kita punya. Sehingga akan menjadi orang yang berguna bagi masyarakat dan bangsa",
             }
         })
     })

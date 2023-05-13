@@ -46,10 +46,10 @@ export function IndexHomes() {
                         <p className="text-2xl italic font-medium text-gray-900 dark:text-white">"{data.ceo ? data.ceo.motto : "Oh No,"}"</p>
                     </blockquote>
                     <figcaption className="flex items-center justify-center mt-6 space-x-3">
-                        <img className="w-6 h-6 rounded-full" src={data.ceo ? data.ceo.image : "Oh No,"} alt={data.ceo ? data.ceo.name : "Oh No,"}/>
+                        <img className="w-16 h-16 rounded-full border" src={data.ceo ? data.ceo.image : "Oh No,"} alt={data.ceo ? data.ceo.name : "Oh No,"}/>
                         <div className="flex items-center divide-x-2 divide-gray-500 dark:divide-gray-700">
                             <cite className="pr-3 font-medium text-gray-900 dark:text-white">{data.ceo ? data.ceo.name : "Oh No,"}</cite>
-                            <cite className="pl-3 text-sm text-gray-500 dark:text-gray-400">Kepala Madrasah</cite>
+                            <cite className="pl-3 text-sm text-gray-500 dark:text-gray-400">Kepala MTs Sunan Ampel Kraton</cite>
                         </div>
                     </figcaption>
                 </figure>

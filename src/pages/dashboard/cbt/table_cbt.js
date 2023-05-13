@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { changePriorityCBT_list, getCBT, updateCBT_list, removeListWIthId } from "../../../service/dashboard/cbt";
 import { Button, Card, CardBody, CardFooter, CardHeader, Checkbox, Chip, Dialog, Input, Option, Select, Typography } from "@material-tailwind/react";
 import { Suspense } from "react";
@@ -8,7 +8,6 @@ import Swal from "sweetalert2";
 import { CubeTransparentIcon } from "@heroicons/react/24/outline"
 
 export function TableCBTElement({Live}) {
-    const nav = useNavigate()
     const [live, setLive] = useState([])
     const [priority, setPriority] = useState(false)
     const [open, setOpen] = useState(false)
@@ -19,7 +18,7 @@ export function TableCBTElement({Live}) {
     const [minDurasi, setMinDurasi] = useState(0)
     const [kelas, setKelas] = useState("")
     const [loading, setLoading] = useState(false)
-    const [txtDelete, setTxtDelete] = useState("Delete")
+    const [txtDelete, setTxtDelete] = useState([])
     const ChangePriority = (event, id) => {
         setPriority(true)
         changePriorityCBT_list(Number(id), event.target.checked).then(e => {
@@ -62,15 +61,23 @@ export function TableCBTElement({Live}) {
             removeListWIthId(id).then(li => {
                 if(!li) return;
                 setTxtDelete("Berhasil")
-                nav(0)
+                let d = live;
+                const index = d.findIndex(Obj => Obj.id === id)
+                console.log(d)
+                console.log(id, index)
+                d.splice(index, 1);
+                setLive(d)
             })
         })
     }
     useEffect(() => {
         getCBT().then(d => {
+            const l = d.map(e => "Delete")
+            setTxtDelete(l)
+            console.log(d)
             setLive(d)
         })
-    }, [live])
+    }, [])
     return(
         <Suspense fallback={<SkeletonTable/>}>
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -147,9 +154,9 @@ export function TableCBTElement({Live}) {
                                         {e.tokelas}
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <span onClick={() => handlerListRemove(k)} className="font-medium cursor-pointer text-red-600 dark:text-red-500 hover:underline mr-3">
-                                            {txtDelete === "Delete" ? "" : <CubeTransparentIcon className="animate-spin w-5 h-5 mr-2"/> }
-                                            {txtDelete}
+                                        <span onClick={() => handlerListRemove(e.id)} className="font-medium cursor-pointer text-red-600 dark:text-red-500 hover:underline mr-3">
+                                            {txtDelete[k] === "Delete" ? "" : <CubeTransparentIcon className="animate-spin w-5 h-5 mr-2"/> }
+                                            {txtDelete[k]}
                                         </span>
                                         <span onClick={() => handlerListChange(k)} className="font-medium cursor-pointer text-orange-600 dark:text-orange-500 hover:underline mr-3">Edit</span>
                                         <Link to={"/dashboard/cbt/id/" + e.id} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Open</Link>

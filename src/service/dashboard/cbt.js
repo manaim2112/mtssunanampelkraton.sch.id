@@ -148,8 +148,6 @@ export function removeListWIthId(id) {
     return new Promise((resolve, reject) => {
         fetch(BASE_URL + "/cbt/list/id/"+ id, {
             method : "DELETE",
-            headers : {"Content-Type" : "application/json"},
-            body : JSON.stringify({id})
         }).then(r => r.json()).then(r => {
             resolve(r.status === 201)
         })

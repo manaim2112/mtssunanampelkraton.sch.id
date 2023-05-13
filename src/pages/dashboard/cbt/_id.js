@@ -176,6 +176,7 @@ export function DataIdCBTDashboardElement({xid}) {
 
     useEffect(() => {
         getDataWithIdCBT(xid).then(d => {
+            console.log(d)
             setList(d)
         })
     }, [xid])
@@ -236,10 +237,10 @@ export function DataIdCBTDashboardElement({xid}) {
                                     JSONParse(e.options).map((t, ke) => (
                                         <li key={ke}>
                                             { JSONParse(e.answer).includes(ke) ? (
-                                                <span className="bg-green-100 text-green-700">
-                                                    {t}
-                                                </span>
-                                            ) : t }
+                                                <span className="bg-green-100 text-green-700" dangerouslySetInnerHTML={{ __html: t }}></span>
+                                            ) : (
+                                                <span dangerouslySetInnerHTML={{ __html: t }}></span>
+                                            )}
                                         </li>
                                     ))
                                 }
