@@ -54,7 +54,10 @@ export function UploadWordCBTDashboard() {
                         //     }
                         // })
                     })
-                })
+                }),
+                styleMap: [
+                    "u => em"
+                ]
             };
             window.mammoth.convertToHtml({arrayBuffer: arrayBuffer}, options).then(function (resultObject) {
                 try {

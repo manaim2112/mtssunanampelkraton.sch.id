@@ -78,14 +78,15 @@ export function getDataStartCBT({start}) {
         const getData = JSON.parse(localStorage.getItem("data@"+ nisn + "@"+ idlist))
         const getTiming = new Date(localStorage.getItem("timing@"+ nisn + "@"+ idlist))
         const getList = JSON.parse(localStorage.getItem("list@"+ nisn + "@"+ idlist))
-
-        return {
-            user,
-            list : getList,
-            soal : getSoal,
-            data : getData,
-            timing : getTiming
-        }
+        return new Promise((resolve, reject) => {
+            resolve({
+                user,
+                list : getList,
+                soal : getSoal,
+                data : getData,
+                timing : getTiming
+            })
+        })
     } catch (error) {
         
         return false

@@ -4,9 +4,9 @@ import { HrElement } from "../../../elements/hr";
 import { useEffect } from "react";
 import { countKelas, deleteKelas, getKelasAll, insertKelas } from "../../../service/dashboard/kelas";
 import { useState } from "react";
-import { Button, Chip, Input, Option, Select } from "@material-tailwind/react";
-import { getStudent, insertManyUser } from "../../../service/dashboard/users";
-import { Link } from "react-router-dom";
+import { Button, Chip, Dialog, DialogBody, DialogFooter, DialogHeader, Input, Option, Select, Typography } from "@material-tailwind/react";
+import { getStudent, insertManyUser, insertUser } from "../../../service/dashboard/users";
+import { Link, useNavigate } from "react-router-dom";
 import { useRef } from "react";
 import XLSX from 'xlsx';
 import useDocumentTitle from "../../../elements/useDocumentTitle"
@@ -19,7 +19,15 @@ export function IndexUsersDashboard() {
     const [kelas, setkelas] = useState([])
     const [user, setUser] = useState([])
     const [loading, setLoading] = useState(true)
+    const [open, setOpen] = useState(false)
+
+    const [nisn, setNisn] = useState("")
+    const [name, setName] = useState("")
+    const [kel, setKel] = useState("")
+    const [sandi, setSandi] = useState("")
     const fileInputRef = useRef(null)
+    const nav = useNavigate()
+    const handleOpen = () => setOpen(!open)
     const handleInputFile = () => {
         fileInputRef.current.click();
 
@@ -71,6 +79,17 @@ export function IndexUsersDashboard() {
         })
     }
 
+    const confirmSave = () => {
+        insertUser({nisn, name, kelas : kel, sandi}).then(r => {
+            if(r) {
+                nav(0)
+            }
+        })
+    }
+    const handleNewUser = () => {
+        handleOpen()
+    }
+
     const insertMany = (event) => {
         const file = event.target.files[0];
         const reader = new FileReader();
@@ -103,7 +122,8 @@ export function IndexUsersDashboard() {
         <Suspense fallback={<SkeletonTable/>}>
             <JumbrotonElement to={"/"} badge={"tutorial"} title={"Beginilah cara mengelola data peserta didik pada Yami-sis"} desc={"Pastikan data sudah sesuai dengan data yang sebenarnya ya, tinggal klik tambah dan simpan, pastikan jabatan juga sudah disetting"} />
             <HrElement/>
-            <Button value="Upload Via Excel" className="" onClick={handleInputFile}>Upload Via Excel</Button>
+            <Button value="Upload Via Excel" className="m-1" onClick={handleInputFile}>Upload Via Excel</Button>
+            <Button value="Add new User" className="m-1" onClick={handleNewUser}>Tambah Peserta didik baru</Button>
 
                     <input type="file" style={{ "display" : "none"}} ref={fileInputRef}  onChange={insertMany}/>
             <div className="grid grid-cols-5 gap-4 mt-8">
@@ -212,6 +232,32 @@ export function IndexUsersDashboard() {
                 </div>
                 
             </div>
+
+            <Dialog open={open} handler={handleOpen} size="xl">
+                    <DialogHeader>
+                        <Typography variant="h3">Tambah baru</Typography>
+                    </DialogHeader>
+                    <DialogBody>
+                        <div className="mt-3" onChange={(e) => setNisn(e.target.value)}>
+                        <Input label="NISN"/>
+                        </div>
+                        <div className="mt-3">
+                        <Input label="Nama" onChange={(e) => setName(e.target.value)}/>
+                        </div>
+                        <div className="mt-3">
+                        <Input label="Kelas" onChange={(e) => setKel(e.target.value)}/>
+                        </div>
+                        <div className="mt-3">
+                        <Input label="Sandi" onChange={(e) => setSandi(e.target.value)}/>
+                        </div>
+
+                    </DialogBody>
+                    <DialogFooter>
+                        <Button color="orange" onClick={handleOpen} className="m-2"> Tutup </Button>
+                        <Button color="blue" onClick={confirmSave} className="m-2">Simpan</Button>
+                    </DialogFooter>
+
+            </Dialog>
         </Suspense>
     )
 }

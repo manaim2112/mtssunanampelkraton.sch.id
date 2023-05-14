@@ -13,6 +13,11 @@
   }
 }
 
+em {
+  font-style: normal;         /* Removes italics */
+  text-decoration: underline; /* Makes underline */
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;

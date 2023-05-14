@@ -20,9 +20,9 @@ export function CBTIndex() {
     
 
     return(
-        <>
+        <div className="h-screen bg-gradient-to-tr from-blue-gray-200 via-yellow-100 to-green-100">
             <Outlet></Outlet>
             
-        </>
+        </div>
     )
 }

@@ -21,6 +21,8 @@ export function ViewResultCBT() {
     const [score, setScore] = useState([])
     const [ans, setAns] = useState([])
     const [loading, setLoading] = useState(false)
+    const [viewPilgan, setViewPilgan] = useState(false)
+    const [viewIsian, setViewIsian] = useState(true)
     useEffect(() => {
         getResultWithUserId(userid).then(r => {
             setResult(r)
@@ -144,70 +146,93 @@ export function ViewResultCBT() {
             <Typography variant="h3"> Hasil dari {user.name}</Typography> {user.nisn}
             <Typography variant="h4">{list.jenis} - {list.name}</Typography>
             <Typography variant="h5">Nilai Sementara {score.reduce((a,b) => Number(a)+Number(b))}</Typography>
+
+            <Checkbox name="pilgan" id="isian" onChange={() => setViewPilgan(!viewPilgan)} label="Pilihan ganda/Isian Singkat" defaultChecked={viewPilgan}/>
+
+            <Checkbox name="isian" id="isian" onChange={() => setViewIsian(!viewIsian)} label="Isian Panjang" defaultChecked={viewIsian}/>
             {
                 soal.map((e,k) => (
-                    <Card key={k} className={`my-2 ${(ans[k] === true) ? "bg-green-100" : (ans[k] === null) ? "bg-white" : "bg-red-100"}`}>
-                        <CardBody>
-                            <Chip color="blue" value={"Nomer "+ (k+1) } className="mx-1"/>
-                            {
-                                (ans[k] === true) ? "score +"+e.score : ""
-                            }
-                            <div className="mt-4" dangerouslySetInnerHTML={{ __html: e.question }}></div>
-                            {
-                                e.tipe === "pilgan" ? (
-                                    <>
-                                        {
-                                            JSONParse(e.options).map((opt, keyopt) => (
-                                                <>
-                                                    {
-                                                        JSON.stringify(JSON.parse(e.answer).sort()) === JSON.stringify(checkResult(e.id)) ? (
-                                                            <Checkbox name={"checkbox-"+ e.id} id={"checkbox-id-"+ e.id + "-" + keyopt} label={opt} disabled checked={
-                                                                checkResult(e.id).includes(keyopt)
-                                                            } color="green"></Checkbox>
-                                                        ) : (
-                                                            <Checkbox name={"checkbox-"+ e.id} id={"checkbox-id-"+ e.id + "-" + keyopt} label={opt} disabled checked={
-                                                                JSON.parse(e.answer).includes(keyopt) || checkResult(e.id).includes(keyopt)
-                                                            } color={JSON.parse(e.answer).includes(keyopt) ? "green" : "red"}></Checkbox>
+                    <>
+                        
+                                {
+                                    e.tipe === "pilgan" && viewPilgan ? (
+                                        <>
+                                        <Card key={k} className={`my-2 ${(ans[k] === true) ? "bg-green-100" : (ans[k] === null) ? "bg-white" : "bg-red-100"}`}>
+                                            <CardBody>
+                                                <Chip color="blue" value={"Nomer "+ (k+1) } className="mx-1"/>
+                                                {
+                                                    (ans[k] === true) ? "score +"+e.score : ""
+                                                }
+                                                <div className="mt-4" dangerouslySetInnerHTML={{ __html: e.question }}></div>
+                                            {
+                                                JSONParse(e.options).map((opt, keyopt) => (
+                                                    <>
+                                                        {
+                                                            JSON.stringify(JSON.parse(e.answer).sort()) === JSON.stringify(checkResult(e.id)) ? (
+                                                                <Checkbox name={"checkbox-"+ e.id} id={"checkbox-id-"+ e.id + "-" + keyopt} label={opt} disabled checked={
+                                                                    checkResult(e.id).includes(keyopt)
+                                                                } color="green"></Checkbox>
+                                                            ) : (
+                                                                <Checkbox name={"checkbox-"+ e.id} id={"checkbox-id-"+ e.id + "-" + keyopt} label={opt} disabled checked={
+                                                                    JSON.parse(e.answer).includes(keyopt) || checkResult(e.id).includes(keyopt)
+                                                                } color={JSON.parse(e.answer).includes(keyopt) ? "green" : "red"}></Checkbox>
 
-                                                        )
-                                                    }
-                                                </>
+                                                            )
+                                                        }
+                                                    </>
 
-                                            ))
-                                        }
-                                    </>
-                                ) : e.tipe === "isian_singkat" ? (
-                                    <div>
-                                        <Input value={checkResult(e.id)} icon={<XMarkIcon className="w-4 h-4"/>} className={
-                                            checkResult(e.id)[0] === JSONParse(e.answer)[0] ? "disabled:bg-green-700 text-white" : "disabled:bg-red-700 text-white"
-                                        } disabled/>
-                                        <Input value={JSONParse(e.answer)[0]} color="green" className={"disabled:bg-green-700 disabled:text-white mt-2"} disabled/>
-
-                                    </div>
-                                ) : e.tipe === "isian_panjang" ? (
-                                    <>
-                                        <div className="flex gap-0">
-                                            <div>
-                                                
-                                                <IconButton onClick={() => handleSucc(k)} color="green" className="m-1">
-                                                    <CheckIcon className="w-5 h-5"></CheckIcon>
-                                                </IconButton>
-                                                <IconButton onClick={() => handleFail(k)} color="red" className="m-1">
-                                                    <XMarkIcon className="w-5 h-5"></XMarkIcon>
-                                                </IconButton>
-                                            </div>
-                                            <Textarea value={checkResult(e.id)} className="mb-2" disabled/>
+                                                ))
+                                            }
+                                            </CardBody>
+                                            </Card>
+                                        </>
+                                    ) : e.tipe === "isian_singkat" && viewPilgan ? (
+                                        <div>
+                                            <Card key={k} className={`my-2 ${(ans[k] === true) ? "bg-green-100" : (ans[k] === null) ? "bg-white" : "bg-red-100"}`}>
+                                            <CardBody>
+                                                <Chip color="blue" value={"Nomer "+ (k+1) } className="mx-1"/>
+                                                {
+                                                    (ans[k] === true) ? "score +"+e.score : ""
+                                                }
+                                                <div className="mt-4" dangerouslySetInnerHTML={{ __html: e.question }}></div>
+                                            <Input value={checkResult(e.id)} icon={<XMarkIcon className="w-4 h-4"/>} className={
+                                                checkResult(e.id)[0] === JSONParse(e.answer)[0] ? "disabled:bg-green-700 text-white" : "disabled:bg-red-700 text-white"
+                                            } disabled/>
+                                            <Input value={JSONParse(e.answer)[0]} color="green" className={"disabled:bg-green-700 disabled:text-white mt-2"} disabled/>
+                                            </CardBody>
+                                            </Card>
                                         </div>
-                                        <Textarea value={JSONParse(e.answer)[0]} className="disabled:bg-green-700 disabled:text-white mt-2" disabled/>
-                                    </>
-                                ) : (
-                                    ""
-                                )
-                            }
+                                    ) : e.tipe === "isian_panjang" && viewIsian ? (
+                                        <>
+                                        <Card key={k} className={`my-2 ${(ans[k] === true) ? "bg-green-100" : (ans[k] === null) ? "bg-white" : "bg-red-100"}`}>
+                                            <CardBody>
+                                                <Chip color="blue" value={"Nomer "+ (k+1) } className="mx-1"/>
+                                                {
+                                                    (ans[k] === true) ? "score +"+e.score : ""
+                                                }
+                                                <div className="mt-4" dangerouslySetInnerHTML={{ __html: e.question }}></div>
+                                            <div className="flex gap-0">
+                                                <div>
+                                                    
+                                                    <IconButton onClick={() => handleSucc(k)} color="green" className="m-1">
+                                                        <CheckIcon className="w-5 h-5"></CheckIcon>
+                                                    </IconButton>
+                                                    <IconButton onClick={() => handleFail(k)} color="red" className="m-1">
+                                                        <XMarkIcon className="w-5 h-5"></XMarkIcon>
+                                                    </IconButton>
+                                                </div>
+                                                <Textarea value={checkResult(e.id)} className="mb-2" disabled/>
+                                            </div>
+                                            <Textarea value={JSONParse(e.answer)[0]} className="disabled:bg-green-700 disabled:text-white mt-2" disabled/>
+                                            </CardBody>
+                                            </Card>
+                                        </>
+                                    ) : (
+                                        ""
+                                    )
+                                }
 
-                        </CardBody>
-                       
-                    </Card>
+                    </>
                 ))
             }
             <Button size="lg" onClick={handleUpdate} color="orange" className="rounded-full">

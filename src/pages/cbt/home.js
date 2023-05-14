@@ -85,7 +85,7 @@ export function HomeCBT() {
     
     return (
         <>
-            <div className="flex">
+            <div className="flex h-screen overflow-y-auto">
                 <div className="p-8 bg-gray-100 h-screen sticky top-2 hidden md:inline-block">
 
                     <IconButton color="white" ripple={true} onClick={logOut}>
@@ -100,14 +100,15 @@ export function HomeCBT() {
                     <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4">
                         {
                             list.map((e,k) => (
-                                <Card key={k}>
+                                <Card key={k} className="m-1">
                                     <CardHeader variant="gradient"
                                 color="yellow"
-                                className="mb-2 mt-5 grid h-8 place-items-center">{e.jenis}</CardHeader>
+                                className="mb-2 mt-0 grid h-8 place-items-center">{e.jenis}</CardHeader>
                                     <CardBody>
                                         <Typography variant="h5">{e.name}</Typography>
                                         <span className="text-sm">Pelaksanaan
                                         <br></br> {e.mulai} - {e.berakhir}</span>
+                                        <div className="">Waktu : {e.durasi} menit</div>
                                     </CardBody>
                                     <CardFooter>
                                         { 

@@ -95,6 +95,18 @@ export function getStudent(kelas) {
     })
 }
 
+export function insertUser({nisn, name, kelas, sandi}) {
+    return new Promise((resolve, reject) => {
+        fetch(BASE_URL + "/user/create", {
+            method : "POST",
+            headers : {"Content-Type" : "application/json"},
+            body : JSON.stringify({nisn, name, kelas, sandi})
+        }).then(r => r.json()).then(r => {
+            resolve(r.status === 201)
+        })
+    })
+}
+
 export function insertManyUser(data) {
     return new Promise((resolve, reject) => {
         fetch(BASE_URL + "/user/createmany", {

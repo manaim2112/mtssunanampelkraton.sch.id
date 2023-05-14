@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { JSONParse, getDataStartCBT } from "../../service/constant";
-import { Button, Card, CardBody, Checkbox, Chip, Dialog, DialogBody, DialogFooter, IconButton, Input, Radio, Textarea, Tooltip, Typography } from "@material-tailwind/react";
+import { JSONParse } from "../../service/constant";
+import { Button, Card, CardBody, Checkbox, Chip,Input, Radio, Textarea, Tooltip, Typography } from "@material-tailwind/react";
 import { CheckIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { checkingResult, finishingCBT } from "../../service/cbt/result";
 import { Suspense } from "react";
@@ -10,7 +10,7 @@ import { SkeletonTable } from "../../elements/skeleton/table";
 import useDocumentTitle from "../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
 import "./start.css"
-
+ 
 export function StartCBT() {
     const {start} = useParams()
     const nav = useNavigate();
@@ -35,31 +35,63 @@ export function StartCBT() {
     const [intervalId, setIntervalId] = useState(null);
     const [showExit, setShowExit] = useState(false);
     useEffect(()=> {
-        const get = getDataStartCBT({start})
-        if(!get) return nav("/cbt")
-        checkingResult({idlist : get.user.id, iduser : get.list.id}).then(r => {
-            if(r.process === "finish") {
-                nav("/cbt/finish/"+ start)
-                return;
-            }
-            setUser(get.user)
-            setList(get.list)
-            setSoal(get.soal)
-            setData(get.data)
+        try {
+            const at = atob(start)
+            const [nisn, idlist] = at.split("@")
+            const local = window.sessionStorage.getItem("refresh-token")
+            const decode = JSONParse(atob(local))
+            const iduser = decode.id
+            setUser(decode)
+
+            checkingResult({idlist, iduser}).then(r => {
+                if(r.process === "finish") {
+                    nav("/cbt/finish/"+ start)
+                    return;
+                }
+                if(r.length < 1) {
+                    return nav("/cbt")
+                }
+                const result = r[0]
+                
+                const l = window.localStorage.getItem("list@"+ nisn +"@"+ idlist)
+                const decode_l  = JSONParse(l)
+                setList(decode_l)
+                
+                const s = window.localStorage.getItem("refresh@"+ nisn + "@" + idlist)
+                const decode_s = JSONParse(s)
+                setSoal(decode_s)
+                
+                const d = window.localStorage.getItem("data@"+ nisn + "@"+ idlist)
+                const decode_d = JSONParse(d)
+                setData(decode_d)
+                
+                
+                const timeNow = Date.now()
+                const timeStart = Date.parse(new Date(atob(result.created_at)))
+                const durasi = Number(decode_l.durasi);
+
+                const timeFlush = timeStart + durasi*60*1000;
+                let timeDifferent = Math.floor((timeFlush - timeNow)/1000);
+                setTiming(timeDifferent)
+                setRemainingTime(timeDifferent)
+    
+                setWaitingLoad(true)
+            })
+
+        } catch (error) {
             
-
-            const timeNow = Date.now()
-            const timeStart = Date.parse(new Date(get.timing))
-            const durasi = get.list.durasi;
-            const timeFlush = timeStart + durasi*60*1000;
-            let timeDifferent = Math.floor((timeFlush - timeNow)/1000);
-            setTiming(timeDifferent)
-            setRemainingTime(timeDifferent)
-
-            setWaitingLoad(true)
-        })
+        }
 
     }, [])
+
+    const checkingButtonFinish = () => {
+        const diff = Number(list.durasi)*60 - remainingTime
+        if(diff >= Number(list.min_durasi)*60) {
+            setShowExit(true);
+        } else {
+            setShowExit(false)
+        }
+    }
 
     useEffect(() => {
         if (remainingTime <= 0) {
@@ -93,6 +125,7 @@ export function StartCBT() {
 
     const menuButton = (h) => {
         setActive(h)
+        setOpen(false)
     }
 
     const savingData = (jj) => {
@@ -134,14 +167,7 @@ export function StartCBT() {
             nav("/cbt/finish/"+ start)
         })
     }
-    const checkingButtonFinish = () => {
-        if(Number(list.durasi)*60 - remainingTime >= Number(list.min_durasi)*60) {
-            console.log(list.min_durasi)
-            setShowExit(true);
-        } else {
-            setShowExit(false)
-        }
-    }
+   
     
 
     const hours = Math.floor(remainingTime / 3600);
@@ -151,20 +177,46 @@ export function StartCBT() {
 
     return(
         <Suspense fallback={"Sedang memproses data"}>
-            <div className="bg-white shadow-md p-4 flex place-items-center text-center">
-                {list.name}
+            <div className="bg-white shadow-md p-4 flex flex-row place-items-center text-center">
+                <div className="basis-1/2">
+                    {list.name}
+                </div>
+                <div className="basis-1/2">
+                    { (active === soal.length-1) && showExit ? (
+                                        <>
+                                        <Button
+                                                size="sm"
+                                                variant="gradient"
+                                                color="red"
+                                                className="group relative flex items-center gap-3 overflow-hidden pr-[72px]"
+                                                onClick={handleFinish}
+                                            >
+                                                SELESAI
+                                                <span className="absolute right-0 grid h-full w-12 place-items-center bg-red-600 transition-colors group-hover:bg-red-700">
+                                                <XCircleIcon className="w-6 h-6 mb-1 text-red-50"></XCircleIcon> 
 
-                { (active === soal.length-1) && showExit ? (
-                                    <>
-                                        <IconButton onClick={handleFinish} ripple color="white">
-                                            <XCircleIcon className="w-6 h-6 mb-1 text-red-400"></XCircleIcon>
-                                        </IconButton>
-                                    </>
-                                ) : ""}
+                                                </span>
+                                            </Button>
+                                        </>
+                                    ) : ""}
+                </div>
             </div>
-
+            <div className="md:px-0 lg:px-0 px-2">
             <Card className="md:w-3/4 lg:w-3/4 w-full mx-auto mt-8 mb-12">
                 <CardBody>
+                    {
+                        open ? (
+                            <>
+                                <Typography variant="h3">Pilih soal nomer berapa ?</Typography>
+                                <div className="grid grid-cols-8 gap-3">
+                                    {
+                                        data.map((r,k) => (
+                                            <Button size="sm" key={k} color={r[1].length >= 0 ? "green" : k===active ? "yellow" : "gray"} variant={r[1].length > 0 ? "gradient" : k===active ? "filled" : "outlined"} ripple={true} onClick={() => menuButton(k)}>{k+1}</Button>
+                                        ))
+                                    }
+                                </div>
+                            </>
+                        ) : (
                             <div className="">
                                 <div className="grid grid-cols-5 gap-3 mb-5">
                                     <div className="col-span-5 md:col-span-3 lg:col-span-3">
@@ -284,8 +336,12 @@ export function StartCBT() {
                                 </div>
                                 
                             </div>
+                        )
+                    }
                 </CardBody>
             </Card>
+
+            </div>
             
             <div className="fixed bottom-0 z-50 w-full h-16 -translate-x-1/2 bg-white border-t border-gray-200 left-1/2 dark:bg-gray-700 dark:border-gray-600">
                 <div className="grid h-full max-w-xl grid-cols-6 mx-auto items-center">
@@ -334,7 +390,7 @@ export function StartCBT() {
                 </div>
             </div>
 
-            <Dialog handler={() => setOpen(!open)} open={open} size="xl">
+            {/* <Dialog handler={() => setOpen(!open)} open={open} size="xl">
                 <DialogBody>
                     <div className="grid lg:grid-cols-12 md:grid-cols-8 sm:grid-cols-6 grid-cols-4 gap-3">
                         {
@@ -354,7 +410,7 @@ export function StartCBT() {
                         <span>Tutup</span>
                     </Button>
                     </DialogFooter>
-            </Dialog>
+            </Dialog> */}
 
         </Suspense>
     )
@@ -365,7 +421,9 @@ export function UserInformation(prop) {
     return(
         <>
             <Typography variant="h5">{user.name}</Typography>
+            <div className="strong">{user.nisn}</div>
             <div className="">{user.kelas}</div>
+
         </>
     )
 }

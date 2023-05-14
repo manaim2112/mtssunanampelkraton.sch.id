@@ -51,6 +51,8 @@ export function finishingCBT({iduser, idlist, answer}) {
 
 export function checkingResult({iduser, idlist}) {
     return new Promise((resolve, reject) => {
+        
+        console.log(idlist, iduser)
         fetch(BASE_URL + "/cbt/result/list/"+ idlist + "/user/"+ iduser).then(r => r.json()).then(r => {
             if(r.status === 200) {
                 resolve(r.data)
