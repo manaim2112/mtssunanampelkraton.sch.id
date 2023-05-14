@@ -17,12 +17,28 @@ export function FinishCBT() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        const g = getDataStartCBT({start})
-        setUser(g.user)
-        setList(g.list)
-        setSoal(g.soal)
-        setData(g.data)
-        setLoading(false)
+        try {
+            const at = atob(start)
+            const [nisn, idlist] = at.split("@")
+            const local = window.sessionStorage.getItem("refresh-token")
+            const decode = JSONParse(atob(local))
+            setUser(decode)
+            const l = window.localStorage.getItem("list@"+ nisn +"@"+ idlist)
+                const decode_l  = JSONParse(l)
+                setList(decode_l)
+                
+                const s = window.localStorage.getItem("refresh@"+ nisn + "@" + idlist)
+                const decode_s = JSONParse(s)
+                setSoal(decode_s)
+                
+                const d = window.localStorage.getItem("data@"+ nisn + "@"+ idlist)
+                const decode_d = JSONParse(d)
+                setData(decode_d)
+
+            setLoading(false)
+        } catch (error) {
+            
+        }
     }, [])
     if(loading) {
         return(

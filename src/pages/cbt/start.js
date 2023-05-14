@@ -302,7 +302,7 @@ export function StartCBT() {
                                                                             checked={data[active] && data[active][0] === soal[active].id && data[active][1].includes(k)}
                                                                             /> 
 
-                                                                        <label htmlFor={"options_key_"+ soal[active].id + "_key_"+ k} className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{e}</label>
+                                                                        <label htmlFor={"options_key_"+ soal[active].id + "_key_"+ k} className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300" dangerouslySetInnerHTML={{__html : e}}></label>
                                                                     </div>
                                                                 ))
                                                             }
