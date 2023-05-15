@@ -9,7 +9,8 @@ import { Suspense } from "react";
 import { SkeletonTable } from "../../elements/skeleton/table";
 import useDocumentTitle from "../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
-import renderMathInElement from "https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.mjs";
+import renderMathInElement from "../../service/auto";
+
 
 import "./start.css"
  

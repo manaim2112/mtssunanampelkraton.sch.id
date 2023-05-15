@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { saveWithUploadWordCBT } from "../../../service/dashboard/cbt";
 import { useNavigate, useParams } from "react-router-dom";
 import { BASE_URL, dataURLtoFile, uuidv4 } from "../../../service/constant";
+import renderMathInElement from "../../../service/auto";
 // import Compressor from "compressorjs";
 import useDocumentTitle from "../../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
 import { SkeletonTable } from "../../../elements/skeleton/table";
-import renderMathInElement from "https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.mjs";
 
 export function UploadWordCBTDashboard() {
     

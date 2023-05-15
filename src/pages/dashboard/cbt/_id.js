@@ -7,7 +7,8 @@ import useDocumentTitle from "../../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { JSONParse, randomText } from "../../../service/constant";
-import renderMathInElement from "https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.mjs";
+import renderMathInElement from "../../../service/auto";
+
 
 
 export function IdCBTDashboard() {
@@ -23,7 +24,7 @@ export function IdCBTDashboard() {
         getWithIdCBT(id).then(d => {
                 setXid(d)
         })
-
+        
         renderMathInElement(document.body, {
             // customised options
             // • auto-render specific keys, e.g.:

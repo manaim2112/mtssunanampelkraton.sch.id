@@ -9,6 +9,8 @@ import { Button, Card, CardBody, Checkbox, Chip, IconButton, Input, Textarea, Ty
 import { JSONParse } from "../../../service/constant"
 import { CheckIcon, SignalIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import Swal from "sweetalert2"
+import renderMathInElement from "../../../service/auto";
+
 
 export function ViewResultCBT() {
     const {id, userid} = useParams()
@@ -75,6 +77,21 @@ export function ViewResultCBT() {
             })
         })
     }, [])
+
+    useEffect(() => {
+        renderMathInElement(document.body, {
+            // customised options
+            // • auto-render specific keys, e.g.:
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            // • rendering keys, e.g.:
+            throwOnError : false
+        });
+    }, [id])
 
     const checkResult = (id) => {
         const res = JSONParse(result[0].answer)
