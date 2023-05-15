@@ -3,8 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@ckeditor/ckeditor5-build-classic": "^37.1.0",
-    "@ckeditor/ckeditor5-react": "^6.0.0",
     "@heroicons/react": "^2.0.17",
     "@material-tailwind/react": "^1.4.2",
     "@testing-library/jest-dom": "^5.14.1",
