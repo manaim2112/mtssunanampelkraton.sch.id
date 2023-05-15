@@ -56,10 +56,12 @@ export function ResultCBT() {
                         icon : "error",
                         showConfirmButton : false
                     })
+                    setWaiting(true)
+                    getResult();
 
                     Swal.fire({
                         title : "Berhasil di Reset",
-                        icon : "error",
+                        icon : "success",
                         text : "Silahkan refresh kembali untuk bisa melakukan pengujian",
                         showConfirmButton : false
                     })

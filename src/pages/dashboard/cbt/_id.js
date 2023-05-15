@@ -7,6 +7,8 @@ import useDocumentTitle from "../../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { JSONParse, randomText } from "../../../service/constant";
+import renderMathInElement from "https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.mjs";
+
 
 export function IdCBTDashboard() {
     const [xid, setXid] = useState("")
@@ -21,6 +23,19 @@ export function IdCBTDashboard() {
         getWithIdCBT(id).then(d => {
                 setXid(d)
         })
+
+        renderMathInElement(document.body, {
+            // customised options
+            // • auto-render specific keys, e.g.:
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            // • rendering keys, e.g.:
+            throwOnError : false
+        });
     }, [xid, id])
 
     const ChangeCode = (id) => {

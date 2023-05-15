@@ -9,6 +9,8 @@ import { Suspense } from "react";
 import { SkeletonTable } from "../../elements/skeleton/table";
 import useDocumentTitle from "../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
+import renderMathInElement from "https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.mjs";
+
 import "./start.css"
  
 export function StartCBT() {
@@ -83,6 +85,21 @@ export function StartCBT() {
         }
 
     }, [])
+
+    useEffect(() => {
+        renderMathInElement(document.body, {
+            // customised options
+            // • auto-render specific keys, e.g.:
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            // • rendering keys, e.g.:
+            throwOnError : false
+        });
+    }, [active])
 
     const checkingButtonFinish = () => {
         const diff = Number(list.durasi)*60 - remainingTime

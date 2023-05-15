@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { saveWithUploadWordCBT } from "../../../service/dashboard/cbt";
 import { useNavigate, useParams } from "react-router-dom";
 import { BASE_URL, dataURLtoFile, uuidv4 } from "../../../service/constant";
@@ -6,14 +6,32 @@ import { BASE_URL, dataURLtoFile, uuidv4 } from "../../../service/constant";
 import useDocumentTitle from "../../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
 import { SkeletonTable } from "../../../elements/skeleton/table";
+import renderMathInElement from "https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/contrib/auto-render.mjs";
+
 export function UploadWordCBTDashboard() {
     
     useDocumentTitle("Upload Soal dengan Ms. Word")
     const {id} = useParams()
     const nav = useNavigate()
     const [htmlContent, setHtmlContent] = useState([])
+
     const [load, setLoad] = useState(false)
     const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        renderMathInElement(document.body, {
+            // customised options
+            // • auto-render specific keys, e.g.:
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            // • rendering keys, e.g.:
+            throwOnError : false
+        });
+    }, [htmlContent])
     const handleFileUpload = async (event) => {
         setLoading(true)
         const file = event.target.files[0];
@@ -166,10 +184,12 @@ export function UploadWordCBTDashboard() {
                                             e.jawaban.map((t, ke) => (
                                                 <li key={ke}>
                                                     { e.kunci.includes(ke) ? (
-                                                        <span className="bg-green-100 text-green-700">
-                                                            {t}
+                                                        <span className="bg-green-100 text-green-700" dangerouslySetInnerHTML={{__html : t}}>
                                                         </span>
-                                                    ) : t }
+                                                    ) : (
+                                                        <span dangerouslySetInnerHTML={{__html : t}}>
+                                                        </span>
+                                                    ) }
                                                 </li>
                                             ))
                                         }

@@ -57,14 +57,22 @@ export function TableCBTElement({Live}) {
             cancelButtonText : "Tidak dulu"
         }).then(e => {
             if(!e.isConfirmed) return;
-            setTxtDelete("")
+            const inde = live.findIndex(Obj => Obj.id === id)
+            let ui = [...txtDelete]
+            ui[inde] = ""
+            setTxtDelete(ui)
             removeListWIthId(id).then(li => {
                 if(!li) return;
-                setTxtDelete("Berhasil")
+                ui[inde] = "Berhasil"
+                setTxtDelete(ui)
                 let d = live;
                 const index = d.findIndex(Obj => Obj.id === id)
                 d.splice(index, 1);
                 setLive(d)
+                setTimeout(() => {
+                    ui[inde] = "Delete";
+                    setTxtDelete(ui)
+                }, 1000)
             })
         })
     }
