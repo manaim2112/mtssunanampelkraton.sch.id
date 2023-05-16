@@ -6,12 +6,14 @@ import { Link } from "react-router-dom";
 import { CountUser } from "../../service/dashboard/users";
 import { CountCBT_list } from "../../service/dashboard/cbt";
 import { countGuru } from "../../service/dashboard/guru";
+import { countKegiatan } from "../../service/kegiatan";
 
 export function HomeDashboard() {
     const [name, setName] = useState("")
     const [countUser, setCountUser] = useState("")
     const [countCBT, setCountCBT] = useState("")
     const [countPegawai, setCountPegawai] = useState("")
+    const [countKegiata, setCountkegiatan] = useState("")
     useEffect(() => {
             setName(getAuthorize().name)
             CountUser().then(e => {
@@ -22,6 +24,10 @@ export function HomeDashboard() {
             })
             countGuru().then(e => {
                 setCountPegawai(e)
+            })
+
+            countKegiatan().then(e => {
+                setCountkegiatan(e)
             })
 
     }, [])
@@ -37,11 +43,11 @@ export function HomeDashboard() {
                         className="mb-4 mt-10 grid h-28 place-items-center"
                     >
                         <Typography variant="h1" color="white">
-                        28
+                        {countKegiata}
                         </Typography>
                     </CardHeader>
                     <CardBody className="text-center">
-                        <Link to="/dashboard/blog">Blog atau konten</Link>
+                        <Link to="/dashboard/kegiatan">Kegiatan Sekolah</Link>
                     </CardBody>
                 </Card>
                 <Card>

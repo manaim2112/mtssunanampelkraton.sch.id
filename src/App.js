@@ -31,6 +31,9 @@ import { StartCBT } from './pages/cbt/start';
 import { FinishCBT } from './pages/cbt/finish';
 import { ResultCBT } from './pages/dashboard/cbt/result';
 import { ViewResultCBT } from './pages/dashboard/cbt/view';
+import { HomeKegiatanDashboard } from './pages/dashboard/kegiatan/home';
+import { EditKegiatanDashboard } from './pages/dashboard/kegiatan/_id';
+import { CreateNewKegiatanDashboard } from './pages/dashboard/kegiatan/create';
 
 
 function App() {
@@ -92,6 +95,10 @@ function App() {
 
             <Route path='users' element={<IndexUsersDashboard/>}/>
             <Route path='guru' element={<IndexGuruDashboard/>}/>
+
+            <Route path='kegiatan' element={<HomeKegiatanDashboard/>}/>
+            <Route path='kegiatan/create' element={<CreateNewKegiatanDashboard/>}/>
+            <Route path='kegiatan/id/:id' element={<EditKegiatanDashboard/>}/>
           </Route>
           </Routes>
         </div>
