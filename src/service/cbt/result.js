@@ -1,6 +1,17 @@
 import { BASE_URL } from "../constant"
 
-export function getResultWithUserId(id, listid) {
+export function getResultWithUserId(id) {
+    return new Promise((resolve, reject) => {
+        fetch(BASE_URL + "/cbt/result/user/"+ id).then(r => r.json()).then(r => {
+            if(r.status === 200) {
+                resolve(r.data)
+            } else {
+                resolve([])
+            }
+        })
+    })
+}
+export function getResultWithUserIdAndListId(id, listid) {
     return new Promise((resolve, reject) => {
         fetch(BASE_URL + "/cbt/result/list/"+ listid + "/user/"+ id).then(r => r.json()).then(r => {
             if(r.status === 200) {

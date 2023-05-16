@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { useParams } from "react-router-dom"
-import { getResultWithUserId } from "../../../service/cbt/result"
+import { getResultWithUserIdAndListId } from "../../../service/cbt/result"
 import { useState } from "react"
 import { getUserWithId } from "../../../service/dashboard/users"
 import { UpdateResultAnswerWIthId, getDataWithIdCBT, getWithIdCBT } from "../../../service/dashboard/cbt"
@@ -10,6 +10,7 @@ import { JSONParse } from "../../../service/constant"
 import { CheckIcon, SignalIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import Swal from "sweetalert2"
 import renderMathInElement from "../../../service/auto";
+import { Preview } from "react-html2pdf"
 
 
 export function ViewResultCBT() {
@@ -26,7 +27,7 @@ export function ViewResultCBT() {
     const [viewPilgan, setViewPilgan] = useState(false)
     const [viewIsian, setViewIsian] = useState(true)
     useEffect(() => {
-        getResultWithUserId(userid, id).then(r => {
+        getResultWithUserIdAndListId(userid, id).then(r => {
             setResult(r)
             getUserWithId(userid).then(u => {
                 setUser(u)
@@ -37,12 +38,11 @@ export function ViewResultCBT() {
                         setList(l)
                         const answer = new Array(so.length).fill(null);
                         const poin = new Array(so.length).fill(0)
-                        console.log(so)
                         so.forEach((res, key) => {
                             const a = JSONParse(res.answer)
                             const ranw = JSONParse(r[0].answer)
                             const index = ranw.findIndex(Obj => Obj[0] === res.id);
-                            console.log(ranw)
+                            if(index === -1) return;
                             const yans = ranw[index][1].sort()
                             if(res.tipe === "pilgan") {
                                 const act = a.sort()
@@ -162,6 +162,8 @@ export function ViewResultCBT() {
     )
     return(
         <>
+            <Preview id={"savePdf"}>
+        
             <Typography variant="h3"> Hasil dari {user.name}</Typography> {user.nisn}
             <Typography variant="h4">{list.jenis} - {list.name}</Typography>
             <Typography variant="h5">Nilai Sementara {score.reduce((a,b) => Number(a)+Number(b))}</Typography>
@@ -254,7 +256,7 @@ export function ViewResultCBT() {
                     </>
                 ))
             }
-            <Button size="lg" onClick={handleUpdate} color="orange" className="rounded-full">
+            <Button size="lg" onClick={handleUpdate} color="orange" className="rounded-full" disabled={loading}>
                 {
                     loading ? (
                         <SignalIcon className="w-4 h-4 animate-spin"></SignalIcon>
@@ -264,7 +266,7 @@ export function ViewResultCBT() {
                 }
             </Button>
             
-
+            </Preview>
         </>
     )
 }

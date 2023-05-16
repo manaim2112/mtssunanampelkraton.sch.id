@@ -85,8 +85,8 @@ export function HomeCBT() {
     
     return (
         <>
-            <div className="flex h-screen overflow-y-auto">
-                <div className="p-8 bg-gray-100 h-screen sticky top-2 hidden md:inline-block">
+            <div className="md:flex lg:flex h-screen overflow-y-auto">
+                <div className="p-8 bg-gray-100/40 md:h-screen lg:h-screen md:sticky lg:sticky top-0 md:inline-block">
 
                     <IconButton color="white" ripple={true} onClick={logOut}>
                         <PowerIcon className="w-6 h-6 text-red-500"></PowerIcon>

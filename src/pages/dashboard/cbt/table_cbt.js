@@ -49,15 +49,16 @@ export function TableCBTElement({Live}) {
         })
     }
     const handlerListRemove = (id) => {
+        const inde = live.findIndex(Obj => Obj.id === id)
+
         Swal.fire({
-            title : "Comfirmation delete",
+            title : "Comfirmation delete CBT " + live[inde].name,
             icon : "warning",
             showCancelButton : true,
             confirmButtonText : "Saya yakin, hapus saja",
             cancelButtonText : "Tidak dulu"
         }).then(e => {
             if(!e.isConfirmed) return;
-            const inde = live.findIndex(Obj => Obj.id === id)
             let ui = [...txtDelete]
             ui[inde] = ""
             setTxtDelete(ui)
@@ -66,8 +67,7 @@ export function TableCBTElement({Live}) {
                 ui[inde] = "Berhasil"
                 setTxtDelete(ui)
                 let d = live;
-                const index = d.findIndex(Obj => Obj.id === id)
-                d.splice(index, 1);
+                d.splice(inde, 1);
                 setLive(d)
                 setTimeout(() => {
                     ui[inde] = "Delete";
