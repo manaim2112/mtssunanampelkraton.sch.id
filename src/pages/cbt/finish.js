@@ -1,7 +1,7 @@
 import { Button, Card, CardBody, Checkbox, Chip, Input, Textarea } from "@material-tailwind/react";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { JSONParse, getDataStartCBT } from "../../service/constant";
+import { JSONParse } from "../../service/constant";
 import { SkeletonTable } from "../../elements/skeleton/table";
 import { Suspense } from "react";
 import { SparklesIcon, XCircleIcon } from "@heroicons/react/24/outline";

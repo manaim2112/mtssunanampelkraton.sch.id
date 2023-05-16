@@ -6,7 +6,7 @@ import { getStudent } from "../../../service/dashboard/users"
 import { RemoveResultWithId, getWithIdCBT } from "../../../service/dashboard/cbt"
 import { SkeletonTable } from "../../../elements/skeleton/table"
 import { Suspense } from "react"
-import { Chip, IconButton, Typography } from "@material-tailwind/react"
+import { Button, Chip, IconButton, Typography } from "@material-tailwind/react"
 import Swal from "sweetalert2"
 
 export function ResultCBT() {
@@ -16,6 +16,7 @@ export function ResultCBT() {
     const [list, setList] = useState([])
     const [user, setUser] = useState([])
     const [waiting, setWaiting] = useState(true)
+
     useEffect(() => {
         getResult()
     }, [])
@@ -84,16 +85,21 @@ export function ResultCBT() {
     return(
         <Suspense fallback={"Menunggu Permintaan"}>
             <Typography variant="h3">Hasil {list.tipe} pada {list.name}</Typography>
-            <div className="mt-5">
-                {
-                    kelas.map((e,k)=> (
-                        <IconButton key={k} value={e} onClick={() => {
-                            getStudent(e).then(ruser => {
-                                setUser(ruser)
-                            })
-                        }} className="mx-1">{e}</IconButton>
-                    ))
-                }
+            <div className="flex gap-4">
+                <div className="mt-5">
+                    {
+                        kelas.map((e,k)=> (
+                            <IconButton key={k} value={e} onClick={() => {
+                                getStudent(e).then(ruser => {
+                                    setUser(ruser)
+                                })
+                            }} className="mx-1">{e}</IconButton>
+                        ))
+                    }
+                </div>
+                <div className="">
+                    <Button color="purple">Print Absensi</Button>
+                </div>
             </div>
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-4">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

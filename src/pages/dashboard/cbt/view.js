@@ -26,7 +26,7 @@ export function ViewResultCBT() {
     const [viewPilgan, setViewPilgan] = useState(false)
     const [viewIsian, setViewIsian] = useState(true)
     useEffect(() => {
-        getResultWithUserId(userid).then(r => {
+        getResultWithUserId(userid, id).then(r => {
             setResult(r)
             getUserWithId(userid).then(u => {
                 setUser(u)
@@ -37,10 +37,12 @@ export function ViewResultCBT() {
                         setList(l)
                         const answer = new Array(so.length).fill(null);
                         const poin = new Array(so.length).fill(0)
+                        console.log(so)
                         so.forEach((res, key) => {
                             const a = JSONParse(res.answer)
                             const ranw = JSONParse(r[0].answer)
                             const index = ranw.findIndex(Obj => Obj[0] === res.id);
+                            console.log(ranw)
                             const yans = ranw[index][1].sort()
                             if(res.tipe === "pilgan") {
                                 const act = a.sort()
