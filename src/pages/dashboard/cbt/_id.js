@@ -7,7 +7,8 @@ import useDocumentTitle from "../../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { JSONParse, randomText } from "../../../service/constant";
-import renderMathInElement from "../../../service/auto";
+import renderMathInElement from "katex/contrib/auto-render/auto-render"
+// import renderMathInElement from "../../../service/auto";
 
 
 

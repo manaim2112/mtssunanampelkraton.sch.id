@@ -7,6 +7,7 @@ import { checkingCodeWithIdList, listSoalWithKelas } from "../../service/cbt/lis
 import { getResultWithUserId, startingCBT } from "../../service/cbt/result";
 import { useNavigate } from "react-router-dom";
 import { getSoalWithIdList } from "../../service/cbt/soal";
+import { SkeletonTable } from "../../elements/skeleton/table";
 
 export function HomeCBT() {
     const [user, setUser] = useState({})
@@ -16,6 +17,13 @@ export function HomeCBT() {
     const [code, setCode] = useState("")
     const [active, setActive] = useState("")
     const [loading, setLoading]= useState(false)
+    const [load, setLoad] = useState(true)
+
+    const [sekarang, setSekarang] = useState([])
+    const [selesai, setSelesai] = useState([])
+    const [berjalan, setBerjalan] = useState([])
+    const [belum, setBelum] = useState([])
+
     const nav = useNavigate()
     const handleOpen = () => setOpen(!open)
     useEffect(() => {
@@ -25,11 +33,38 @@ export function HomeCBT() {
         const j = JSONParse(atob(h))
         listSoalWithKelas(j.kelas).then(e => {
             setList(e)
+            getResultWithUserId(j.id).then(r => {
+                setResult(r)
+                const ac = r.map(p => p.idlist);
+                const now = [];
+                const end = [];
+                const not = [];
+                const way = [];
+                e.forEach((l, kl) => {
+                    
+                    if(ac.includes(l.id)) {
+                        if(r[r.findIndex(O => O.idlist === l.id)].process === "start") {
+                            way.push(l)
+                        } else {
+                            end.push(l)
+                        }
+                    } else {
+                        if(l.priority) {
+                            now.push(l)
+                        } else {
+                            not.push(l)
+                        }
+                    }
+                })
+
+                setSekarang(now)
+                setSelesai(end)
+                setBerjalan(way)
+                setBelum(not)
+                setLoad(false)
+            })
         })
 
-        getResultWithUserId(j.id).then(r => {
-            setResult(r)
-        })
 
         setUser(j)
     }, [])
@@ -83,6 +118,12 @@ export function HomeCBT() {
         })
     }
     
+    if(load) {
+        return(
+            <SkeletonTable/>
+        )
+    }
+
     return (
         <>
             <div className="md:flex lg:flex h-screen overflow-y-auto">
@@ -97,9 +138,167 @@ export function HomeCBT() {
                     <Typography variant="h2" className="text-slate-800">Selamat datang kembali, {user.name} </Typography>
 
                     <HrElement/>    
+                    <Typography variant="h5" className="mb-4 underline">Ujian Sedang Berjalan</Typography>
                     <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4">
+
                         {
-                            list.map((e,k) => (
+                            berjalan.map((e,k) => (
+                                <Card key={k} className="m-1">
+                                    <CardHeader variant="gradient"
+                                color="yellow"
+                                className="mb-2 mt-0 grid h-8 place-items-center">{e.jenis}</CardHeader>
+                                    <CardBody>
+                                        <Typography variant="h5">{e.name}</Typography>
+                                        <span className="text-sm">Pelaksanaan
+                                        <br></br> {e.mulai} - {e.berakhir}</span>
+                                        <div className="">Waktu : {e.durasi} menit</div>
+                                    </CardBody>
+                                    <CardFooter>
+                                        { 
+                                            result.map(e => e.idlist).includes(e.id) ? (
+                                                <>
+                                                
+                                                    {
+                                                        result[result.findIndex(O => O.idlist === e.id)].process === "start" ? (         
+                                                            <div onClick={()=> handleStart(e.id)} className="text-green-300 text-center cursor-pointer px-2 hover:text-green-500 inline-block bg-green-100 rounded-lg">Lanjutkan mengerjakan 
+                                                            </div>
+                                                        ) : (
+                                                                <div className="text-green-500 flex place-items-center">
+                                                                    <CheckBadgeIcon className="w-6 h-6 mr-3"></CheckBadgeIcon> Telah Selesai mengerjakan
+
+                                                                </div>
+
+                                                        )
+                                                    }
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {
+                                                        e.priority ? (
+                                                            <div onClick={()=> handleStart(e.id)} className="text-blue-300 text-center cursor-pointer px-2 hover:text-blue-500 inline-block hover:bg-blue-100 hover:rounded-lg">Open 
+                                                            </div>
+                                                        ) : (
+                                                            "Belum Waktunya"
+                                                        )
+                                                    }
+                                                </>
+                                            )
+                                        }
+                                    </CardFooter>
+                                </Card>
+
+                            ))
+                        }
+                    </div>
+                    <Typography variant="h5" className="my-5 underline">Ujian Terbuka</Typography>
+                    <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4">
+
+                        {
+                            sekarang.map((e,k) => (
+                                <Card key={k} className="m-1">
+                                    <CardHeader variant="gradient"
+                                color="yellow"
+                                className="mb-2 mt-0 grid h-8 place-items-center">{e.jenis}</CardHeader>
+                                    <CardBody>
+                                        <Typography variant="h5">{e.name}</Typography>
+                                        <span className="text-sm">Pelaksanaan
+                                        <br></br> {e.mulai} - {e.berakhir}</span>
+                                        <div className="">Waktu : {e.durasi} menit</div>
+                                    </CardBody>
+                                    <CardFooter>
+                                        { 
+                                            result.map(e => e.idlist).includes(e.id) ? (
+                                                <>
+                                                
+                                                    {
+                                                        result[result.findIndex(O => O.idlist === e.id)].process === "start" ? (         
+                                                            <div onClick={()=> handleStart(e.id)} className="text-green-300 text-center cursor-pointer px-2 hover:text-green-500 inline-block bg-green-100 rounded-lg">Lanjutkan mengerjakan 
+                                                            </div>
+                                                        ) : (
+                                                                <div className="text-green-500 flex place-items-center">
+                                                                    <CheckBadgeIcon className="w-6 h-6 mr-3"></CheckBadgeIcon> Telah Selesai mengerjakan
+
+                                                                </div>
+
+                                                        )
+                                                    }
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {
+                                                        e.priority ? (
+                                                            <div onClick={()=> handleStart(e.id)} className="text-blue-300 text-center cursor-pointer px-2 hover:text-blue-500 inline-block hover:bg-blue-100 hover:rounded-lg">Open 
+                                                            </div>
+                                                        ) : (
+                                                            "Belum Waktunya"
+                                                        )
+                                                    }
+                                                </>
+                                            )
+                                        }
+                                    </CardFooter>
+                                </Card>
+
+                            ))
+                        }
+                    </div>
+                    <Typography variant="h5" className="my-5 underline">Ujian Selesai</Typography>
+                    <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4">
+
+                        {
+                            selesai.map((e,k) => (
+                                <Card key={k} className="m-1">
+                                    <CardHeader variant="gradient"
+                                color="yellow"
+                                className="mb-2 mt-0 grid h-8 place-items-center">{e.jenis}</CardHeader>
+                                    <CardBody>
+                                        <Typography variant="h5">{e.name}</Typography>
+                                        <span className="text-sm">Pelaksanaan
+                                        <br></br> {e.mulai} - {e.berakhir}</span>
+                                        <div className="">Waktu : {e.durasi} menit</div>
+                                    </CardBody>
+                                    <CardFooter>
+                                        { 
+                                            result.map(e => e.idlist).includes(e.id) ? (
+                                                <>
+                                                
+                                                    {
+                                                        result[result.findIndex(O => O.idlist === e.id)].process === "start" ? (         
+                                                            <div onClick={()=> handleStart(e.id)} className="text-green-300 text-center cursor-pointer px-2 hover:text-green-500 inline-block bg-green-100 rounded-lg">Lanjutkan mengerjakan 
+                                                            </div>
+                                                        ) : (
+                                                                <div className="text-green-500 flex place-items-center">
+                                                                    <CheckBadgeIcon className="w-6 h-6 mr-3"></CheckBadgeIcon> Telah Selesai mengerjakan
+
+                                                                </div>
+
+                                                        )
+                                                    }
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {
+                                                        e.priority ? (
+                                                            <div onClick={()=> handleStart(e.id)} className="text-blue-300 text-center cursor-pointer px-2 hover:text-blue-500 inline-block hover:bg-blue-100 hover:rounded-lg">Open 
+                                                            </div>
+                                                        ) : (
+                                                            "Belum Waktunya"
+                                                        )
+                                                    }
+                                                </>
+                                            )
+                                        }
+                                    </CardFooter>
+                                </Card>
+
+                            ))
+                        }
+                    </div>
+                    <Typography variant="h5" className="my-5 underline">Belum Waktunya</Typography>
+                    <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4">
+
+                        {
+                            belum.map((e,k) => (
                                 <Card key={k} className="m-1">
                                     <CardHeader variant="gradient"
                                 color="yellow"

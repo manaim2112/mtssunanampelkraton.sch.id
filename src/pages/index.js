@@ -14,7 +14,7 @@ import { Outlet } from "react-router-dom";
 //     )
 // }
 
-export function IndexHome() {
+export default function IndexHome() {
 
     return(
         <>
