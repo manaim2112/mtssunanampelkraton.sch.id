@@ -13,6 +13,8 @@ import renderMathInElement from "../../service/auto";
 
 
 import "./start.css"
+import { usePageVisibility } from "../../elements/useVisibility";
+import localforage from "localforage";
  
 export function StartCBT() {
     const {start} = useParams()
@@ -37,6 +39,39 @@ export function StartCBT() {
     const [remainingTime, setRemainingTime] = useState(60); // waktu dalam detik
     const [intervalId, setIntervalId] = useState(null);
     const [showExit, setShowExit] = useState(false);
+    const isVisible = usePageVisibility();
+    const [err, setErr] = useState(false)
+
+    useEffect( () => {
+        if(!localStorage.getItem("hidden_date") && !isVisible) {
+            localStorage.setItem("hidden_date", Date.now())
+        }
+        if(localStorage.getItem("hidden_date") && isVisible) {
+            const g = localStorage.getItem("hidden_date")
+            if(Date.now() - g >= 1000*10) {
+                document.title = "Peringatan !!!..."
+                console.log("true")
+                setErr(true)
+            } else {
+                localStorage.removeItem("hidden_date")
+            }
+        }
+
+        if(localStorage.getItem("hidden_date")) {
+            setErr(true)
+        }
+         
+    }, [isVisible])
+
+    useEffect(() => {
+        const remove = setTimeout(() => {
+            localStorage.removeItem("hidden_date")
+            setErr(false)
+        }, 1000*60*5)
+
+        return () => clearTimeout(remove)
+    }, [err])
+
     useEffect(()=> {
         try {
             const at = atob(start)
@@ -206,6 +241,21 @@ export function StartCBT() {
     const seconds = remainingTime % 60;
 
 
+    if(err) {
+        return(
+            <div className="fixed h-screen top-0 w-full bg-red-500">
+                <div className="mt-12 text-center px-8 mx-auto">
+                    <Typography variant="h1" className="text-white">
+                        Anda Terdeteksi melakukan kegiatan tidak fokus pada ujian
+                    </Typography>
+                    <Typography variant="h4" className="text-white">
+                        Segera hubungi pengawas terdekat
+                    </Typography>
+                    <img className="mx-auto" src="https://www.onlygfx.com/wp-content/uploads/2020/05/alert-stamp-5.png" alt="Alert"/>
+                </div>
+            </div>
+        )
+    }
     return(
         <Suspense fallback={"Sedang memproses data"}>
             <div className="bg-white shadow-md p-4 flex flex-row place-items-center text-center">
