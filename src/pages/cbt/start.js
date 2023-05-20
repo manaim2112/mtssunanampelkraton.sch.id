@@ -45,21 +45,21 @@ export function StartCBT() {
     useEffect( () => {
         const at = atob(start)
         const [nisn, idlist] = at.split("@")
-        if(!localStorage.getItem("hidden_date_"+ idlist) && !isVisible) {
-            localStorage.setItem("hidden_date_"+ idlist, Date.now())
+        if(!localStorage.getItem("hidden_date_"+ idlist + "_"+ nisn) && !isVisible) {
+            localStorage.setItem("hidden_date_"+ idlist + "_"+ nisn, Date.now())
         }
-        if(localStorage.getItem("hidden_date_"+ idlist) && isVisible) {
-            const g = localStorage.getItem("hidden_date_"+ idlist)
+        if(localStorage.getItem("hidden_date_"+ idlist + "_"+ nisn) && isVisible) {
+            const g = localStorage.getItem("hidden_date_"+ idlist + "_"+ nisn)
             if(Date.now() - g >= 1000*10) {
                 document.title = "Peringatan !!!..."
                 console.log("true")
                 setErr(true)
             } else {
-                localStorage.removeItem("hidden_date_"+ idlist)
+                localStorage.removeItem("hidden_date_"+ idlist + "_"+ nisn)
             }
         }
 
-        if(localStorage.getItem("hidden_date_"+ idlist)) {
+        if(localStorage.getItem("hidden_date_"+ idlist + "_"+ nisn)) {
             setErr(true)
         }
          
@@ -70,15 +70,15 @@ export function StartCBT() {
         const [nisn, idlist] = at.split("@")
 
         if(err) {
-            const u = localStorage.getItem("hidden_date_"+ idlist);
+            const u = localStorage.getItem("hidden_date_"+ idlist + "_"+ nisn);
             if(Date.now() - u >= 1000*60*5) {
-                localStorage.removeItem("hidden_date_"+ idlist)
+                localStorage.removeItem("hidden_date_"+ idlist + "_"+ nisn)
                 setErr(false)
             }
         }
 
         const remove = setTimeout(() => {
-            localStorage.removeItem("hidden_date_"+ idlist)
+            localStorage.removeItem("hidden_date_"+ idlist + "_"+ nisn)
             setErr(false)
         }, 1000*60*5)
 
