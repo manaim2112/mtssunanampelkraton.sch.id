@@ -43,29 +43,42 @@ export function StartCBT() {
     const [err, setErr] = useState(false)
 
     useEffect( () => {
-        if(!localStorage.getItem("hidden_date") && !isVisible) {
-            localStorage.setItem("hidden_date", Date.now())
+        const at = atob(start)
+        const [nisn, idlist] = at.split("@")
+        if(!localStorage.getItem("hidden_date_"+ idlist) && !isVisible) {
+            localStorage.setItem("hidden_date_"+ idlist, Date.now())
         }
-        if(localStorage.getItem("hidden_date") && isVisible) {
-            const g = localStorage.getItem("hidden_date")
+        if(localStorage.getItem("hidden_date_"+ idlist) && isVisible) {
+            const g = localStorage.getItem("hidden_date_"+ idlist)
             if(Date.now() - g >= 1000*10) {
                 document.title = "Peringatan !!!..."
                 console.log("true")
                 setErr(true)
             } else {
-                localStorage.removeItem("hidden_date")
+                localStorage.removeItem("hidden_date_"+ idlist)
             }
         }
 
-        if(localStorage.getItem("hidden_date")) {
+        if(localStorage.getItem("hidden_date_"+ idlist)) {
             setErr(true)
         }
          
     }, [isVisible])
 
     useEffect(() => {
+        const at = atob(start)
+        const [nisn, idlist] = at.split("@")
+
+        if(err) {
+            const u = localStorage.getItem("hidden_date_"+ idlist);
+            if(Date.now() - u >= 1000*60*5) {
+                localStorage.removeItem("hidden_date_"+ idlist)
+                setErr(false)
+            }
+        }
+
         const remove = setTimeout(() => {
-            localStorage.removeItem("hidden_date")
+            localStorage.removeItem("hidden_date_"+ idlist)
             setErr(false)
         }, 1000*60*5)
 
@@ -73,6 +86,8 @@ export function StartCBT() {
     }, [err])
 
     useEffect(()=> {
+        const at = atob(start)
+        const [nisn, idlist] = at.split("@")
         try {
             const at = atob(start)
             const [nisn, idlist] = at.split("@")
