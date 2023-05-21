@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { getResultWithUserIdAndListId } from "../../../service/cbt/result"
 import { useState } from "react"
-import { getUserWithId } from "../../../service/dashboard/users"
+import { getStudent, getUserWithId } from "../../../service/dashboard/users"
 import { UpdateResultAnswerWIthId, getDataWithIdCBT, getWithIdCBT } from "../../../service/dashboard/cbt"
 import { SkeletonTable } from "../../../elements/skeleton/table"
 import { Card, CardBody, Checkbox, Chip, IconButton, Input, Tooltip, Typography } from "@material-tailwind/react"
@@ -15,6 +15,7 @@ import html2pdf from "html2pdf.js"
 
 export function ViewResultCBT() {
     const HtmlRef = useRef(null)
+    const nav = useNavigate()
     const {id, userid} = useParams()
     const [result, setResult] = useState([])
     const [resultC, setResultC] = useState([])
@@ -28,6 +29,7 @@ export function ViewResultCBT() {
     const [viewPilgan, setViewPilgan] = useState(false)
     const [viewIsian, setViewIsian] = useState(true)
     const [on, setOn] = useState(false)
+    const [listUser, setListUser] = useState([])
 
     useEffect(() => {
         getResultWithUserIdAndListId(userid, id).then(r => {
@@ -90,11 +92,18 @@ export function ViewResultCBT() {
                             // • rendering keys, e.g.:
                             throwOnError : false
                         });
+
+                        getStudent(u.kelas).then(us => {
+                            setListUser(us)
+                        })
                     })
                 })
             })
         })
-    }, [])
+        console.log("sa")
+    }, [userid, id])
+
+
 
 
     const checkResult = (id) => {
@@ -167,6 +176,8 @@ export function ViewResultCBT() {
           };
         html2pdf().set(opt).from(element).save();
     };
+
+
 
     if(waiting) return (
         <>
@@ -255,10 +266,10 @@ export function ViewResultCBT() {
                                             <div className="flex gap-0 mt-2">
                                                 <div className="w-64">
                                                     <IconButton onClick={() => handleSucc(k)} color="green" variant={ans[k] === true ? "gradient" : (ans[k] === false) ? "outlined" : "outlined"} className="m-0" size="sm">
-                                                        <CheckIcon className="w-4 h-4"></CheckIcon>
+                                                        <CheckIcon className="w-4 h-4"/>
                                                     </IconButton>
                                                     <IconButton onClick={() => handleFail(k)} color="red" variant={ans[k] === false ? "gradient" : (ans[k] === true) ? "outlined" : "outlined"} className="mx-1" size="sm">
-                                                        <XMarkIcon className="w-4 h-4"></XMarkIcon>
+                                                        <XMarkIcon className="w-4 h-4"/>
                                                     </IconButton>
                                                 </div>
                                                 <div className="bg-white border border-deep-orange-300 rounded-lg p-1"> {"Jawaban : "+ checkResult(e.id)} </div>
@@ -316,14 +327,14 @@ export function ViewResultCBT() {
                 </div>
                 <div  className="mb-4">
                 <Tooltip
-                    content="Next"
+                    content="List Nama"
                     animate={{
                         mount: { scale: 1, y: 0 },
                         unmount: { scale: 0, y: 25 },
                     }}
                     placement="left-end"
                     >
-                   <IconButton color="red" variant="gradient" onClick={() => setOn(true)}>
+                   <IconButton color="green" variant="gradient" onClick={() => setOn(true)}>
                         <UserGroupIcon className="h-4 w-4"/>
                     </IconButton>
                 </Tooltip>
@@ -332,8 +343,15 @@ export function ViewResultCBT() {
 
             <div onClick={() => setOn(false)} className={`fixed top-0 z-[500] w-full h-screen bg-red-300/10 ${on ? "" : "hidden"}`} >
             </div>
-            <div className={`fixed z-[502] top-0 right-0 w-64 h-screen bg-white rounded-l-lg shadow-lg p-4 transition-all ${on ? "scale-x-100" : "scale-x-0"}`}>
-                Testing
+            <div className={`fixed z-[502] top-0 h-screen overflow-y-auto overflow-x-auto bg-white rounded-l-lg shadow-lg p-4 transition-all ${on ? "w-64 right-0" : "w-0 -right-10"}`}>
+                <Typography variant="h4">List Kelas {user.kelas}</Typography>
+                {
+                    listUser.map((value, key) => (
+                        <div key={key} className={`hover:underline hover:text-blue-400 cursor-pointer ${user.id === value.id ? "text-blue-400" : ""}`} onClick={() => nav("/dashboard/cbt/id/"+ id + "/result/"+ value.id + "/view/")}>
+                           {key+1}.  {value.name}
+                        </div>
+                    ))
+                }
             </div>
         </>
     )

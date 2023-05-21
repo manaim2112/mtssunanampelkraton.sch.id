@@ -9,6 +9,7 @@ import { Suspense } from "react"
 import { Button, Chip, IconButton, Typography } from "@material-tailwind/react"
 import Swal from "sweetalert2"
 import html2pdf from 'html2pdf.js';
+import jsPDF from "jspdf"
 
 export function ResultCBT() {
     const {id} = useParams()
@@ -83,12 +84,32 @@ export function ResultCBT() {
 
     const handleSaveAsPDF = () => {
         const element = HtmlRef.current;
-        var opt = {
-            filename:     'myfile-'+ Date.now() +'.pdf',
-            margin : 2.5,
-            pagebreak: { mode: 'avoid-all' }
-          };
-        html2pdf().set(opt).from(element).save();
+        const pdf  = new jsPDF({
+            orientation: 'p',
+            unit: 'pt',
+            format: 'legal',
+            putOnlyUsedFonts:true,
+            floatPrecision: 16, // or "smart", default is 16,
+            compress : true,
+           })
+           pdf.setFont("helvetica");
+            pdf.setFontSize(12);
+            pdf.context2d.scale(.7, .6)
+           pdf.html(element, {
+            margin : .5,
+            callback: function (doc) {
+              doc.save(list.name + "_" + v + "_" + Date.now());
+            },
+            x: 10,
+            y: 10
+         });
+        // var opt = {
+        //     filename:     'myfile-'+ Date.now() +'.pdf',
+        //     margin : 2.5,
+        //     pagebreak: { mode: 'avoid-all' },
+        //     jsPDF: { unit: 'pt', format: 'legal', orientation: 'portrait' }
+        //   };
+        // html2pdf().set(opt).from(element).toContainer().save();
     };
 
     if(waiting) return (
@@ -143,10 +164,10 @@ export function ResultCBT() {
                     {
                         user.map((e,k) => (
                             <tr key={k} className={`bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 ${k % 19 === 0 ? "page-break" : ""}`}>
-                                <td className="px-6 py-2">{k+1}</td>
-                                <td className="px-6 py-2">{e.name}</td>
-                                <td className="px-6 py-2">{e.kelas}</td>
-                                <td className="px-6 py-2">{
+                                <td className="px-6 py-1">{k+1}</td>
+                                <td className="px-6 py-1">{e.name}</td>
+                                <td className="px-6 py-1">{e.kelas}</td>
+                                <td className="px-6 py-1">{
                                     status(e.id) === "start" ? (
                                         <Chip color="orange" value={"Sedang mengerjakan"}/>
                                     ) : status(e.id) === "finish" ? (
