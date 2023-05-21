@@ -41,6 +41,7 @@ export function ViewResultCBT() {
                     setSoal(so)
                     getWithIdCBT(id).then(l => {
                         setList(l)
+                        document.title = "Hasil " +  l.name + " dari "+ u.name;
                         const answer = new Array(so.length).fill(null);
                         const poin = new Array(so.length).fill(0)
                         so.forEach((res, key) => {
@@ -92,6 +93,8 @@ export function ViewResultCBT() {
                             // • rendering keys, e.g.:
                             throwOnError : false
                         });
+
+                        
 
                         getStudent(u.kelas).then(us => {
                             setListUser(us)
