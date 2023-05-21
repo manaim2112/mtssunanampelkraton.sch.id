@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useEffect } from "react"
 import { getCBTResultWIthListId } from "../../../service/cbt/result"
 import { Link, useParams } from "react-router-dom"
@@ -8,6 +8,7 @@ import { SkeletonTable } from "../../../elements/skeleton/table"
 import { Suspense } from "react"
 import { Button, Chip, IconButton, Typography } from "@material-tailwind/react"
 import Swal from "sweetalert2"
+import html2pdf from 'html2pdf.js';
 
 export function ResultCBT() {
     const {id} = useParams()
@@ -16,6 +17,8 @@ export function ResultCBT() {
     const [list, setList] = useState([])
     const [user, setUser] = useState([])
     const [waiting, setWaiting] = useState(true)
+    const [v, setV] = useState("9A")
+    const HtmlRef = useRef(null)
 
     useEffect(() => {
         getResult()
@@ -77,6 +80,17 @@ export function ResultCBT() {
             return null
         }
     }
+
+    const handleSaveAsPDF = () => {
+        const element = HtmlRef.current;
+        var opt = {
+            filename:     'myfile-'+ Date.now() +'.pdf',
+            margin : 2.5,
+            pagebreak: { mode: 'avoid-all' }
+          };
+        html2pdf().set(opt).from(element).save();
+    };
+
     if(waiting) return (
         <>
             <SkeletonTable/>
@@ -90,18 +104,19 @@ export function ResultCBT() {
                     {
                         kelas.map((e,k)=> (
                             <IconButton key={k} value={e} onClick={() => {
+                                setV(e)
                                 getStudent(e).then(ruser => {
                                     setUser(ruser)
                                 })
-                            }} className="mx-1">{e}</IconButton>
+                            }} className="mx-1" variant={ e === v ? "gradient" : "outlined"} selected>{e}</IconButton>
                         ))
                     }
                 </div>
-                <div className="">
-                    <Button color="purple">Print Absensi</Button>
+                <div className="mt-5">
+                    <Button onClick={handleSaveAsPDF} color="purple">Print Absensi</Button>
                 </div>
             </div>
-            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-4">
+            <table ref={HtmlRef} className="w-full text-sm text-left text-black dark:text-gray-400 mt-4">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                             <th scope="col" className="px-6 py-3">
@@ -127,11 +142,11 @@ export function ResultCBT() {
                     <tbody>
                     {
                         user.map((e,k) => (
-                            <tr key={k} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                <td className="px-6 py-4">{k+1}</td>
-                                <td className="px-6 py-4">{e.name}</td>
-                                <td className="px-6 py-4">{e.kelas}</td>
-                                <td className="px-6 py-4">{
+                            <tr key={k} className={`bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 ${k % 19 === 0 ? "page-break" : ""}`}>
+                                <td className="px-6 py-2">{k+1}</td>
+                                <td className="px-6 py-2">{e.name}</td>
+                                <td className="px-6 py-2">{e.kelas}</td>
+                                <td className="px-6 py-2">{
                                     status(e.id) === "start" ? (
                                         <Chip color="orange" value={"Sedang mengerjakan"}/>
                                     ) : status(e.id) === "finish" ? (

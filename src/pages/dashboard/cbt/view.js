@@ -1,19 +1,20 @@
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useParams } from "react-router-dom"
 import { getResultWithUserIdAndListId } from "../../../service/cbt/result"
 import { useState } from "react"
 import { getUserWithId } from "../../../service/dashboard/users"
 import { UpdateResultAnswerWIthId, getDataWithIdCBT, getWithIdCBT } from "../../../service/dashboard/cbt"
 import { SkeletonTable } from "../../../elements/skeleton/table"
-import { Button, Card, CardBody, Checkbox, Chip, IconButton, Input, Textarea, Typography } from "@material-tailwind/react"
+import { Card, CardBody, Checkbox, Chip, IconButton, Input, Tooltip, Typography } from "@material-tailwind/react"
 import { JSONParse } from "../../../service/constant"
-import { CheckIcon, SignalIcon, XMarkIcon } from "@heroicons/react/24/outline"
+import { BookmarkSquareIcon, CheckIcon, PrinterIcon, SignalIcon, UserGroupIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import Swal from "sweetalert2"
 import renderMathInElement from "../../../service/auto";
-import { Preview } from "react-html2pdf"
+import html2pdf from "html2pdf.js"
 
 
 export function ViewResultCBT() {
+    const HtmlRef = useRef(null)
     const {id, userid} = useParams()
     const [result, setResult] = useState([])
     const [resultC, setResultC] = useState([])
@@ -26,6 +27,8 @@ export function ViewResultCBT() {
     const [loading, setLoading] = useState(false)
     const [viewPilgan, setViewPilgan] = useState(false)
     const [viewIsian, setViewIsian] = useState(true)
+    const [on, setOn] = useState(false)
+
     useEffect(() => {
         getResultWithUserIdAndListId(userid, id).then(r => {
             setResult(r)
@@ -74,26 +77,25 @@ export function ViewResultCBT() {
 
 
                         setWaiting(false)
+
+                        renderMathInElement(document.body, {
+                            // customised options
+                            // • auto-render specific keys, e.g.:
+                            delimiters: [
+                                {left: '$$', right: '$$', display: true},
+                                {left: '$', right: '$', display: false},
+                                {left: '\\(', right: '\\)', display: false},
+                                {left: '\\[', right: '\\]', display: true}
+                            ],
+                            // • rendering keys, e.g.:
+                            throwOnError : false
+                        });
                     })
                 })
             })
         })
     }, [])
 
-    useEffect(() => {
-        renderMathInElement(document.body, {
-            // customised options
-            // • auto-render specific keys, e.g.:
-            delimiters: [
-                {left: '$$', right: '$$', display: true},
-                {left: '$', right: '$', display: false},
-                {left: '\\(', right: '\\)', display: false},
-                {left: '\\[', right: '\\]', display: true}
-            ],
-            // • rendering keys, e.g.:
-            throwOnError : false
-        });
-    }, [id])
 
     const checkResult = (id) => {
         const res = JSONParse(result[0].answer)
@@ -155,6 +157,17 @@ export function ViewResultCBT() {
         })
     }
 
+    const handleSaveAsPDF = () => {
+        const element = HtmlRef.current;
+        var opt = {
+            filename:    user.kelas + "_"+ list.name + '-'+ Date.now() +'.pdf',
+            margin : 0.3,
+            jsPDF:        { unit: 'in', format: 'legal', orientation: 'portrait' },
+            pagebreak: { mode: 'avoid-all' }
+          };
+        html2pdf().set(opt).from(element).save();
+    };
+
     if(waiting) return (
         <>
             <SkeletonTable/>
@@ -162,29 +175,32 @@ export function ViewResultCBT() {
     )
     return(
         <>
-            <Preview id={"savePdf"}>
-        
-            <Typography variant="h3"> Hasil dari {user.name}</Typography> {user.nisn}
-            <Typography variant="h4">{list.jenis} - {list.name}</Typography>
-            <Typography variant="h5">Nilai Sementara {score.reduce((a,b) => Number(a)+Number(b))}</Typography>
+            <div ref={HtmlRef}>
+            <Typography variant="h4"> Hasil dari {user.name} [{user.nisn}] ({user.kelas})</Typography> 
+            <Typography variant="h6">{list.jenis} - {list.name} | Nilai Sementara {score.reduce((a,b) => Number(a)+Number(b))}</Typography>
 
             <Checkbox name="pilgan" id="isian" onChange={() => setViewPilgan(!viewPilgan)} label="Pilihan ganda/Isian Singkat" defaultChecked={viewPilgan}/>
 
             <Checkbox name="isian" id="isian" onChange={() => setViewIsian(!viewIsian)} label="Isian Panjang" defaultChecked={viewIsian}/>
             {
                 soal.map((e,k) => (
-                    <>
+                    <div key={k} className="text-sm">
                         
                                 {
                                     e.tipe === "pilgan" && viewPilgan ? (
                                         <>
-                                        <Card key={k} className={`my-2 ${(ans[k] === true) ? "bg-green-100" : (ans[k] === null) ? "bg-white" : "bg-red-100"}`}>
-                                            <CardBody>
-                                                <Chip color="blue" value={"Nomer "+ (k+1) } className="mx-1"/>
-                                                {
+                                        <Card className={`relative my-1 border border-gray-800 text-black ${(ans[k] === true) ? "bg-green-50" : (ans[k] === null) ? "bg-white" : "bg-red-50"}`}>
+                                            <div className="absolute top-[-10px]">
+                                                <div className="bg-yellow-400 text-black px-3">
+                                                    {k+1} 
+                                                    {
                                                     (ans[k] === true) ? "score +"+e.score : ""
-                                                }
-                                                <div className="mt-4" dangerouslySetInnerHTML={{ __html: e.question }}></div>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <CardBody className="p-3">
+                                                
+                                                <div className="text-black" dangerouslySetInnerHTML={{ __html: e.question }}></div>
                                             {
                                                 JSONParse(e.options).map((opt, keyopt) => (
                                                     <>
@@ -209,7 +225,7 @@ export function ViewResultCBT() {
                                         </>
                                     ) : e.tipe === "isian_singkat" && viewPilgan ? (
                                         <div>
-                                            <Card key={k} className={`my-2 ${(ans[k] === true) ? "bg-green-100" : (ans[k] === null) ? "bg-white" : "bg-red-100"}`}>
+                                            <Card className={`my-1 text-black border border-gray-800 ${(ans[k] === true) ? "bg-green-100" : (ans[k] === null) ? "bg-white" : "bg-red-100"}`}>
                                             <CardBody>
                                                 <Chip color="blue" value={"Nomer "+ (k+1) } className="mx-1"/>
                                                 {
@@ -225,26 +241,31 @@ export function ViewResultCBT() {
                                         </div>
                                     ) : e.tipe === "isian_panjang" && viewIsian ? (
                                         <>
-                                        <Card key={k} className={`my-2 ${(ans[k] === true) ? "bg-green-100" : (ans[k] === null) ? "bg-white" : "bg-red-100"}`}>
-                                            <CardBody>
-                                                <Chip color="blue" value={"Nomer "+ (k+1) } className="mx-1"/>
-                                                {
+                                        <Card className={`my-1 relative text-black border border-gray-800 ${(ans[k] === true) ? "bg-green-50" : (ans[k] === false) ? "bg-red-50" : "bg-white"}`}>
+                                            <div className="absolute top-[-10px]">
+                                                <div className="bg-yellow-400 text-black px-3">
+                                                    {k+1} 
+                                                    {
                                                     (ans[k] === true) ? "score +"+e.score : ""
-                                                }
-                                                <div className="mt-4" dangerouslySetInnerHTML={{ __html: e.question }}></div>
-                                            <div className="flex gap-0">
-                                                <div>
-                                                    
-                                                    <IconButton onClick={() => handleSucc(k)} color="green" className="m-1">
-                                                        <CheckIcon className="w-5 h-5"></CheckIcon>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <CardBody className="p-3">
+                                                <div className="mt-0" dangerouslySetInnerHTML={{ __html: e.question }}></div>
+                                            <div className="flex gap-0 mt-2">
+                                                <div className="w-64">
+                                                    <IconButton onClick={() => handleSucc(k)} color="green" variant={ans[k] === true ? "gradient" : (ans[k] === false) ? "outlined" : "outlined"} className="m-0" size="sm">
+                                                        <CheckIcon className="w-4 h-4"></CheckIcon>
                                                     </IconButton>
-                                                    <IconButton onClick={() => handleFail(k)} color="red" className="m-1">
-                                                        <XMarkIcon className="w-5 h-5"></XMarkIcon>
+                                                    <IconButton onClick={() => handleFail(k)} color="red" variant={ans[k] === false ? "gradient" : (ans[k] === true) ? "outlined" : "outlined"} className="mx-1" size="sm">
+                                                        <XMarkIcon className="w-4 h-4"></XMarkIcon>
                                                     </IconButton>
                                                 </div>
-                                                <Textarea value={checkResult(e.id)} className="mb-2" disabled/>
+                                                <div className="bg-white border border-deep-orange-300 rounded-lg p-1"> {"Jawaban : "+ checkResult(e.id)} </div>
                                             </div>
-                                            <Textarea value={JSONParse(e.answer)[0]} className="disabled:bg-green-700 disabled:text-white mt-2" disabled/>
+                                            <div>
+                                            {"Kunci Jawaban : "+ JSONParse(e.answer)[0]}
+                                            </div>
                                             </CardBody>
                                             </Card>
                                         </>
@@ -253,20 +274,76 @@ export function ViewResultCBT() {
                                     )
                                 }
 
-                    </>
+                    </div>
                 ))
             }
-            <Button size="lg" onClick={handleUpdate} color="orange" className="rounded-full" disabled={loading}>
-                {
-                    loading ? (
-                        <SignalIcon className="w-4 h-4 animate-spin"></SignalIcon>
-                    ) : (
-                        <span>Update</span>
-                    )
-                }
-            </Button>
-            
-            </Preview>
+            </div>
+
+            <div className="fixed bottom-5 right-5">
+                <div  className="mb-2">
+                <Tooltip
+                    content="Update Jawaban"
+                    animate={{
+                        mount: { scale: 1, y: 0 },
+                        unmount: { scale: 0, y: 25 },
+                    }}
+                    placement="left-end"
+                    >
+                   <IconButton color="blue" variant="gradient" disabled={loading} onClick={handleUpdate}>
+                        {
+                                loading ? (
+                                    <SignalIcon className="w-4 h-4 animate-spin"></SignalIcon>
+                                ) : (
+                                    <BookmarkSquareIcon className="h-4 w-4"/>
+                                )
+                            }
+                    </IconButton>
+                </Tooltip>
+                </div>
+                <div  className="mb-4">
+                <Tooltip
+                    content="Print Hasil Ujian"
+                    animate={{
+                        mount: { scale: 1, y: 0 },
+                        unmount: { scale: 0, y: 25 },
+                    }}
+                    placement="left-end"
+                    >
+                   <IconButton color="red" variant="gradient" onClick={handleSaveAsPDF}>
+                        <PrinterIcon className="h-4 w-4"/>
+                    </IconButton>
+                </Tooltip>
+                </div>
+                <div  className="mb-4">
+                <Tooltip
+                    content="Next"
+                    animate={{
+                        mount: { scale: 1, y: 0 },
+                        unmount: { scale: 0, y: 25 },
+                    }}
+                    placement="left-end"
+                    >
+                   <IconButton color="red" variant="gradient" onClick={() => setOn(true)}>
+                        <UserGroupIcon className="h-4 w-4"/>
+                    </IconButton>
+                </Tooltip>
+                </div>
+            </div>
+
+            <div onClick={() => setOn(false)} className={`fixed top-0 z-[500] w-full h-screen bg-red-300/10 ${on ? "" : "hidden"}`} >
+            </div>
+            <div className={`fixed z-[502] top-0 right-0 w-64 h-screen bg-white rounded-l-lg shadow-lg p-4 transition-all ${on ? "scale-x-100" : "scale-x-0"}`}>
+                Testing
+            </div>
         </>
+    )
+}
+
+export function ToggleUserResult({data}) {
+    return(
+        <div>
+        
+
+        </div>
     )
 }
