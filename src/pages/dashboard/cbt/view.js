@@ -100,7 +100,6 @@ export function ViewResultCBT() {
                 })
             })
         })
-        console.log("sa")
     }, [userid, id])
 
 

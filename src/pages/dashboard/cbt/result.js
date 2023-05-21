@@ -8,7 +8,6 @@ import { SkeletonTable } from "../../../elements/skeleton/table"
 import { Suspense } from "react"
 import { Button, Chip, IconButton, Typography } from "@material-tailwind/react"
 import Swal from "sweetalert2"
-import html2pdf from 'html2pdf.js';
 import jsPDF from "jspdf"
 
 export function ResultCBT() {
