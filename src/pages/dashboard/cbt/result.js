@@ -21,10 +21,6 @@ export function ResultCBT() {
     const HtmlRef = useRef(null)
 
     useEffect(() => {
-        getResult()
-    }, [])
-
-    const getResult = () => {
         getCBTResultWIthListId(id).then(e => {
             setResult(e)
             getWithIdCBT(id).then(l => {
@@ -38,7 +34,8 @@ export function ResultCBT() {
             })
             
         })
-    }
+    }, [id])
+
     const resetResult = (id) => {
         const index = result.findIndex(Obj => Obj.iduser === id)
         if(index === -1) return;
@@ -61,7 +58,19 @@ export function ResultCBT() {
                         showConfirmButton : false
                     })
                     setWaiting(true)
-                    getResult();
+                    getCBTResultWIthListId(id).then(e => {
+                        setResult(e)
+                        getWithIdCBT(id).then(l => {
+                            setList(l)
+                            const k = l.tokelas.split(",").map(u => u.trim())
+                            setKelas(k)
+                            getStudent(k[0]).then(ruser => {
+                                setUser(ruser)
+                                setWaiting(false)
+                            })
+                        })
+                        
+                    })
 
                     Swal.fire({
                         title : "Berhasil di Reset",
