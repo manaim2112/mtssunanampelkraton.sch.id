@@ -102,6 +102,7 @@ export function ViewResultCBT() {
 
                         getStudent(u.kelas).then(us => {
                             setListUser(us)
+                            setLoadView(false)
                         })
                     })
                 })
@@ -375,21 +376,26 @@ export function ViewResultCBT() {
                                         getStudent(l).then(e => {
                                             nav("/dashboard/cbt/id/"+ id + "/result/"+ e[0].id + "/view/")
                                         })
-                                    }} className={`inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 ${ l === user.kelas ? "border-b-blue-500 text-blue-500" : ""} dark:hover:text-gray-300`}>{l}</span>
+                                    }} className={`inline-block p-4 cursor-pointer border-b-2 border-transparent rounded-t-lg hover:text-blue-600 hover:border-blue-300 ${ l === user.kelas ? "border-b-blue-500 text-blue-500" : ""} dark:hover:text-blue-300`}>{l}</span>
                                 </li>
                             ))
                         }
                     </ul>
                 </div>
 
-                
-                <Typography variant="h6">List Kelas {user.kelas}</Typography>
                 {
-                    listUser.map((value, key) => (
-                        <div key={key} className={`hover:underline hover:text-blue-400 cursor-pointer ${user.id === value.id ? "text-blue-400" : ""}`} onClick={() => nav("/dashboard/cbt/id/"+ id + "/result/"+ value.id + "/view/")}>
-                           {key+1}.  {value.name}
+                    loadView ? (<SkeletonTable/>) : (
+                        <div className="mt-4">
+                            <Typography variant="h5">List Kelas {user.kelas}</Typography>
+                            {
+                                listUser.map((value, key) => (
+                                    <div key={key} className={`hover:underline hover:text-blue-400 cursor-pointer ${user.id === value.id ? "text-blue-400" : ""}`} onClick={() => nav("/dashboard/cbt/id/"+ id + "/result/"+ value.id + "/view/")}>
+                                       {key+1}.  {value.name}
+                                    </div>
+                                ))
+                            }
                         </div>
-                    ))
+                    )
                 }
             </div>
         </>

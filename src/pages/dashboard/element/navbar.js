@@ -37,14 +37,14 @@ const profileMenuItems = [
     icon: PowerIcon,
     action : () => {
       sessionStorage.removeItem("refresh-admin")
-      window.location.reload()
+      window.location.replace(window.location.origin + "/auth/login_admin")
     }
   },
 ];
  
 function ProfileMenu() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const closeMenu = () => setIsMenuOpen(false);
+  // const closeMenu = () => setIsMenuOpen(false);
  
   return (
     <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
