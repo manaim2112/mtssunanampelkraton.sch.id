@@ -192,7 +192,6 @@ export function DataIdCBTDashboardElement({xid}) {
 
     useEffect(() => {
         getDataWithIdCBT(xid).then(d => {
-            console.log(d)
             setList(d)
         })
     }, [xid])

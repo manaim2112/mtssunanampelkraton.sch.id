@@ -30,10 +30,15 @@ export function ViewResultCBT() {
     const [viewIsian, setViewIsian] = useState(true)
     const [on, setOn] = useState(false)
     const [listUser, setListUser] = useState([])
+    const [loadView, setLoadView] = useState(false)
 
     useEffect(() => {
+        setLoadView(true)
         getResultWithUserIdAndListId(userid, id).then(r => {
+            r = r.sort((a,b) => a[0]-b[0])
+            const ranw = JSONParse(r[0].answer)
             setResult(r)
+            setResultC(ranw)
             getUserWithId(userid).then(u => {
                 setUser(u)
                 getDataWithIdCBT(id).then(s => {
@@ -46,7 +51,6 @@ export function ViewResultCBT() {
                         const poin = new Array(so.length).fill(0)
                         so.forEach((res, key) => {
                             const a = JSONParse(res.answer)
-                            const ranw = JSONParse(r[0].answer)
                             const index = ranw.findIndex(Obj => Obj[0] === res.id);
                             if(index === -1) return;
                             const yans = ranw[index][1].sort()
@@ -127,9 +131,16 @@ export function ViewResultCBT() {
         const a = [...ans]
         a[key] = false;
         const s = soal[key].id
-        const ranw = JSONParse(result[0].answer)
+        const ranw = resultC
         const index = ranw.findIndex(Obj => Obj[0] === s);
-        ranw[index][2] = false;
+        console.log(index)
+        if(ranw[index] && ranw[index].length === 3) {
+            ranw[index][2] = false;
+        } else if(ranw[index] && ranw[index].length === 2) {
+            ranw[index].push(false)
+        } else {
+            ranw[index] = [s, [], false]
+        }
         const sd = [...score]
         sd[key] = 0;
         setScore(sd)
@@ -142,12 +153,21 @@ export function ViewResultCBT() {
         const a = [...ans]
         a[key] = true;
         const s = soal[key].id
-        const ranw = JSONParse(result[0].answer)
+        const ranw = resultC
         const index = ranw.findIndex(Obj => Obj[0] === s);
-        ranw[index][2] = true;
+        if(ranw[index] && ranw[index].length === 3) {
+            ranw[index][2] = true;
+        } else if(ranw[index] && ranw[index].length === 2) {
+            ranw[index].push(true)
+        } else {
+            ranw[index] = [s, [], true]
+        }
         const sd = [...score]
         sd[key] = soal[key].score;
         setScore(sd)
+        console.log(ranw[index])
+        console.log(ranw)
+        console.log(a)
         setResultC(ranw)
         setAns(a)
     }
@@ -345,8 +365,25 @@ export function ViewResultCBT() {
 
             <div onClick={() => setOn(false)} className={`fixed top-0 z-[500] w-full h-screen bg-red-300/10 ${on ? "" : "hidden"}`} >
             </div>
-            <div className={`fixed z-[502] top-0 h-screen overflow-y-auto overflow-x-auto bg-white rounded-l-lg shadow-lg p-4 transition-all ${on ? "w-64 right-0" : "w-0 -right-10"}`}>
-                <Typography variant="h4">List Kelas {user.kelas}</Typography>
+            <div className={`fixed z-[502] top-0 h-screen overflow-y-auto overflow-x-auto bg-white rounded-l-lg shadow-lg p-4 transition-all ${on ? "w-64 right-0" : "w-0 -right-10"}`}> 
+                <div className="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
+                    <ul className="flex flex-nowrap -mb-px overflow-y-auto">
+                        {
+                            list.tokelas.split(",").map(e => e.trim()).map((l, keyL) => (
+                                <li className="mr-2" key={keyL}>
+                                    <span onClick={() => {
+                                        getStudent(l).then(e => {
+                                            nav("/dashboard/cbt/id/"+ id + "/result/"+ e[0].id + "/view/")
+                                        })
+                                    }} className={`inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 ${ l === user.kelas ? "border-b-blue-500 text-blue-500" : ""} dark:hover:text-gray-300`}>{l}</span>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                </div>
+
+                
+                <Typography variant="h6">List Kelas {user.kelas}</Typography>
                 {
                     listUser.map((value, key) => (
                         <div key={key} className={`hover:underline hover:text-blue-400 cursor-pointer ${user.id === value.id ? "text-blue-400" : ""}`} onClick={() => nav("/dashboard/cbt/id/"+ id + "/result/"+ value.id + "/view/")}>

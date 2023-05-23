@@ -45,7 +45,6 @@ export function insertCBT_list(data) {
             headers : {"Content-Type" : "application/json"},
             body : JSON.stringify(data)
         }).then(r=>r.json()).then(r => {
-            console.log(r)
             if(r.status === 201) {
                 resolve(true)
             } else {
@@ -228,7 +227,6 @@ export function saveWithUploadWordCBT(data, id) {
             })
         }
     });
-    console.log(oi)
     return new Promise((resolve, reject) => {
         try {
             fetch(BASE_URL + "/cbt/soal/create_many", {
@@ -236,10 +234,8 @@ export function saveWithUploadWordCBT(data, id) {
                 headers : {"Content-Type": "application/json"},
                 body : JSON.stringify(oi)
             }).then(r=>r.json()).then(r => {
-                console.log(r)
                 resolve(r.status === 201)
             }).catch(err => {
-                console.log(err)
                 resolve(false)
             })
         } catch (error) {

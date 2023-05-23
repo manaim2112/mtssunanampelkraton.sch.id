@@ -29,11 +29,16 @@ const profileMenuItems = [
   {
     label: "My Profile",
     icon: UserCircleIcon,
+    action : () => {},
 
   },
   {
     label: "Keluar",
     icon: PowerIcon,
+    action : () => {
+      sessionStorage.removeItem("refresh-admin")
+      location.reload()
+    }
   },
 ];
  
@@ -65,12 +70,12 @@ function ProfileMenu() {
         </Button>
       </MenuHandler>
       <MenuList className="p-1">
-        {profileMenuItems.map(({ label, icon }, key) => {
+        {profileMenuItems.map(({ label, icon, action }, key) => {
           const isLastItem = key === profileMenuItems.length - 1;
           return (
             <MenuItem
               key={label}
-              onClick={closeMenu}
+              onClick={action}
               className={`flex items-center gap-2 rounded ${
                 isLastItem
                   ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
