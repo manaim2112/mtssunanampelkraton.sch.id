@@ -37,7 +37,7 @@ const profileMenuItems = [
     icon: PowerIcon,
     action : () => {
       sessionStorage.removeItem("refresh-admin")
-      location.reload()
+      window.location.reload()
     }
   },
 ];
