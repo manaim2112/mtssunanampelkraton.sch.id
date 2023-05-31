@@ -161,14 +161,12 @@ export function ViewResultCBT() {
         } else if(ranw[index] && ranw[index].length === 2) {
             ranw[index].push(true)
         } else {
-            ranw[index] = [s, [], true]
+            ranw.push([s, [], true])
         }
         const sd = [...score]
         sd[key] = soal[key].score;
         setScore(sd)
-        console.log(ranw[index])
         console.log(ranw)
-        console.log(a)
         setResultC(ranw)
         setAns(a)
     }
@@ -179,6 +177,7 @@ export function ViewResultCBT() {
         const answer = JSON.stringify(resultC)
 
         UpdateResultAnswerWIthId({id, answer}).then(t => {
+
             setLoading(false)
            Swal.fire({
             title : "Berhasil Update",

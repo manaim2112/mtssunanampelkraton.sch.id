@@ -120,12 +120,14 @@ export function changeCodeCBT_list({id, code}) {
 }
 
 export function updateStartEndCBT({id, mulai, berakhir}) {
+    console.log(id, mulai, berakhir)
     return new Promise((resolve, reject) => {
         fetch(BASE_URL + "/cbt/list/update_start_end", {
             method : "PUT",
             headers : {"Content-Type" : "application/json"},
-            body : JSON.stringify({id, mulai, berakhir})
+            body : JSON.stringify({id, mulai : `${mulai}`, berakhir : `${berakhir}`})
         }).then(r=>r.json()).then(e => {
+            console.log("response", e)
             resolve(e.status === 201)
         })
     })
@@ -193,6 +195,7 @@ export function UpdateResultAnswerWIthId({id, answer}) {
             headers : {"Content-Type" : "application/json"},
             body : JSON.stringify({id, answer})
         }).then(r =>r.json()).then(r => {
+            console.log(answer, r)
             resolve(r.status === 201)
         })
     })

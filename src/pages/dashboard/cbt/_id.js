@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { RemoveSoalWithId, changeCodeCBT_list, getDataWithIdCBT, getWithIdCBT, swithAcakCBT_list, updateStartEndCBT } from "../../../service/dashboard/cbt";
 import {  useNavigate, useParams } from "react-router-dom";
 import { Button, Chip, IconButton, Input, Switch, Typography } from "@material-tailwind/react";
-import { ArrowPathIcon, CheckIcon, PencilIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, CheckIcon, PencilIcon, PencilSquareIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import useDocumentTitle from "../../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { JSONParse, randomText } from "../../../service/constant";
 import renderMathInElement from "../../../service/auto";
+import { useRef } from "react";
 
 
 
@@ -18,10 +19,12 @@ export function IdCBTDashboard() {
     const nav = useNavigate()
     const Myswal = withReactContent(Swal)
     const [codeChange, setCodeChange] = useState(false)
-    const [startInput, setStartInput] = useState("")
-    const [endInput, setEndInput] = useState("")
+    const [min, setMin] = useState(0)
+    const [max, setMax] = useState(0)
     useEffect(() => {
+        
         getWithIdCBT(id).then(d => {
+            console.log(d)
                 setXid(d)
         })
         
@@ -37,7 +40,7 @@ export function IdCBTDashboard() {
             // • rendering keys, e.g.:
             throwOnError : false
         });
-    }, [xid, id])
+    }, [])
 
     const ChangeCode = (id) => {
         setCodeChange(true)
@@ -50,6 +53,7 @@ export function IdCBTDashboard() {
     const swichAcak = (e, id) => {
         swithAcakCBT_list({id, acak :e.target.checked}).then(t => {
             if(t) {
+                console.log(t)
                 setXid(xid)
                 Myswal.fire({
                     "title" : "Berhasil",
@@ -63,24 +67,42 @@ export function IdCBTDashboard() {
         })
     }
 
-    const setStartDate = (date, id) => {
+    // const setStartDate = (date, id) => {
+    //     const value = startInput.current.value;
+    //     return console.log(value)
+        // updateStartEndCBT({id, mulai : date, berakhir : xid.berakhir}).then(e => {
+        //     if(e) {
+        //         setXid(xid)
+        //         Myswal.fire({
+        //             "title" : "Berhasil",
+        //             "icon" : "success",
+        //             "showConfirmButton" : false,
+        //             "timer" : 1500,
+        //             "position" : "top-end",
+        //         })
+        //     }
+        // })
+    // }
+    // const setEndDate = (date, id) => {
 
-        updateStartEndCBT({id, mulai : date, berakhir : xid.berakhir}).then(e => {
-            if(e) {
-                setXid(xid)
-                Myswal.fire({
-                    "title" : "Berhasil",
-                    "icon" : "success",
-                    "showConfirmButton" : false,
-                    "timer" : 1500,
-                    "position" : "top-end",
-                })
-            }
-        })
-    }
-    const setEndDate = (date, id) => {
-
-        updateStartEndCBT({id, mulai : xid.mulai, berakhir : date}).then(e => {
+    //     updateStartEndCBT({id, mulai : xid.mulai, berakhir : date}).then(e => {
+    //         if(e) {
+    //             setXid(xid)
+    //             Myswal.fire({
+    //                 "title" : "Berhasil",
+    //                 "icon" : "success",
+    //                 "showConfirmButton" : false,
+    //                 "timer" : 1500,
+    //                 "position" : "top-end",
+    //             })
+    //         }
+    //     })
+    // }
+    const handleChangeStart = (id) => {
+        console.log(min, max)
+        const minimum = min.toString()
+        const maximum = max.toString()
+        updateStartEndCBT({id, mulai : minimum, berakhir : maximum}).then(e => {
             if(e) {
                 setXid(xid)
                 Myswal.fire({
@@ -126,23 +148,24 @@ export function IdCBTDashboard() {
 
                         </li>
                         <li className="w-full px-4 py-2 border-b border-gray-200 dark:border-gray-600 flex place-items-center gap-3">
-                        <span className="bg-slate-200 px-2 py-1 rounded-full mx-2">Dimulai saat</span>
-                        <Input label="time" id="inputStartCBTList" type="date" min={"2023-01-01"} max={"2123-01-01"} onChange={(date) => setStartInput(date.target.value) } value={xid.mulai== null ? "" : xid.mulai}></Input>
-                        <IconButton size="sm" onClick={() => {
-                                setStartDate(startInput, xid.id)
-                        }}>
-                            <PencilIcon className="w-4 h-4"></PencilIcon>
-                        </IconButton>
+                        <div className="bg-slate-200 px-2 py-1 rounded-full mx-2 w-32">Nilai Minimum</div>
+                        <div>
+                            <Input type="number" defaultValue={xid.mulai} onKeyUp={e => setMin(e.target.value)} label="Angka"/>
+                        </div>
 
                         </li>
                         <li className="w-full px-4 py-2 border-b border-gray-200 dark:border-gray-600 flex">
-                        <span className="bg-slate-200 px-2 py-1 rounded-full mx-2">Diakhiri saat</span> 
-                        <Input label="time" type="date" min={"2023-01-01"} max={"2123-01-01"} onChange={(date) => setEndInput(date.target.value)} value={xid.berakhir== null ? "" : xid.berakhir}></Input>
-                        <IconButton size="sm" onClick={() => {
-                                setEndDate(endInput, xid.id)
-                        }}>
-                            <PencilIcon className="w-4 h-4"></PencilIcon>
-                        </IconButton>
+                        <div className="bg-slate-200 px-2 py-1 rounded-full mx-2 w-32">Nilai Maksimum</div> 
+                        <div className="">
+                            <Input type="number" className="w-8" defaultValue={xid.berakhir} onKeyUp={e => setMax(e.target.value)} label="Angka"/>
+                        </div>
+                        <div className="ml-4">
+                            <IconButton onClick={e => handleChangeStart(xid.id)} color="green" variant="gradient">
+                                <PencilSquareIcon className="w-4 h-4"/>
+                            </IconButton>
+                        </div>
+
+                       
 
                         </li>
                         <li className="w-full px-4 py-2 border-b border-gray-200 dark:border-gray-600 flex">

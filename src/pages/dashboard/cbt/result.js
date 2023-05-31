@@ -23,6 +23,7 @@ export function ResultCBT() {
     const [soal, setSoal] = useState([])
     const [waiting, setWaiting] = useState(true)
     const [score, setScore] = useState([])
+    const [scoreEnd, setScoreEnd] = useState([])
     const [v, setV] = useState(null)
     const HtmlRef = useRef(null)
     const [load, setLoad] = useState(false)
@@ -32,6 +33,27 @@ export function ResultCBT() {
     useEffect(() => {
         processData()
     }, [id, v])
+
+    function mapToRange(arr, min, max) {
+        const minValue = Math.min(...arr);
+        const maxValue = Math.max(...arr);
+      
+        const mappedArray = arr.map((value) => {
+          if (value < minValue) {
+            return min;
+          } else if (value > maxValue) {
+            return max;
+          } else {
+            const percentage = (value - minValue) / (maxValue - minValue);
+            return Math.ceil(min + percentage * (max - min));
+          }
+        });
+      
+        return mappedArray;
+      }
+      
+     
+      
 
     const processData = () => {
         setLoad(true)
@@ -95,7 +117,11 @@ export function ResultCBT() {
                                 myscore.push(scoreItem.reduce((a,b) => Number(a) + Number(b)))
                             }
                         });
+                        const mappedArray = mapToRange(myscore, Number(l.mulai), Number(l.berakhir));
+                        
+                        console.log(mappedArray);
                         setScore(myscore)
+                        setScoreEnd(mappedArray)
                         setUser(ruser)
                         setWaiting(false)
                         setLoad(false)
@@ -113,7 +139,7 @@ export function ResultCBT() {
             const workbook =  XLSX.utils.book_new()
             response.forEach((user, keyUser) => {
                 // Check Score
-                const myscore = [];
+                const myscore = []
                 user.forEach(element => {
                     const index = result.findIndex(Obj => Obj.iduser === element.id)
                     if(index === -1) return myscore.push(0)
@@ -164,6 +190,8 @@ export function ResultCBT() {
                     }
                 });
                 // End score
+                const endScore = mapToRange(myscore, Number(list.mulai), Number(list.berakhir));
+
                 const rows = [];
                 user.forEach((u, k) => {
                     rows.push({
@@ -172,7 +200,8 @@ export function ResultCBT() {
                         Nama : u.name,
                         Kelas : u.kelas,
                         Progress : status(u.id) === "start" ? "Sedang mengerjakan" : status(u.id) === "finish" ? "Tuntas" : "Belum Absen",
-                        Nilai : myscore[k]
+                        "Nilai Sementara" : myscore[k],
+                        "Nilai Akhir" : endScore[k]
                     })
                 })
                 const worksheet = XLSX.utils.json_to_sheet(rows);
@@ -226,6 +255,7 @@ export function ResultCBT() {
     }
 
     const resetResult = (id) => {
+        return;
         const index = result.findIndex(Obj => Obj.iduser === id)
         if(index === -1) return;
 
@@ -340,7 +370,10 @@ export function ResultCBT() {
                                         Progress
                                     </th>
                                     <th scope="col" className="px-6 py-3">
-                                        Nilai
+                                        Nilai Sementara
+                                    </th>
+                                    <th scope="col" className="px-6 py-3">
+                                        Nilai Akhir
                                     </th>
                                     <th scope="col" className="px-6 py-3">
                                         cek hasil
@@ -369,6 +402,7 @@ export function ResultCBT() {
                                             )
                                         }</td>
                                         <td className="px-6 py-1">{score[k]}</td>
+                                        <td className="px-6 py-1">{scoreEnd[k]}</td>
 
                                         <td>
                                             {

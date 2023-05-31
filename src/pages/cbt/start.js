@@ -14,7 +14,6 @@ import renderMathInElement from "../../service/auto";
 
 import "./start.css"
 import { usePageVisibility } from "../../elements/useVisibility";
-import localforage from "localforage";
  
 export function StartCBT() {
     const {start} = useParams()

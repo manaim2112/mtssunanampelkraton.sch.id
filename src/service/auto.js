@@ -1,4 +1,4 @@
-import katex from './katex';
+import katex from "katex"
 
 
 /* eslint no-constant-condition:0 */
