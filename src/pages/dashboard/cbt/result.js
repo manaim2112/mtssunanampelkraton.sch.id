@@ -201,7 +201,7 @@ export function ResultCBT() {
                         Kelas : u.kelas,
                         Progress : status(u.id) === "start" ? "Sedang mengerjakan" : status(u.id) === "finish" ? "Tuntas" : "Belum Absen",
                         "Nilai Sementara" : myscore[k],
-                        "Nilai Akhir" : endScore[k]
+                        // "Nilai Akhir" : endScore[k]
                     })
                 })
                 const worksheet = XLSX.utils.json_to_sheet(rows);
@@ -372,9 +372,9 @@ export function ResultCBT() {
                                     <th scope="col" className="px-6 py-3">
                                         Nilai Sementara
                                     </th>
-                                    <th scope="col" className="px-6 py-3">
+                                    {/* <th scope="col" className="px-6 py-3">
                                         Nilai Akhir
-                                    </th>
+                                    </th> */}
                                     <th scope="col" className="px-6 py-3">
                                         cek hasil
                                     </th>
@@ -402,7 +402,7 @@ export function ResultCBT() {
                                             )
                                         }</td>
                                         <td className="px-6 py-1">{score[k]}</td>
-                                        <td className="px-6 py-1">{scoreEnd[k]}</td>
+                                        {/* <td className="px-6 py-1">{scoreEnd[k]}</td> */}
 
                                         <td>
                                             {
