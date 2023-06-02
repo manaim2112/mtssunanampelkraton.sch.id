@@ -6,40 +6,44 @@ import {
   Route,
   Outlet
 } from "react-router-dom";
-import { IndexHome } from './pages';
-import { IndexBerita } from './pages/berita';
-import { IdBerita } from './pages/berita/_id';
-import { IndexHomes } from './pages/home';
-import { CBTIndex } from './pages/cbt';
-import { IndexDashboard } from './pages/dashboard';
-import { HomeDashboard } from './pages/dashboard/home';
-import { IndexMateriDashboard } from './pages/dashboard/materi';
-import { IndexPenugasanDashboard } from './pages/dashboard/penugasan';
-import { IndexCBTDashboard } from './pages/dashboard/cbt';
-import { IdMateriDashboard } from './pages/dashboard/materi/_id';
-import { IdCBTDashboard } from './pages/dashboard/cbt/_id';
-import { UploadWordCBTDashboard } from './pages/dashboard/cbt/uploadviaword';
-import { IndexUsersDashboard } from './pages/dashboard/users';
-import { IndexGuruDashboard } from './pages/dashboard/guru';
-import { IndexLoginUser } from './pages/authorize/login_user';
-import { IndexLoginAdmin } from './pages/authorize/login_guru';
-import { HomeCBT } from './pages/cbt/home';
-import { IndexUser } from './pages/user';
-import { IndexUserWithNisn } from './pages/user/_nisn';
-import { Install } from './pages/instalation';
-import { StartCBT } from './pages/cbt/start';
-import { FinishCBT } from './pages/cbt/finish';
-import { ResultCBT } from './pages/dashboard/cbt/result';
-import { ViewResultCBT } from './pages/dashboard/cbt/view';
-import { HomeKegiatanDashboard } from './pages/dashboard/kegiatan/home';
-import { EditKegiatanDashboard } from './pages/dashboard/kegiatan/_id';
-import { CreateNewKegiatanDashboard } from './pages/dashboard/kegiatan/create';
+import { lazy } from 'react';
+import { Suspense } from 'react';
 
+const IndexHome = lazy(() => import("./pages"))
+const IndexBerita = lazy(() => import("./pages/berita"))
+const IdBerita = lazy(() => import("./pages/berita/_id"))
+const IndexHomes = lazy(() => import("./pages/home"))
+const CBTIndex = lazy(() => import("./pages/cbt"))
+const IndexDashboard = lazy(() => import("./pages/dashboard"))
+const HomeDashboard = lazy(() => import("./pages/dashboard/home"))
+const IndexMateriDashboard = lazy(() => import("./pages/dashboard/materi"))
+const IndexPenugasanDashboard = lazy(() => import("./pages/dashboard/penugasan"))
+const IndexCBTDashboard = lazy(() => import("./pages/dashboard/cbt"))
+const IdMateriDashboard = lazy(() => import("./pages/dashboard/materi/_id"))
+const IdCBTDashboard = lazy(() => import("./pages/dashboard/cbt/_id"))
+const UploadWordCBTDashboard = lazy(() => import("./pages/dashboard/cbt/uploadviaword"))
+const IndexUsersDashboard = lazy(() => import("./pages/dashboard/users"))
+const IndexGuruDashboard = lazy(() => import("./pages/dashboard/guru"))
+const IndexLoginUser = lazy(() => import("./pages/authorize/login_user"))
+const IndexLoginAdmin = lazy(() => import("./pages/authorize/login_guru"))
+const HomeCBT = lazy(() => import("./pages/cbt/home"))
+const IndexUser = lazy(() => import("./pages/user"))
+const IndexUserWithNisn = lazy(() => import("./pages/user/_nisn"))
+const Install = lazy(() => import("./pages/instalation"))
+const StartCBT = lazy(() => import("./pages/cbt/start"))
+const FinishCBT = lazy(() => import("./pages/cbt/finish"))
+const ResultCBT = lazy(() => import("./pages/dashboard/cbt/result"))
+const ViewResultCBT = lazy(() => import("./pages/dashboard/cbt/view"))
+const HomeKegiatanDashboard = lazy(() => import("./pages/dashboard/kegiatan/home"))
+const EditKegiatanDashboard = lazy(() => import("./pages/dashboard/kegiatan/_id"))
+const CreateNewKegiatanDashboard = lazy(() => import("./pages/dashboard/kegiatan/create"))
+const ExportNilai = lazy(() => import("../src/pages/dashboard/cbt/export_nilai"))
 
 function App() {
 
   
   return (
+    <Suspense fallback={"Tunggu Sebentart"}>
     <div className="font-sans">
       {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
@@ -57,9 +61,11 @@ function App() {
       </header> */}
 
       <Outlet/>
+      
       <Router>
-        <div>        
+        <div>
           <Routes>
+            
             <Route path='/install' element={<Install/>}>
               </Route>
           <Route path="/" element={<IndexHome />}>
@@ -86,7 +92,7 @@ function App() {
             <Route path='materi/id/:id' element={<IdMateriDashboard/>}/>
             <Route path='penugasan' element={<IndexPenugasanDashboard/>}/>
             <Route path='cbt' element={<IndexCBTDashboard/>}/>
-
+            <Route path='cbt/export_nilai' element={<ExportNilai/>}/>
             <Route path='cbt/id/:id' element={<IdCBTDashboard/>}/>
             <Route path='cbt/id/:id/result' element={<ResultCBT/>}/>
             <Route path='cbt/id/:id/result/:userid/view' element={<ViewResultCBT/>}/>
@@ -104,6 +110,7 @@ function App() {
         </div>
       </Router>
     </div>
+    </Suspense>
   );
 
 }

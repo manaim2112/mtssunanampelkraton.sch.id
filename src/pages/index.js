@@ -1,7 +1,8 @@
 import { Typography } from "@material-tailwind/react";
-import { NavbarElement } from "../elements/navbar";
 
 import { Outlet } from "react-router-dom";
+import { Suspense } from "react";
+import { lazy } from "react";
 
 
 // export function IndexHome() {
@@ -13,11 +14,11 @@ import { Outlet } from "react-router-dom";
 //         </>
 //     )
 // }
-
-export function IndexHome() {
+const NavbarElement = lazy(() => import("../elements/navbar"))
+export default function IndexHome() {
 
     return(
-        <>
+        <Suspense fallback={"Tunggu Sebentar"}>
             <NavbarElement></NavbarElement>
             
             <Outlet/>
@@ -74,6 +75,6 @@ export function IndexHome() {
       </Typography>
     </footer>
             
-        </>
+    </Suspense>
     )
 }

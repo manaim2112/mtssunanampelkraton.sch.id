@@ -1,6 +1,6 @@
 import useDocumentTitle from "../../elements/useDocumentTitle"
 
-export function IndexBerita() {
+export default function IndexBerita() {
     useDocumentTitle("Berita terkini")
     return (
         <>

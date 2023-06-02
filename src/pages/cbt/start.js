@@ -15,7 +15,7 @@ import renderMathInElement from "../../service/auto";
 import "./start.css"
 import { usePageVisibility } from "../../elements/useVisibility";
  
-export function StartCBT() {
+export default function StartCBT() {
     const {start} = useParams()
     const nav = useNavigate();
     useDocumentTitle("Selamat Mengerjakan soal")

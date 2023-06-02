@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
-import { RemoveSoalWithId, changeCodeCBT_list, getDataWithIdCBT, getWithIdCBT, swithAcakCBT_list, updateStartEndCBT } from "../../../service/dashboard/cbt";
+import { RemoveSoalWithId, getDataWithIdCBT, updateStartEndCBT } from "../../../service/dashboard/cbt";
 import {  useNavigate, useParams } from "react-router-dom";
 import { Button, Chip, IconButton, Input, Switch, Typography } from "@material-tailwind/react";
-import { ArrowPathIcon, CheckIcon, PencilIcon, PencilSquareIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, CheckIcon, PencilSquareIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import useDocumentTitle from "../../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { JSONParse, randomText } from "../../../service/constant";
 import renderMathInElement from "../../../service/auto";
-import { useRef } from "react";
 
 
 
-export function IdCBTDashboard() {
+export default function IdCBTDashboard() {
     const [xid, setXid] = useState("")
     const {id} = useParams()
     useDocumentTitle("EDIT")
@@ -22,10 +21,10 @@ export function IdCBTDashboard() {
     const [min, setMin] = useState(0)
     const [max, setMax] = useState(0)
     useEffect(() => {
-        
-        getWithIdCBT(id).then(d => {
-            console.log(d)
-                setXid(d)
+        import("../../../service/dashboard/cbt").then(({getWithIdCBT}) => {
+            getWithIdCBT(id).then(d => {
+                    setXid(d)
+            })
         })
         
         renderMathInElement(document.body, {
@@ -44,75 +43,49 @@ export function IdCBTDashboard() {
 
     const ChangeCode = (id) => {
         setCodeChange(true)
-        changeCodeCBT_list({id, code : randomText()}).then(r => {
-            setXid(xid)
-            setCodeChange(false)
+        import("../../../service/dashboard/cbt").then(({changeCodeCBT_list}) => {
+            changeCodeCBT_list({id, code : randomText()}).then(r => {
+                setXid(xid)
+                setCodeChange(false)
+            })
         })
     }
 
     const swichAcak = (e, id) => {
-        swithAcakCBT_list({id, acak :e.target.checked}).then(t => {
-            if(t) {
-                console.log(t)
-                setXid(xid)
-                Myswal.fire({
-                    "title" : "Berhasil",
-                    "icon" : "success",
-                    "showConfirmButton" : false,
-                    "timer" : 1500,
-                    "position" : "top-end",
-                })
-                
-            }
+        import("../../../service/dashboard/cbt").then(({swithAcakCBT_list}) => {
+            swithAcakCBT_list({id, acak :e.target.checked}).then(t => {
+                if(t) {
+                    console.log(t)
+                    setXid(xid)
+                    Myswal.fire({
+                        "title" : "Berhasil",
+                        "icon" : "success",
+                        "showConfirmButton" : false,
+                        "timer" : 1500,
+                        "position" : "top-end",
+                    })
+                    
+                }
+            })
         })
     }
 
-    // const setStartDate = (date, id) => {
-    //     const value = startInput.current.value;
-    //     return console.log(value)
-        // updateStartEndCBT({id, mulai : date, berakhir : xid.berakhir}).then(e => {
-        //     if(e) {
-        //         setXid(xid)
-        //         Myswal.fire({
-        //             "title" : "Berhasil",
-        //             "icon" : "success",
-        //             "showConfirmButton" : false,
-        //             "timer" : 1500,
-        //             "position" : "top-end",
-        //         })
-        //     }
-        // })
-    // }
-    // const setEndDate = (date, id) => {
-
-    //     updateStartEndCBT({id, mulai : xid.mulai, berakhir : date}).then(e => {
-    //         if(e) {
-    //             setXid(xid)
-    //             Myswal.fire({
-    //                 "title" : "Berhasil",
-    //                 "icon" : "success",
-    //                 "showConfirmButton" : false,
-    //                 "timer" : 1500,
-    //                 "position" : "top-end",
-    //             })
-    //         }
-    //     })
-    // }
     const handleChangeStart = (id) => {
-        console.log(min, max)
         const minimum = min.toString()
         const maximum = max.toString()
-        updateStartEndCBT({id, mulai : minimum, berakhir : maximum}).then(e => {
-            if(e) {
-                setXid(xid)
-                Myswal.fire({
-                    "title" : "Berhasil",
-                    "icon" : "success",
-                    "showConfirmButton" : false,
-                    "timer" : 1500,
-                    "position" : "top-end",
-                })
-            }
+        import("../../../service/dashboard/cbt").then(({updateStartEndCBT}) => {
+            updateStartEndCBT({id, mulai : minimum, berakhir : maximum}).then(e => {
+                if(e) {
+                    setXid(xid)
+                    Myswal.fire({
+                        "title" : "Berhasil",
+                        "icon" : "success",
+                        "showConfirmButton" : false,
+                        "timer" : 1500,
+                        "position" : "top-end",
+                    })
+                }
+            })
         })
     }
     return(

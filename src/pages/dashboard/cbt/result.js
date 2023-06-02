@@ -1,9 +1,7 @@
 import { useRef, useState } from "react"
 import { useEffect } from "react"
-import { getCBTResultWIthListId } from "../../../service/cbt/result"
 import { Link, useParams } from "react-router-dom"
-import { getStudent } from "../../../service/dashboard/users"
-import { RemoveResultWithId, getDataWithIdCBT, getWithIdCBT } from "../../../service/dashboard/cbt"
+import { RemoveResultWithId} from "../../../service/dashboard/cbt"
 import { SkeletonTable } from "../../../elements/skeleton/table"
 import { Suspense } from "react"
 import { Chip, IconButton, Tooltip, Typography } from "@material-tailwind/react"
@@ -12,9 +10,8 @@ import jsPDF from "jspdf"
 import { JSONParse } from "../../../service/constant"
 import { PrinterIcon, SignalIcon } from "@heroicons/react/24/outline"
 import XLSX from "xlsx"
-import { getUserWithKelas } from "../../../service/cbt/user"
 
-export function ResultCBT() {
+export default function ResultCBT() {
     const {id} = useParams()
     const [result, setResult] = useState([])
     const [kelas, setKelas] = useState([])
@@ -57,199 +54,208 @@ export function ResultCBT() {
 
     const processData = () => {
         setLoad(true)
-        getCBTResultWIthListId(id).then(e => {
-            setResult(e)
-            getDataWithIdCBT(id).then(so => {
-                setSoal(so)
-                getWithIdCBT(id).then(l => {
-                    setList(l)
-                    const k = l.tokelas.split(",").map(u => u.trim())
-                    setKelas(k)
-                    const settKe = v ? v : k[0];
-                    getStudent(settKe).then(ruser => {
-                        const myscore = [];
-                        ruser.forEach(element => {
-                            const index = e.findIndex(Obj => Obj.iduser === element.id)
-                            if(index === -1) return myscore.push(0)
-                            const ans = JSONParse(e[index].answer)
-                            if(ans.length === 0) {
-                                myscore.push(0)
-                            } else {
-                                const scoreItem = [];
-                                so.forEach(sss => {
-                                    const indexAns = ans.findIndex(OO => OO[0] === sss.id);
-                                    if(indexAns === -1) {
-                                        return scoreItem.push(0)
-                                    }
-                                    if(!ans[indexAns][1]) {
-                                        return scoreItem.push(0)
-                                    }
-                                    if(ans[indexAns][1].length === 0) {
-                                        return scoreItem.push(0)
-                                    }
-                                    switch(sss.tipe) {
-                                        case "pilgan" : 
-                                            if(JSON.stringify(ans[indexAns][1].sort((a,b) => a-b)) === JSON.stringify(JSONParse(sss.answer).sort((a,b) => a-b))) {
-                                                scoreItem.push(sss.score)
-                                            } else {
-                                                scoreItem.push(0)
-                                            }
-                                        break;
-                                        case "isian_singkat" :
-                                            if(ans[indexAns][1] === JSONParse(sss.answer)[0]) {
-                                                scoreItem.push(sss.score)
-                                            }else {
-                                                scoreItem.push(0)
-                                            }
-                                        break;
-                                        case "isian_panjang" :
-                                            if(ans[indexAns][2]) {
-                                                scoreItem.push(sss.score)
-                                            } else {
-                                                scoreItem.push(0)
-                                            }
-                                        break;
-                                        default : 
-                                            scoreItem.push(0)
-                                        
-                                    }
+        import("../../../service/dashboard/cbt").then(({getDataWithIdCBT, getWithIdCBT}) => {
+            import("../../../service/cbt/result").then(({getCBTResultWIthListId}) => {
+                import("../../../service/dashboard/users").then(({getStudent}) => {
+                    getCBTResultWIthListId(id).then(e => {
+                        setResult(e)
+                        getDataWithIdCBT(id).then(so => {
+                            setSoal(so)
+                            getWithIdCBT(id).then(l => {
+                                setList(l)
+                                const k = l.tokelas.split(",").map(u => u.trim())
+                                setKelas(k)
+                                const settKe = v ? v : k[0];
+                                getStudent(settKe).then(ruser => {
+                                    const myscore = [];
+                                    ruser.forEach(element => {
+                                        const index = e.findIndex(Obj => Obj.iduser === element.id)
+                                        if(index === -1) return myscore.push(0)
+                                        const ans = JSONParse(e[index].answer)
+                                        if(ans.length === 0) {
+                                            myscore.push(0)
+                                        } else {
+                                            const scoreItem = [];
+                                            so.forEach(sss => {
+                                                const indexAns = ans.findIndex(OO => OO[0] === sss.id);
+                                                if(indexAns === -1) {
+                                                    return scoreItem.push(0)
+                                                }
+                                                if(!ans[indexAns][1]) {
+                                                    return scoreItem.push(0)
+                                                }
+                                                if(ans[indexAns][1].length === 0) {
+                                                    return scoreItem.push(0)
+                                                }
+                                                switch(sss.tipe) {
+                                                    case "pilgan" : 
+                                                        if(JSON.stringify(ans[indexAns][1].sort((a,b) => a-b)) === JSON.stringify(JSONParse(sss.answer).sort((a,b) => a-b))) {
+                                                            scoreItem.push(sss.score)
+                                                        } else {
+                                                            scoreItem.push(0)
+                                                        }
+                                                    break;
+                                                    case "isian_singkat" :
+                                                        if(ans[indexAns][1] === JSONParse(sss.answer)[0]) {
+                                                            scoreItem.push(sss.score)
+                                                        }else {
+                                                            scoreItem.push(0)
+                                                        }
+                                                    break;
+                                                    case "isian_panjang" :
+                                                        if(ans[indexAns][2]) {
+                                                            scoreItem.push(sss.score)
+                                                        } else {
+                                                            scoreItem.push(0)
+                                                        }
+                                                    break;
+                                                    default : 
+                                                        scoreItem.push(0)
+                                                    
+                                                }
+                                            })
+                                            myscore.push(scoreItem.reduce((a,b) => Number(a) + Number(b)))
+                                        }
+                                    });
+                                    const mappedArray = mapToRange(myscore, Number(l.mulai), Number(l.berakhir));
+                                    
+                                    setScore(myscore)
+                                    setScoreEnd(mappedArray)
+                                    setUser(ruser)
+                                    setWaiting(false)
+                                    setLoad(false)
                                 })
-                                myscore.push(scoreItem.reduce((a,b) => Number(a) + Number(b)))
-                            }
-                        });
-                        const mappedArray = mapToRange(myscore, Number(l.mulai), Number(l.berakhir));
+                            })
+                        })
                         
-                        console.log(mappedArray);
-                        setScore(myscore)
-                        setScoreEnd(mappedArray)
-                        setUser(ruser)
-                        setWaiting(false)
-                        setLoad(false)
                     })
                 })
             })
-            
         })
     }
 
     const exportToExcel = () => {
         setLoadExportToExcel(true)
         const ll = list.tokelas.split(",").map(e => e.trim())
-        getUserWithKelas(ll).then(response => {
-            const workbook =  XLSX.utils.book_new()
-            response.forEach((user, keyUser) => {
-                // Check Score
-                const myscore = []
-                user.forEach(element => {
-                    const index = result.findIndex(Obj => Obj.iduser === element.id)
-                    if(index === -1) return myscore.push(0)
-                    const ans = JSONParse(result[index].answer)
-                    if(ans.length === 0) {
-                        myscore.push(0)
-                    } else {
-                        const scoreItem = [];
-                        soal.forEach(sss => {
-                            const indexAns = ans.findIndex(OO => OO[0] === sss.id);
-                            if(indexAns === -1) {
-                                return scoreItem.push(0)
-                            }
-                            if(!ans[indexAns][1]) {
-                                return scoreItem.push(0)
-                            }
-                            if(ans[indexAns][1].length === 0) {
-                                return scoreItem.push(0)
-                            }
-                            switch(sss.tipe) {
-                                case "pilgan" : 
-                                    if(JSON.stringify(ans[indexAns][1].sort((a,b) => a-b)) === JSON.stringify(JSONParse(sss.answer).sort((a,b) => a-b))) {
-                                        scoreItem.push(sss.score)
-                                    } else {
+        import("../../../service/cbt/user").then(({getUserWithKelas}) => {
+            getUserWithKelas(ll).then(response => {
+                const workbook =  XLSX.utils.book_new()
+                response.forEach((user, keyUser) => {
+                    // Check Score
+                    const myscore = []
+                    user.forEach(element => {
+                        const index = result.findIndex(Obj => Obj.iduser === element.id)
+                        if(index === -1) return myscore.push(0)
+                        const ans = JSONParse(result[index].answer)
+                        if(ans.length === 0) {
+                            myscore.push(0)
+                        } else {
+                            const scoreItem = [];
+                            soal.forEach(sss => {
+                                const indexAns = ans.findIndex(OO => OO[0] === sss.id);
+                                if(indexAns === -1) {
+                                    return scoreItem.push(0)
+                                }
+                                if(!ans[indexAns][1]) {
+                                    return scoreItem.push(0)
+                                }
+                                if(ans[indexAns][1].length === 0) {
+                                    return scoreItem.push(0)
+                                }
+                                switch(sss.tipe) {
+                                    case "pilgan" : 
+                                        if(JSON.stringify(ans[indexAns][1].sort((a,b) => a-b)) === JSON.stringify(JSONParse(sss.answer).sort((a,b) => a-b))) {
+                                            scoreItem.push(sss.score)
+                                        } else {
+                                            scoreItem.push(0)
+                                        }
+                                    break;
+                                    case "isian_singkat" :
+                                        if(ans[indexAns][1] === JSONParse(sss.answer)[0]) {
+                                            scoreItem.push(sss.score)
+                                        }else {
+                                            scoreItem.push(0)
+                                        }
+                                    break;
+                                    case "isian_panjang" :
+                                        if(ans[indexAns][2]) {
+                                            scoreItem.push(sss.score)
+                                        } else {
+                                            scoreItem.push(0)
+                                        }
+                                    break;
+                                    default : 
                                         scoreItem.push(0)
-                                    }
-                                break;
-                                case "isian_singkat" :
-                                    if(ans[indexAns][1] === JSONParse(sss.answer)[0]) {
-                                        scoreItem.push(sss.score)
-                                    }else {
-                                        scoreItem.push(0)
-                                    }
-                                break;
-                                case "isian_panjang" :
-                                    if(ans[indexAns][2]) {
-                                        scoreItem.push(sss.score)
-                                    } else {
-                                        scoreItem.push(0)
-                                    }
-                                break;
-                                default : 
-                                    scoreItem.push(0)
-                                
-                            }
+                                    
+                                }
+                            })
+                            myscore.push(scoreItem.reduce((a,b) => Number(a) + Number(b)))
+                        }
+                    });
+                    // End score
+                    const endScore = mapToRange(myscore, Number(list.mulai), Number(list.berakhir));
+    
+                    const rows = [];
+                    user.forEach((u, k) => {
+                        rows.push({
+                            Absen : k+1,
+                            Nisn : u.nisn,
+                            Nama : u.name,
+                            Kelas : u.kelas,
+                            Progress : status(u.id) === "start" ? "Sedang mengerjakan" : status(u.id) === "finish" ? "Tuntas" : "Belum Absen",
+                            "Nilai Sementara" : myscore[k],
+                            // "Nilai Akhir" : endScore[k]
                         })
-                        myscore.push(scoreItem.reduce((a,b) => Number(a) + Number(b)))
-                    }
-                });
-                // End score
-                const endScore = mapToRange(myscore, Number(list.mulai), Number(list.berakhir));
-
-                const rows = [];
-                user.forEach((u, k) => {
-                    rows.push({
-                        Absen : k+1,
-                        Nisn : u.nisn,
-                        Nama : u.name,
-                        Kelas : u.kelas,
-                        Progress : status(u.id) === "start" ? "Sedang mengerjakan" : status(u.id) === "finish" ? "Tuntas" : "Belum Absen",
-                        "Nilai Sementara" : myscore[k],
-                        // "Nilai Akhir" : endScore[k]
                     })
+                    const worksheet = XLSX.utils.json_to_sheet(rows);
+                    XLSX.utils.book_append_sheet(workbook, worksheet, ll[keyUser])
                 })
-                const worksheet = XLSX.utils.json_to_sheet(rows);
-                XLSX.utils.book_append_sheet(workbook, worksheet, ll[keyUser])
+                XLSX.writeFile(workbook, list.name + "_RekapNilai_"+ Date.now() +".xlsx", { compression: true });
+                setLoadExportToExcel(false)
             })
-            XLSX.writeFile(workbook, list.name + "_RekapNilai_"+ Date.now() +".xlsx", { compression: true });
-            setLoadExportToExcel(false)
         })
         // writeXLSX
     }
     const exportToExcelKehadiran = () => {
         setLoadExportToExcelKehadiran(true)
         const ll = list.tokelas.split(",").map(e => e.trim())
-        getUserWithKelas(ll).then(response => {
-            const workbook =  XLSX.utils.book_new()
-            response.forEach((user, keyUser) => {
-                // End score
-                const rows = [];
-                console.log(user)
-                user.forEach((u, k) => {
-                    const ind = result.findIndex(Obj => Obj.iduser === u.id)
-                    if(ind === -1) return;
-                    console.log(result[ind])
-                    rows.push({
-                        No : k+1,
-                        Nisn : u.nisn,
-                        Nama : u.name,
-                        Kelas : u.kelas,
-                        KEHADIRAN : status(u.id) === "start" ? "HADIR" : status(u.id) === "finish" ? "HADIR" : "HADIR",
-                        Masuk : atob(result[ind].created_at ? result[ind].created_at : ""),
-                        // Selesai : atob(result[ind].updated_at)
+        import("../../../service/cbt/user").then(({getUserWithKelas}) => {
+            getUserWithKelas(ll).then(response => {
+                const workbook =  XLSX.utils.book_new()
+                response.forEach((user, keyUser) => {
+                    // End score
+                    const rows = [];
+                    console.log(user)
+                    user.forEach((u, k) => {
+                        const ind = result.findIndex(Obj => Obj.iduser === u.id)
+                        if(ind === -1) return;
+                        console.log(result[ind])
+                        rows.push({
+                            No : k+1,
+                            Nisn : u.nisn,
+                            Nama : u.name,
+                            Kelas : u.kelas,
+                            KEHADIRAN : status(u.id) === "start" ? "HADIR" : status(u.id) === "finish" ? "HADIR" : "HADIR",
+                            Masuk : atob(result[ind].created_at ? result[ind].created_at : ""),
+                            // Selesai : atob(result[ind].updated_at)
+                        })
                     })
+                    const worksheet = XLSX.utils.json_to_sheet(rows);
+                    var wscols = [
+                        {wch:3},
+                        {wch:13},
+                        {wch:25},
+                        {wch:3},
+                        {wch:10},
+                        {wch:20},
+                    ];
+                    
+                    worksheet['!cols'] = wscols;
+                    XLSX.utils.book_append_sheet(workbook, worksheet, ll[keyUser])
                 })
-                const worksheet = XLSX.utils.json_to_sheet(rows);
-                var wscols = [
-                    {wch:3},
-                    {wch:13},
-                    {wch:25},
-                    {wch:3},
-                    {wch:10},
-                    {wch:20},
-                ];
-                
-                worksheet['!cols'] = wscols;
-                XLSX.utils.book_append_sheet(workbook, worksheet, ll[keyUser])
+                XLSX.writeFile(workbook, list.name + "_RekapKehadiran_"+ Date.now() +".xlsx", { compression: true });
+                setLoadExportToExcelKehadiran(false)
             })
-            XLSX.writeFile(workbook, list.name + "_RekapKehadiran_"+ Date.now() +".xlsx", { compression: true });
-            setLoadExportToExcelKehadiran(false)
         })
         // writeXLSX
     }

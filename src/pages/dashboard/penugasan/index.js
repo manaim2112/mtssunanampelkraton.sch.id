@@ -1,6 +1,6 @@
 import useDocumentTitle from "../../../elements/useDocumentTitle";
 
-export function IndexPenugasanDashboard() {
+export default function IndexPenugasanDashboard() {
     useDocumentTitle("Penugasan - Dashboard")
 
     return(

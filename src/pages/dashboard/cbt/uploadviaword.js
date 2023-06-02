@@ -8,7 +8,7 @@ import useDocumentTitle from "../../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
 import { SkeletonTable } from "../../../elements/skeleton/table";
 
-export function UploadWordCBTDashboard() {
+export default function UploadWordCBTDashboard() {
     
     useDocumentTitle("Upload Soal dengan Ms. Word")
     const {id} = useParams()

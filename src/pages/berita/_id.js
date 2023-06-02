@@ -1,4 +1,4 @@
-export function IdBerita(param) {
+export default function IdBerita(param) {
     return (
         <>
             Ini params id

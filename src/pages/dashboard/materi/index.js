@@ -5,7 +5,7 @@ import { TableMateriElement } from "./table_materi";
 import { HrElement } from "../../../elements/hr";
 import { useEffect } from "react";
 
-export function IndexMateriDashboard() {
+export default function IndexMateriDashboard() {
     const {setSidebarActive} = useSidebarActive()
     useDocumentTitle("Materi - Dashboard")
     useEffect(() => {

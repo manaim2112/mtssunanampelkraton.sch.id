@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
 
-export function EditKegiatanDashboard() {
+export default function EditKegiatanDashboard() {
     const {id} = useParams()
     return(
         <>

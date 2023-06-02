@@ -1,10 +1,15 @@
 import { useState } from "react";
-import { NavbarElement } from "../../elements/navbar";
-import { LoginWithUser } from "../../service/authorize";
 import useDocumentTitle from "../../elements/useDocumentTitle";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Suspense } from "react";
+import { SkeletonTable } from "../../elements/skeleton/table";
+import { lazy } from "react";
+import { startTransition } from "react";
 
-export function IndexLoginUser() {
+
+const NavbarElement = lazy(() => import("../../elements/navbar"))
+
+export default function IndexLoginUser() {
     useDocumentTitle("Masuk sebagai Peserta didik")
     const [nisn, setNisn] = useState("")
     const [sandi, setSandi] = useState("")
@@ -27,27 +32,29 @@ export function IndexLoginUser() {
     const LoginButton = () => {
         setLoading(true)
         setAlert(false)
-        LoginWithUser(nisn, sandi).then(e => {
-            if(e) {
-                window.sessionStorage.setItem("refresh-token", e)
-                const redirect = searchParams.get("redirect")
-                const json = JSON.parse(atob(e))
-                if (redirect == null) {
-                    nav("/user/"+ json.nisn)
+        import("../../service/authorize").then(({LoginWithUser}) => {
+            LoginWithUser(nisn, sandi).then(e => {
+                if(e) {
+                    window.sessionStorage.setItem("refresh-token", e)
+                    const redirect = searchParams.get("redirect")
+                    const json = JSON.parse(atob(e))
+                    if (redirect == null) {
+                        nav("/user/"+ json.nisn)
+                    } else {
+                        nav(redirect)
+                    }
                 } else {
-                    nav(redirect)
+                    setAlert(true)
                 }
-            } else {
-                setAlert(true)
-            }
-
-            setLoading(false)
-        }).catch(err => {
-            setLoading(false)
+    
+                setLoading(false)
+            }).catch(err => {
+                setLoading(false)
+            })
         })
     }
     return (
-        <>
+        <Suspense fallback={<SkeletonTable/>}>
             <NavbarElement/>
 
             <div className="w-64 mx-auto mt-11">    
@@ -94,7 +101,7 @@ export function IndexLoginUser() {
                     <Link to={"/auth/login_admin"} className="text-sm hover:text-blue-400 hover:underline">Masuk Sebagai Pegawai ?</Link>
                 </div>
             </div>
-        </>
+        </Suspense>
     )
 
 }

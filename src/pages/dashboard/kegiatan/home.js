@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { countKegiatan, getKegiatanWithPage } from "../../../service/kegiatan";
 import { Link, useNavigate } from "react-router-dom";
 
-export function HomeKegiatanDashboard() {
+export default function HomeKegiatanDashboard() {
     useDocumentTitle("Kegiatan Sekolah")
     const [count, setCount] = useState(0)
     const [page, setPage] = useState(1)

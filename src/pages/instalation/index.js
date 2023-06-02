@@ -5,7 +5,7 @@ import { insertNewUser, install } from "../../service/install";
 import { Link } from "react-router-dom";
 import useDocumentTitle from "../../elements/useDocumentTitle";
 
-export function Install() {
+export default function Install() {
     useDocumentTitle("Instalasi Yami-sis")
     const [loading, setLoading] = useState(false)
     const [msg, setMsg] = useState("Menginstall peserta didik ... (1)")

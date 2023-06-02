@@ -8,7 +8,7 @@ import { useState } from "react";
 import { insertGuru } from "../../../service/dashboard/guru";
 import { useNavigate } from "react-router-dom";
 
-export function IndexGuruDashboard() {
+export default function IndexGuruDashboard() {
     
     useDocumentTitle("Pegawai - Dashboard")
     

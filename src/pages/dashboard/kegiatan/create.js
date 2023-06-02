@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css"
 
-export function CreateNewKegiatanDashboard() {
+export default function CreateNewKegiatanDashboard() {
     const [html, setHtml] = useState("")
     const quillRef = useRef(null)
     const modules = {

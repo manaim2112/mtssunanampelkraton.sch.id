@@ -7,7 +7,7 @@ import { Suspense } from "react";
 import { SparklesIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 
-export function FinishCBT() {
+export default function FinishCBT() {
     const {start} = useParams()
     const nav = useNavigate();
     const [user, setUser] = useState({})

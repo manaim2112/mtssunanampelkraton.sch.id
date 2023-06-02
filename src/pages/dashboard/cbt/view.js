@@ -1,9 +1,6 @@
 import { useEffect, useRef } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { getResultWithUserIdAndListId } from "../../../service/cbt/result"
 import { useState } from "react"
-import { getStudent, getUserWithId } from "../../../service/dashboard/users"
-import { UpdateResultAnswerWIthId, getDataWithIdCBT, getWithIdCBT } from "../../../service/dashboard/cbt"
 import { SkeletonTable } from "../../../elements/skeleton/table"
 import { Card, CardBody, Checkbox, Chip, IconButton, Input, Tooltip, Typography } from "@material-tailwind/react"
 import { JSONParse } from "../../../service/constant"
@@ -13,7 +10,7 @@ import renderMathInElement from "../../../service/auto";
 import html2pdf from "html2pdf.js"
 
 
-export function ViewResultCBT() {
+export default function ViewResultCBT() {
     const HtmlRef = useRef(null)
     const nav = useNavigate()
     const {id, userid} = useParams()
@@ -34,80 +31,93 @@ export function ViewResultCBT() {
 
     useEffect(() => {
         setLoadView(true)
-        getResultWithUserIdAndListId(userid, id).then(r => {
-            r = r.sort((a,b) => a[0]-b[0])
-            const ranw = JSONParse(r[0].answer)
-            setResult(r)
-            setResultC(ranw)
-            getUserWithId(userid).then(u => {
-                setUser(u)
-                getDataWithIdCBT(id).then(s => {
-                    const so = s.sort((a,b) => a.id-b.id)
-                    setSoal(so)
-                    getWithIdCBT(id).then(l => {
-                        setList(l)
-                        document.title = "Hasil " +  l.name + " dari "+ u.name;
-                        const answer = new Array(so.length).fill(null);
-                        const poin = new Array(so.length).fill(0)
-                        so.forEach((res, key) => {
-                            const a = JSONParse(res.answer)
-                            const index = ranw.findIndex(Obj => Obj[0] === res.id);
-                            if(index === -1) return;
-                            const yans = ranw[index][1].sort()
-                            if(res.tipe === "pilgan") {
-                                const act = a.sort()
-                                if(JSON.stringify(act) === JSON.stringify(yans)) {
-                                    answer[key] = true;
-                                    poin[key] = res.score;
-                                    
-                                } else {
-                                    answer[key] = false;
+        import("../../../service/dashboard/cbt").then((
+            {
+                getDataWithIdCBT,
+                getWithIdCBT
+            }) => {
+                import("../../../service/cbt/result").then(({getResultWithUserIdAndListId}) => {
+                    getResultWithUserIdAndListId(userid, id).then(r => {
+                        r = r.sort((a,b) => a[0]-b[0])
+                        const ranw = JSONParse(r[0].answer)
+                        setResult(r)
+                        setResultC(ranw)
 
-                                }
-                            } else if(res.tipe === "isian_singkat") {
-                                if(a[0].toLowerCase() === yans[0].toLowerCase()) {
-                                    answer[key] = true;
-                                    poin[key] = res.score;
-                                } else {
-                                    answer[key] = false;
-                                }
-                            } else if(res.tipe === "isian_panjang") {
-                                answer[key] = ranw[index][2]
-                                if(ranw[index][2] === true) {
-                                    poin[key] = res.score;
-                                }
-                            }
+                        import("../../../service/dashboard/users").then(({getUserWithId, getStudent}) => {
+                            getUserWithId(userid).then(u => {
+                                setUser(u)
+                                getDataWithIdCBT(id).then(s => {
+                                    const so = s.sort((a,b) => a.id-b.id)
+                                    setSoal(so)
+                                    getWithIdCBT(id).then(l => {
+                                        setList(l)
+                                        document.title = "Hasil " +  l.name + " dari "+ u.name;
+                                        const answer = new Array(so.length).fill(null);
+                                        const poin = new Array(so.length).fill(0)
+                                        so.forEach((res, key) => {
+                                            const a = JSONParse(res.answer)
+                                            const index = ranw.findIndex(Obj => Obj[0] === res.id);
+                                            if(index === -1) return;
+                                            const yans = ranw[index][1].sort()
+                                            if(res.tipe === "pilgan") {
+                                                const act = a.sort()
+                                                if(JSON.stringify(act) === JSON.stringify(yans)) {
+                                                    answer[key] = true;
+                                                    poin[key] = res.score;
+                                                    
+                                                } else {
+                                                    answer[key] = false;
+                
+                                                }
+                                            } else if(res.tipe === "isian_singkat") {
+                                                if(a[0].toLowerCase() === yans[0].toLowerCase()) {
+                                                    answer[key] = true;
+                                                    poin[key] = res.score;
+                                                } else {
+                                                    answer[key] = false;
+                                                }
+                                            } else if(res.tipe === "isian_panjang") {
+                                                answer[key] = ranw[index][2]
+                                                if(ranw[index][2] === true) {
+                                                    poin[key] = res.score;
+                                                }
+                                            }
+                                        })
+                
+                                        setAns(answer)
+                                        setScore(poin)
+                
+                
+                                        setWaiting(false)
+                
+                                        renderMathInElement(document.body, {
+                                            // customised options
+                                            // • auto-render specific keys, e.g.:
+                                            delimiters: [
+                                                {left: '$$', right: '$$', display: true},
+                                                {left: '$', right: '$', display: false},
+                                                {left: '\\(', right: '\\)', display: false},
+                                                {left: '\\[', right: '\\]', display: true}
+                                            ],
+                                            // • rendering keys, e.g.:
+                                            throwOnError : false
+                                        });
+                
+                                        
+                
+                                        getStudent(u.kelas).then(us => {
+                                            setListUser(us)
+                                            setLoadView(false)
+                                        })
+                                    })
+                                })
+                            })
                         })
 
-                        setAns(answer)
-                        setScore(poin)
-
-
-                        setWaiting(false)
-
-                        renderMathInElement(document.body, {
-                            // customised options
-                            // • auto-render specific keys, e.g.:
-                            delimiters: [
-                                {left: '$$', right: '$$', display: true},
-                                {left: '$', right: '$', display: false},
-                                {left: '\\(', right: '\\)', display: false},
-                                {left: '\\[', right: '\\]', display: true}
-                            ],
-                            // • rendering keys, e.g.:
-                            throwOnError : false
-                        });
-
-                        
-
-                        getStudent(u.kelas).then(us => {
-                            setListUser(us)
-                            setLoadView(false)
-                        })
                     })
                 })
+
             })
-        })
     }, [userid, id])
 
 
@@ -176,15 +186,17 @@ export function ViewResultCBT() {
         const id = result[0].id;
         const answer = JSON.stringify(resultC)
 
-        UpdateResultAnswerWIthId({id, answer}).then(t => {
-
-            setLoading(false)
-           Swal.fire({
-            title : "Berhasil Update",
-            icon : "success",
-            showConfirmButton : false,
-            timer : 1000
-           })
+        import("../../../service/dashboard/cbt").then(({UpdateResultAnswerWIthId}) => {
+            UpdateResultAnswerWIthId({id, answer}).then(t => {
+    
+                setLoading(false)
+               Swal.fire({
+                title : "Berhasil Update",
+                icon : "success",
+                showConfirmButton : false,
+                timer : 1000
+               })
+            })
         })
     }
 
@@ -372,8 +384,10 @@ export function ViewResultCBT() {
                             list.tokelas.split(",").map(e => e.trim()).map((l, keyL) => (
                                 <li className="mr-2" key={keyL}>
                                     <span onClick={() => {
-                                        getStudent(l).then(e => {
-                                            nav("/dashboard/cbt/id/"+ id + "/result/"+ e[0].id + "/view/")
+                                        import("../../../service/dashboard/users").then(({getStudent}) => {
+                                            getStudent(l).then(e => {
+                                                nav("/dashboard/cbt/id/"+ id + "/result/"+ e[0].id + "/view/")
+                                            })
                                         })
                                     }} className={`inline-block p-4 cursor-pointer border-b-2 border-transparent rounded-t-lg hover:text-blue-600 hover:border-blue-300 ${ l === user.kelas ? "border-b-blue-500 text-blue-500" : ""} dark:hover:text-blue-300`}>{l}</span>
                                 </li>

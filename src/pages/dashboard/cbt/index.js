@@ -5,12 +5,10 @@ import useDocumentTitle from "../../../elements/useDocumentTitle";
 import { TableCBTElement } from "./table_cbt";
 import { Button, Card, CardBody, CardFooter, CardHeader, Dialog, Drawer, IconButton, Input, Option, Select, Typography } from "@material-tailwind/react";
 import { useState } from "react";
-import { insertCBT_list } from "../../../service/dashboard/cbt";
 import { randomText } from "../../../service/constant";
-import { getKelasAll } from "../../../service/dashboard/kelas";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
-export function IndexCBTDashboard() {
+export default function IndexCBTDashboard() {
     useDocumentTitle("CBT - Dashboard")
     
     return (
@@ -35,25 +33,32 @@ export function AddNewCBTList() {
     const [kelas, setKelas] = useState("")
     const [akelas, setAkelas] = useState([])
     const [load, setLoad] = useState(false)
+
     useEffect(() => {
+        handleKelasAll()
+    }, [])
+
+    const handleKelasAll = () => {
+      import("../../../service/dashboard/kelas").then(({getKelasAll}) => {
         getKelasAll().then(e => {
             setAkelas(e)
         })
-    }, [])
+      })
+    }
     const handleOpen = () => setOpen(!open)
     const handleOpenXLS = () => setOpenXLS(!openXLS)
     const handleSave = () => {
         setLoad(true)
-        insertCBT_list({
-            name, jenis, durasi, min_durasi : minDurasi, code : randomText(), tokelas : kelas
-        }).then(e => {
-            if(e) {
-                setOpen(false)
-                getKelasAll().then(u => {
-                  setAkelas(u)
-                })
-            }
-            setLoad(false)
+        import("../../../service/dashboard/cbt").then(({insertCBT_list}) => {
+          insertCBT_list({
+              name, jenis, durasi, min_durasi : minDurasi, code : randomText(), tokelas : kelas
+          }).then(e => {
+              if(e) {
+                  setOpen(false)
+                  handleKelasAll();
+              }
+              setLoad(false)
+          })
         })
     }
   return (

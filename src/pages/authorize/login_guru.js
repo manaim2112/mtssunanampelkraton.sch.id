@@ -1,10 +1,14 @@
 import { useState } from "react";
-import { NavbarElement } from "../../elements/navbar";
-import { LoginWithAdmin } from "../../service/authorize";
 import useDocumentTitle from "../../elements/useDocumentTitle";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { lazy } from "react";
+import { Suspense } from "react";
+import { SkeletonTable } from "../../elements/skeleton/table";
+import { startTransition } from "react";
 
-export function IndexLoginAdmin() {
+const NavbarElement = lazy(() => import("../../elements/navbar"))
+
+export default function IndexLoginAdmin() {
     useDocumentTitle("Masuk sebagai Admin")
     const [nisn, setNisn] = useState("")
     const [sandi, setSandi] = useState("")
@@ -27,28 +31,32 @@ export function IndexLoginAdmin() {
     const LoginButton = () => {
         setLoading(true)
         setAlert(false)
-        LoginWithAdmin(nisn, sandi).then(e => {
-            if(e) {
-                window.sessionStorage.setItem("refresh-admin", e)
-                const redirect = searchParams.get("redirect")
-                if (redirect == null) {
-                    nav("/dashboard")
-                } else {
-                    nav(redirect)
-                }
-            } else {
-                setAlert(true)
-            }
-
-            setLoading(false)
-        }).catch(err => {
-            setLoading(false)
+        startTransition(() => {
+            import("../../service/authorize").then(({LoginWithAdmin}) => {
+                LoginWithAdmin(nisn, sandi).then(e => {
+                    if(e) {
+                        window.sessionStorage.setItem("refresh-admin", e)
+                        const redirect = searchParams.get("redirect")
+                        if (redirect == null) {
+                            nav("/dashboard")
+                        } else {
+                            nav(redirect)
+                        }
+                    } else {
+                        setAlert(true)
+                    }
+        
+                    setLoading(false)
+                }).catch(err => {
+                    setLoading(false)
+                })
+            })
         })
     }
     return (
-        <>
+        <Suspense fallback={<SkeletonTable/>}>
             <NavbarElement/>
-
+            
             <div className="w-64 mx-auto mt-11">    
                 <h2 className="text-3xl">Masuk Sebagai Guru/Operator</h2>
                 { alert ? (
@@ -93,7 +101,7 @@ export function IndexLoginAdmin() {
                     <Link to={"/auth/login_user"} className="text-sm hover:text-blue-400 hover:underline">Masuk Sebagai Peserta didik ?</Link>
                 </div>
             </div>
-        </>
+        </Suspense>
     )
 
 }

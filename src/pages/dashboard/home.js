@@ -3,12 +3,8 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { getAuthorize } from "../../service/constant";
 import { Link } from "react-router-dom";
-import { CountUser } from "../../service/dashboard/users";
-import { CountCBT_list } from "../../service/dashboard/cbt";
-import { countGuru } from "../../service/dashboard/guru";
-import { countKegiatan } from "../../service/kegiatan";
 
-export function HomeDashboard() {
+export default function HomeDashboard() {
     const [name, setName] = useState("")
     const [countUser, setCountUser] = useState("")
     const [countCBT, setCountCBT] = useState("")
@@ -16,18 +12,27 @@ export function HomeDashboard() {
     const [countKegiata, setCountkegiatan] = useState("")
     useEffect(() => {
             setName(getAuthorize().name)
-            CountUser().then(e => {
-                setCountUser(e)
+            import("../../service/dashboard/users").then(({CountUser}) => {
+                CountUser().then(e => {
+                    setCountUser(e)
+                })
             })
-            CountCBT_list().then(e => {
-                setCountCBT(e)
+            import("../../service/dashboard/cbt").then(({CountCBT_list}) => {
+                CountCBT_list().then(e => {
+                    setCountCBT(e)
+                })
             })
-            countGuru().then(e => {
-                setCountPegawai(e)
+            import("../../service/dashboard/guru").then(({countGuru}) => {
+
+                countGuru().then(e => {
+                    setCountPegawai(e)
+                })
             })
 
-            countKegiatan().then(e => {
-                setCountkegiatan(e)
+            import("../../service/kegiatan").then(({countKegiatan}) => {
+                countKegiatan().then(e => {
+                    setCountkegiatan(e)
+                })
             })
 
     }, [])

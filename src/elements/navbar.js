@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { getHeaderDataService } from "../service/home"
 import { Link } from "react-router-dom"
 
-export function NavbarElement({active}) {
+export default function NavbarElement({active}) {
     const [head, setHead] = useState([])
     useEffect(() => {
         getHeaderDataService().then(d => {

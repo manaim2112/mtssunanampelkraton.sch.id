@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { getAuthorizeUser } from "../../service/constant"
 
-export function IndexUserWithNisn() {
+export default function IndexUserWithNisn() {
     const u = getAuthorizeUser()
     const nav = useNavigate()
     if(!u) {

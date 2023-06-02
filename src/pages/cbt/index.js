@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-export function CBTIndex() {
+export default function CBTIndex() {
     // const videoRef = useRef(null);
     const nav = useNavigate()
     // useEffect(() => {

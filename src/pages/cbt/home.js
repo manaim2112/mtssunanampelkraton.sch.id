@@ -8,7 +8,7 @@ import { getResultWithUserId, startingCBT } from "../../service/cbt/result";
 import { useNavigate } from "react-router-dom";
 import { getSoalWithIdList } from "../../service/cbt/soal";
 
-export function HomeCBT() {
+export default function HomeCBT() {
     const [user, setUser] = useState({})
     const [list, setList] = useState([])
     const [result, setResult] = useState([])

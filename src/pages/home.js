@@ -4,7 +4,7 @@ import useDocumentTitle from "../elements/useDocumentTitle";
 import { getHomeDataService } from "../service/home";
 import { Link } from "react-router-dom";
 
-export function IndexHomes() {
+export default function IndexHomes() {
     const [data, setData] = useState([]);
     useDocumentTitle("Selamat datang di kanal resmi kami")
     useEffect(() => {

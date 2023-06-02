@@ -1,8 +1,9 @@
 import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
 import { NavbarDashboard } from "./element/navbar";
 import { Typography } from "@material-tailwind/react";
+import { Suspense } from "react";
 
-export function IndexDashboard() {
+export default function IndexDashboard() {
     const nav = useNavigate()
 
     const Auth = window.sessionStorage.getItem("refresh-admin")
@@ -13,7 +14,7 @@ export function IndexDashboard() {
     // useEffect(() => {
     // }, [])
     return(
-        <>
+        <Suspense fallback={"Tunggu Sebentar"}>
             <NavbarDashboard/>
             <div className="px-3 lg:px-12">
                 <Outlet/>   
@@ -38,7 +39,7 @@ export function IndexDashboard() {
                     </div>
                 </div>
             </div> */}
-        </>
+        </Suspense>
     )
 }
 

@@ -13,7 +13,7 @@ import useDocumentTitle from "../../../elements/useDocumentTitle"
 import Swal from "sweetalert2";
 import { SkeletonTable } from "../../../elements/skeleton/table";
 import { Suspense } from "react";
-export function IndexUsersDashboard() {
+export default function IndexUsersDashboard() {
     useDocumentTitle(" Daftar Siswa")
     const [ckelas, setCkelas] = useState(0)
     const [kelas, setkelas] = useState([])
@@ -113,7 +113,6 @@ export function IndexUsersDashboard() {
           insertManyUser(extract).then(e => {
             Swal.fire("Notif", e, "success")
           })
-          console.log('Excel data:', extract);
         };
     
         reader.readAsArrayBuffer(file);
