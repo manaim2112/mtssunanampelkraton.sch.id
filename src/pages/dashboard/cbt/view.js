@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { useState } from "react"
 import { SkeletonTable } from "../../../elements/skeleton/table"
 import { Card, CardBody, Checkbox, Chip, IconButton, Input, Tooltip, Typography } from "@material-tailwind/react"
@@ -220,6 +220,9 @@ export default function ViewResultCBT() {
     )
     return(
         <>
+            <Link to={"/dashboard/cbt/id/"+ id + "/result"} className="text-blue-400 hover:text-blue-600 hover:underline">
+                Kembali Ke halaman sebelumnya ...
+            </Link>
             <div ref={HtmlRef}>
             <Typography variant="h4"> Hasil dari {user.name} [{user.nisn}] ({user.kelas})</Typography> 
             <Typography variant="h6">{list.jenis} - {list.name} | Nilai Sementara {score.reduce((a,b) => Number(a)+Number(b))}</Typography>

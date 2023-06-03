@@ -17,6 +17,15 @@ export const getAuthorize = () => {
         return {}
     }
 }
+
+export const getOperator = () => {
+    try {
+        const a = getAuthorize();
+        return a.jabatan === "operator"
+    } catch (error) {
+        return false
+    }   
+}
 export const getAuthorizeUser = () => {
     try {
         const Auth = window.sessionStorage.getItem("refresh-token")
@@ -93,4 +102,22 @@ export function getDataStartCBT({start}) {
     }
 
 
+}
+
+export function mapToRange(arr, min, max) {
+    const minValue = Math.min(...arr);
+    const maxValue = Math.max(...arr);
+  
+    const mappedArray = arr.map((value) => {
+      if (value < minValue) {
+        return min;
+      } else if (value > maxValue) {
+        return max;
+      } else {
+        const percentage = (value - minValue) / (maxValue - minValue);
+        return Math.ceil(min + percentage * (max - min));
+      }
+    });
+  
+    return mappedArray;
 }
