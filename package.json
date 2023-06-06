@@ -11,11 +11,13 @@
     "compress-create-react-app": "^1.4.2",
     "compressorjs": "^1.2.1",
     "html2pdf.js": "^0.10.1",
+    "javascript-obfuscator": "^4.0.2",
     "jspdf": "^2.5.1",
     "katex": "^0.16.7",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
     "react": "^18.2.0",
+    "react-app-rewired": "^2.2.1",
     "react-cookie": "^4.1.1",
     "react-dom": "^18.2.0",
     "react-quill": "^2.0.0",
@@ -26,6 +28,7 @@
     "sweetalert2-react-content": "^5.0.7",
     "terser": "^5.17.7",
     "web-vitals": "^2.1.0",
+    "webpack-obfuscator": "^3.5.1",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz"
   },
   "scripts": {
@@ -33,6 +36,8 @@
     "terser": "terser ./build/static/js/*.js -m --mangle-props regex=/_$/ -o ./minified/ --overwrite",
     "build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build && compress-cra",
     "buildlinux": "export GENERATE_SOURCEMAP=false && react-scripts build && compress-cra",
+    "buildOBS": "set \"GENERATE_SOURCEMAP=false\" && react-app-rewired build",
+    "buildOBSlinux": "export GENERATE_SOURCEMAP=false && react-app-rewired build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
