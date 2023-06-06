@@ -1,14 +1,13 @@
-import { useEffect, useRef } from "react"
+import { lazy, useEffect, useRef } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { useState } from "react"
-import { SkeletonTable } from "../../../elements/skeleton/table"
 import { Card, CardBody, Checkbox, Chip, IconButton, Input, Tooltip, Typography } from "@material-tailwind/react"
 import { JSONParse } from "../../../service/constant"
 import { BookmarkSquareIcon, CheckIcon, PrinterIcon, SignalIcon, UserGroupIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import Swal from "sweetalert2"
 import html2pdf from "html2pdf.js"
-import renderMathInElement from "katex/contrib/auto-render"
 
+const SkeletonTable = lazy(() => import("../../../elements/skeleton/table"))
 
 export default function ViewResultCBT() {
     const HtmlRef = useRef(null)
@@ -89,19 +88,20 @@ export default function ViewResultCBT() {
                 
                 
                                         setWaiting(false)
-                
-                                        renderMathInElement(document.body, {
-                                            // customised options
-                                            // • auto-render specific keys, e.g.:
-                                            delimiters: [
-                                                {left: '$$', right: '$$', display: true},
-                                                {left: '$', right: '$', display: false},
-                                                {left: '\\(', right: '\\)', display: false},
-                                                {left: '\\[', right: '\\]', display: true}
-                                            ],
-                                            // • rendering keys, e.g.:
-                                            throwOnError : false
-                                        });                            
+                                        import("../../../service/katex/auto-render").then(renderMathInElement => {
+                                            renderMathInElement(HtmlRef?.current, {
+                                                // customised options
+                                                // • auto-render specific keys, e.g.:
+                                                delimiters: [
+                                                    {left: '$$', right: '$$', display: true},
+                                                    {left: '$', right: '$', display: false},
+                                                    {left: '\\(', right: '\\)', display: false},
+                                                    {left: '\\[', right: '\\]', display: true}
+                                                ],
+                                                // • rendering keys, e.g.:
+                                                throwOnError : false
+                                            });                            
+                                        })
                                         
                                         
                 

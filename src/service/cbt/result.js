@@ -2,7 +2,7 @@ import { pathCheckingResult, pathFinishCBT, pathGetCBTResultWithListId, pathGetR
 
 export function getResultWithUserId(id) {
     return new Promise((resolve, reject) => {
-        fetch(pathGetResultWithUserId).then(r => r.json()).then(r => {
+        fetch(pathGetResultWithUserId(id)).then(r => r.json()).then(r => {
             if(r.status === 200) {
                 resolve(r.data)
             } else {
@@ -13,7 +13,7 @@ export function getResultWithUserId(id) {
 }
 export function getResultWithUserIdAndListId(id, listid) {
     return new Promise((resolve, reject) => {
-        fetch(pathGetResultWithUserIdAndListId).then(r => r.json()).then(r => {
+        fetch(pathGetResultWithUserIdAndListId(id, listid)).then(r => r.json()).then(r => {
             if(r.status === 200) {
                 resolve(r.data)
             } else {
@@ -24,7 +24,7 @@ export function getResultWithUserIdAndListId(id, listid) {
 }
 export function getResultWIthid(id) {
     return new Promise((resolve, reject) => {
-        fetch(pathGetResultWithId).then(r => r.json()).then(e => {
+        fetch(pathGetResultWithId(id)).then(r => r.json()).then(e => {
             if(e.status === 200) {
                 resolve(e.data)
             } else {
@@ -75,7 +75,7 @@ export function checkingResult({iduser, idlist}) {
 
 export function getCBTResultWIthListId(id) {
     return new Promise((resolve, reject) => {
-        fetch(pathGetCBTResultWithListId).then(r => r.json()).then(r => {
+        fetch(pathGetCBTResultWithListId(id)).then(r => r.json()).then(r => {
             if(r.status === 200) {
                 resolve(r.data)
             } else {

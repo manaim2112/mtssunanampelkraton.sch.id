@@ -1,8 +1,9 @@
-import useDocumentTitle from "../../../elements/useDocumentTitle";
+import { useEffect } from "react";
 
 export default function IndexPenugasanDashboard() {
-    useDocumentTitle("Penugasan - Dashboard")
-
+    useEffect(() => {
+        document.title = "Penugasan _ dashboard"
+    })
     return(
         <>
             Penugasan

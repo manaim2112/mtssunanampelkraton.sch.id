@@ -2,15 +2,13 @@ import { useEffect, useState } from "react";
 import {  useNavigate, useParams } from "react-router-dom";
 import { Button, Chip, IconButton, Input, Switch, Typography } from "@material-tailwind/react";
 import { ArrowPathIcon, CheckIcon, PencilSquareIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import useDocumentTitle from "../../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { JSONParse, randomText } from "../../../service/constant";
-import renderMathInElement from "katex/contrib/auto-render";
+import { JSONParse} from "../../../service/constant";
+import { useRef } from "react";
 export default function IdCBTDashboard() {
     const [xid, setXid] = useState("")
     const {id} = useParams()
-    useDocumentTitle("EDIT")
     const nav = useNavigate()
     const Myswal = withReactContent(Swal)
     const [codeChange, setCodeChange] = useState(false)
@@ -19,30 +17,21 @@ export default function IdCBTDashboard() {
     useEffect(() => {
         import("../../../service/dashboard/cbt").then(({getWithIdCBT}) => {
             getWithIdCBT(id).then(d => {
+                document.title = "Data "+ d.name;
                     setXid(d)
             })
         })
         
-            renderMathInElement(document.body, {
-                // customised options
-                // • auto-render specific keys, e.g.:
-                delimiters: [
-                    {left: '$$', right: '$$', display: true},
-                    {left: '$', right: '$', display: false},
-                    {left: '\\(', right: '\\)', display: false},
-                    {left: '\\[', right: '\\]', display: true}
-                ],
-                // • rendering keys, e.g.:
-                throwOnError : false
-            });
     }, [])
 
     const ChangeCode = (id) => {
         setCodeChange(true)
         import("../../../service/dashboard/cbt").then(({changeCodeCBT_list}) => {
-            changeCodeCBT_list({id, code : randomText()}).then(r => {
-                setXid(xid)
-                setCodeChange(false)
+            import("../../../service/constant").then(({randomText}) => {
+                changeCodeCBT_list({id, code : randomText()}).then(r => {
+                    setXid(xid)
+                    setCodeChange(false)
+                })
             })
         })
     }
@@ -181,11 +170,26 @@ export function DataIdCBTDashboardElement({xid}) {
     const [list, setList] = useState([])
     const [sureDelete, setSureDelete] = useState([])
     const Myswal = withReactContent(Swal)
+    const renderMath = useRef(null)
 
     useEffect(() => {
         import("../../../service/dashboard/cbt").then(({getDataWithIdCBT}) => {
             getDataWithIdCBT(xid).then(d => {
                 setList(d)
+                import("../../../service/katex/auto-render").then(renderMathInElement => {
+                    renderMathInElement.default(renderMath?.current, {
+                        // customised options
+                        // • auto-render specific keys, e.g.:
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ],
+                        // • rendering keys, e.g.:
+                        throwOnError : false
+                    });
+                })
             })
         })
     }, [xid])
@@ -220,7 +224,7 @@ export function DataIdCBTDashboardElement({xid}) {
 
     }
     return(
-        <>
+        <div ref={renderMath}>
         
             {
                 list.map((e,k) => (
@@ -270,6 +274,6 @@ export function DataIdCBTDashboardElement({xid}) {
                     </div>
                 ))
             }
-        </>
+        </div>
     )
 }

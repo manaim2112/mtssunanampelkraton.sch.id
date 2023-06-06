@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
-import { BeritaElement } from "../elements/berita";
-import useDocumentTitle from "../elements/useDocumentTitle";
-import { getHomeDataService } from "../service/home";
+import { useEffect, useState, lazy } from "react";
 import { Link } from "react-router-dom";
 
+const BeritaElement = lazy(() => import("../elements/berita"))
 export default function IndexHomes() {
     const [data, setData] = useState([]);
-    useDocumentTitle("Selamat datang di kanal resmi kami")
     useEffect(() => {
-        getHomeDataService().then(d => {
-            setData(d)
+        document.title = "Selamat dayang di kanal resmi kami";
+        import("../service/home").then(({getHomeDataService}) => {
+            getHomeDataService().then(d => {
+                setData(d)
+            })
         })
     }, [])
     return(

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export function JumbrotonElement({badge, title, desc, to}) {
+export default function JumbrotonElement({badge, title, desc, to}) {
     return(
         <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8 md:px-8 mb-8">
                 <Link to={to} className="bg-blue-100 text-blue-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-md dark:bg-gray-700 dark:text-blue-400 mb-2">

@@ -1,15 +1,17 @@
 import React, { useEffect } from "react";
-import { HrElement } from "../../../elements/hr";
-import { JumbrotonElement } from "../../../elements/jumbroton";
-import useDocumentTitle from "../../../elements/useDocumentTitle";
-import { TableCBTElement } from "./table_cbt";
 import { Button, Card, CardBody, CardFooter, CardHeader, Dialog, Drawer, IconButton, Input, Option, Select, Typography } from "@material-tailwind/react";
 import { useState } from "react";
 import { randomText } from "../../../service/constant";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { lazy } from "react";
 
+const TableCBTElement = lazy(() => import('./table_cbt'))
+const JumbrotonElement = lazy(() => import("../../../elements/jumbroton"))
+const HrElement = lazy(() => import("../../../elements/hr"))
 export default function IndexCBTDashboard() {
-    useDocumentTitle("CBT - Dashboard")
+    useEffect(() => {
+      document.title = "CBT - Dashboard"
+    }, [])
     
     return (
         <>

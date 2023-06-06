@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Card, CardBody, CardFooter, CardHeader, Checkbox, Chip, Dialog, Input, Option, Select, Typography } from "@material-tailwind/react";
 import { Suspense } from "react";
-import { SkeletonTable } from "../../../elements/skeleton/table";
 import Swal from "sweetalert2";
 import { CubeTransparentIcon } from "@heroicons/react/24/outline"
+import { lazy } from "react";
 
-export function TableCBTElement() {
+const SkeletonTable = lazy(() => import("../../../elements/skeleton/table"))
+export default function TableCBTElement() {
     const nav = useNavigate()
     const [live, setLive] = useState([])
     const [priority, setPriority] = useState(false)

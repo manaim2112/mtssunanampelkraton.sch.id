@@ -1,18 +1,22 @@
+import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { getAuthorizeUser } from "../../service/constant"
 
 export default function IndexUser() {
-    const u = getAuthorizeUser()
     const nav = useNavigate()
-    if(!u) {
-        nav("/auth/login_user")
-        return;
-    }
+    useEffect(() => {
+        import("../../service/constant").then(({getAuthorizeUser}) => {
+            if(!getAuthorizeUser()) {
+                nav("/auth/login_user")
+                return;
+            }
+            const timeOut = setTimeout(() => {
+                 nav("/cbt")
+             }, 3000)
+             return () => clearTimeout(timeOut)
+        })
 
+    }, [nav])
 
-    setTimeout(() => {
-        nav("/cbt")
-    }, 3000)
     return(
         <>
             Tunggu sebentar

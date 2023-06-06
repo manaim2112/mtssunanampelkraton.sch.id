@@ -1,28 +1,24 @@
 import { Button, Typography } from "@material-tailwind/react";
-import useDocumentTitle from "../../../elements/useDocumentTitle";
 import { useEffect, useState } from "react";
-import { countKegiatan, getKegiatanWithPage } from "../../../service/kegiatan";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function HomeKegiatanDashboard() {
-    useDocumentTitle("Kegiatan Sekolah")
     const [count, setCount] = useState(0)
     const [page, setPage] = useState(1)
     const [data, setData] = useState([])
     const nav = useNavigate()
     useEffect(() => {
-        countKegiatan().then(c => {
-            setCount(c)
+        document.title = "Kegiatan Sekolah";
+        import("../../../service/kegiatan").then(({countKegiatan, getKegiatanWithPage}) => {
+            countKegiatan().then(c => {
+                setCount(c)
+                getKegiatanWithPage(page).then(r => {
+                    setData(r)
+                })
+            })
         })
-        console.log("count")
-    }, [count])
+    }, [count, page])
 
-    useEffect(() => {
-        getKegiatanWithPage(page).then(r => {
-            setData(r)
-        })
-        console.log("page")
-    }, [page])
 
     const prevHandler = () => {
         if(page > 1) {

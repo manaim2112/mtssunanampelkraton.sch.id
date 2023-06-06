@@ -1,20 +1,14 @@
 
-import { JumbrotonElement } from "../../../elements/jumbroton";
-import { HrElement } from "../../../elements/hr";
-import { useEffect } from "react";
-import { countKelas, deleteKelas, getKelasAll, insertKelas } from "../../../service/dashboard/kelas";
-import { useState } from "react";
+import { useEffect, Suspense, lazy, useRef, useState  } from "react";
 import { Button, Chip, Dialog, DialogBody, DialogFooter, DialogHeader, Input, Option, Select, Typography } from "@material-tailwind/react";
-import { getStudent, insertManyUser, insertUser } from "../../../service/dashboard/users";
 import { Link, useNavigate } from "react-router-dom";
-import { useRef } from "react";
-import XLSX from 'xlsx';
-import useDocumentTitle from "../../../elements/useDocumentTitle"
 import Swal from "sweetalert2";
-import { SkeletonTable } from "../../../elements/skeleton/table";
-import { Suspense } from "react";
+
+const SkeletonTable = lazy(() => import("../../../elements/skeleton/table"))
+const HrElement = lazy(() => import("../../../elements/hr"))
+const JumbrotonElement = lazy(() => import("../../../elements/jumbroton"))
+
 export default function IndexUsersDashboard() {
-    useDocumentTitle(" Daftar Siswa")
     const [ckelas, setCkelas] = useState(0)
     const [kelas, setkelas] = useState([])
     const [user, setUser] = useState([])
@@ -32,58 +26,71 @@ export default function IndexUsersDashboard() {
         fileInputRef.current.click();
 
     }
-    useEffect(() => {
-        countKelas().then(e => {
-            setCkelas(e)
-        })
-    }, [])
-
-    useEffect(() => {
-        getKelasAll().then(e => {
-            setkelas(e)
-            getStudent(e[0].name).then(d => {
+    const getUser = (kelas) => {
+        setLoading(true)
+        import("../../../service/dashboard/users").then(({getStudent}) => {
+            getStudent(kelas).then(d => {
                 setUser(d)
                 setLoading(false)
             })
         })
-    }, [])
-
-    const getUser = (kelas) => {
-        setLoading(true)
-        getStudent(kelas).then(d => {
-            setUser(d)
-            setLoading(false)
-        })
     }
 
+    useEffect(() => {
+        document.title = "Daftar siswa";
+        import("../../../service/dashboard/kelas").then(({countKelas}) => {
+            countKelas().then(e => {
+                setCkelas(e)
+            })
+        })
+    }, [])
+
+    useEffect(() => {
+        import("../../../service/dashboard/kelas").then(({getKelasAll}) => {
+            getKelasAll().then(e => {
+                setkelas(e)
+                getUser(e[0].name)
+            })
+
+        })
+    }, [])
+
+    
+
     const eventDelete = (id) => {
-        deleteKelas(id).then(e => {
-            if(e) {
+        import("../../../service/dashboard/kelas").then(({deleteKelas, getKelasAll, countKelas}) => {
+            deleteKelas(id).then(e => {
+                if(e) {
+                    getKelasAll().then(e => {
+                        setkelas(e)
+                    })
+                    countKelas().then(e => {
+                        setCkelas(e)
+                    })
+                }
+            })
+        })
+    }
+    const eventAdd = (name) => {
+        import("../../../service/dashboard/kelas").then(({insertKelas, getKelasAll, countKelas}) => {
+            insertKelas(name).then(() => {
                 getKelasAll().then(e => {
                     setkelas(e)
                 })
                 countKelas().then(e => {
                     setCkelas(e)
                 })
-            }
-        })
-    }
-    const eventAdd = (name) => {
-        insertKelas(name).then(() => {
-            getKelasAll().then(e => {
-                setkelas(e)
-            })
-            countKelas().then(e => {
-                setCkelas(e)
             })
         })
     }
 
     const confirmSave = () => {
-        insertUser({nisn, name, kelas : kel, sandi}).then(r => {
-            if(r) {
-                nav(0)
-            }
+        import("../../../service/dashboard/users").then(({insertUser}) => {
+            insertUser({nisn, name, kelas : kel, sandi}).then(r => {
+                if(r) {
+                    nav(0)
+                }
+            })
         })
     }
     const handleNewUser = () => {
@@ -95,24 +102,27 @@ export default function IndexUsersDashboard() {
         const reader = new FileReader();
         
         reader.onload = (e) => {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-          excelData.shift();
-          const extract = excelData.map(r => {
-            return {
-                nisn :  r[1].toString(),
-                name : r[2],
-                kelas : r[3],
-                pass : r[4]
-            }
-          })
-
-          insertManyUser(extract).then(e => {
-            Swal.fire("Notif", e, "success")
-          })
+            import("xlsx").then(XLSX => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                excelData.shift();
+                const extract = excelData.map(r => {
+                  return {
+                      nisn :  r[1].toString(),
+                      name : r[2],
+                      kelas : r[3],
+                      pass : r[4]
+                  }
+                })
+                import("../../../service/dashboard/users").then(({insertManyUser})=> {
+                    insertManyUser(extract).then(e => {
+                      Swal.fire("Notif", e, "success")
+                    })
+                })
+            })
         };
     
         reader.readAsArrayBuffer(file);

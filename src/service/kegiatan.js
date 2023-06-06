@@ -68,7 +68,7 @@ export function getKegiatanTerbaru() {
 export function getKegiatanWithPage(page) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(pathGetKegiatanWithPage).then(r => r.json()).then(r => {
+            fetch(pathGetKegiatanWithPage(page)).then(r => r.json()).then(r => {
                 if(r.status === 200) {
                     resolve(r.data)
                 }

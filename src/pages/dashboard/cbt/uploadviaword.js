@@ -1,28 +1,25 @@
 import { lazy, useEffect, useState } from "react";
-import { saveWithUploadWordCBT } from "../../../service/dashboard/cbt";
 import { useNavigate, useParams } from "react-router-dom";
-import { BASE_URL, dataURLtoFile, uuidv4 } from "../../../service/constant";
-// import Compressor from "compressorjs";
-import useDocumentTitle from "../../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
-// import { SkeletonTable } from "../../../elements/skeleton/table";
-import renderMathInElement from "katex/contrib/auto-render"
-
+import { useRef } from "react";
+import { Suspense } from "react";
 
 const { SkeletonTable } = lazy(() => import("../../../elements/skeleton/table"))
 
+
 export default function UploadWordCBTDashboard() {
-    
-    useDocumentTitle("Upload Soal dengan Ms. Word")
     const {id} = useParams()
     const nav = useNavigate()
     const [htmlContent, setHtmlContent] = useState([])
+    const render = useRef(null)
 
     const [load, setLoad] = useState(false)
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-            renderMathInElement(document.body, {
+        document.title = "UploadSoal dengan Ms. WOrd"
+        import("../../../service/katex/auto-render").then(renderMathInElement => {
+            renderMathInElement.default(render?.current, {
                 // customised options
                 // • auto-render specific keys, e.g.:
                 delimiters: [
@@ -34,6 +31,7 @@ export default function UploadWordCBTDashboard() {
                 // • rendering keys, e.g.:
                 throwOnError : false
             });
+        })
     }, [htmlContent])
     const handleFileUpload = async (event) => {
         setLoading(true)
@@ -46,18 +44,16 @@ export default function UploadWordCBTDashboard() {
                 convertImage: window.mammoth.images.imgElement(function(image) {
                     return image.read("base64").then((imageBuffer) => {
                         const form = new FormData();
-                        const name = uuidv4()
-                        const a = dataURLtoFile("data:image/png;base64," + imageBuffer, name + ".png")
-                        form.append("photo", a);
-                        return fetch(BASE_URL + "/cbt/soal/upload_foto", {
-                            method : "POST",
-                            body : form
-                        }).then(res => res.json()).then(res => {
-                            if(res.status === 201) {
-                                return {
-                                    src : BASE_URL + "/cbt/soal/image/"+ name + ".png"
-                                }
-                            }
+                        return import("../../../service/constant").then(({uuidv4, dataURLtoFile}) => {
+                            const name = uuidv4()
+                            const a = dataURLtoFile("data:image/png;base64," + imageBuffer, name + ".png")
+                            form.append("photo", a);
+    
+                            return import("../../../service/cbt/soal/uploadphoto").then(uploadPhotoSoal => {
+                                return uploadPhotoSoal.default(form, name).then(({src}) => {
+                                    return src
+                                })
+                            })
                         })
                         // const j = new Compressor(a, {
                         //     quality : 0.8,
@@ -137,19 +133,21 @@ export default function UploadWordCBTDashboard() {
 
     const handleSave = () => {
         setLoad(true)
-        saveWithUploadWordCBT(htmlContent, id).then(e => {
-            
-            if(e) {
-                setLoad(false)
-
-                setTimeout(() => {
-                    nav(-1)
-                }, 3000)
-            }
+        import("../../../service/dashboard/cbt").then(({saveWithUploadWordCBT}) => {
+            saveWithUploadWordCBT(htmlContent, id).then(e => {
+                
+                if(e) {
+                    setLoad(false)
+    
+                    setTimeout(() => {
+                        nav(-1)
+                    }, 3000)
+                }
+            })
         })
     }
     return(
-        <>
+        <Suspense fallback="Tunggu sebentar..">
         
             <div className="flex items-center justify-center w-full">
                 <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
@@ -167,7 +165,7 @@ export default function UploadWordCBTDashboard() {
             </div>
             {
                 loading ? <SkeletonTable/> : (
-                    <div className="overflow-auto">
+                    <div className="overflow-auto" ref={render}>
                         { htmlContent.length > 0 ? (
                             <div className="text-slate-700 my-2"> Preview Sekilas, periksa dengan teliti soal dibawah ini. Klik tombol simpan di paling bawah untuk menyimpan soal </div>
                         ) : ""}
@@ -253,6 +251,6 @@ export default function UploadWordCBTDashboard() {
 
                 )
             }
-        </>
+        </Suspense>
     )
 }

@@ -1,18 +1,17 @@
-import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { NavbarDashboard } from "./element/navbar";
 import { Typography } from "@material-tailwind/react";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 
 export default function IndexDashboard() {
     const nav = useNavigate()
-
-    const Auth = window.sessionStorage.getItem("refresh-admin")
-    if(!Auth) {
-        nav("/auth/login_admin")
-    }
-
-    // useEffect(() => {
-    // }, [])
+    
+    useEffect(() => {
+        const Auth = window.sessionStorage.getItem("refresh-admin")
+        if(!Auth) {
+            nav("/auth/login_admin")
+        }
+    }, [nav])
     return(
         <Suspense fallback={"Tunggu Sebentar"}>
             <NavbarDashboard/>
@@ -43,6 +42,3 @@ export default function IndexDashboard() {
     )
 }
 
-export function useSidebarActive() {
-    return useOutletContext();
-}

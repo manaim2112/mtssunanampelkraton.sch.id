@@ -1,16 +1,14 @@
-import { useSidebarActive } from "..";
-import useDocumentTitle from "../../../elements/useDocumentTitle";
-import { JumbrotonElement } from "../../../elements/jumbroton";
-import { TableMateriElement } from "./table_materi";
-import { HrElement } from "../../../elements/hr";
 import { useEffect } from "react";
+import { lazy } from "react";
+
+const JumbrotonElement = lazy(() => import("../../../elements/jumbroton"))
+const TableMateriElement = lazy(() => import("./table_materi"))
+const HrElement = lazy(() => import("../../../elements/hr"))
 
 export default function IndexMateriDashboard() {
-    const {setSidebarActive} = useSidebarActive()
-    useDocumentTitle("Materi - Dashboard")
     useEffect(() => {
-        setSidebarActive("materi")
-    })
+        document.title = "Materi - Dashboard"
+    }, [])
 
 
     return (

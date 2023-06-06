@@ -1,8 +1,7 @@
 import { Typography } from "@material-tailwind/react";
 
 import { Outlet } from "react-router-dom";
-import { Suspense } from "react";
-import { lazy } from "react";
+import { Suspense, lazy } from "react";
 
 
 // export function IndexHome() {

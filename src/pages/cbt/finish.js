@@ -1,12 +1,10 @@
 import { Button, Card, CardBody, Checkbox, Chip, Input, Textarea } from "@material-tailwind/react";
-import { useEffect } from "react";
+import { useEffect, Suspense, useState, lazy } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { JSONParse } from "../../service/constant";
-import { SkeletonTable } from "../../elements/skeleton/table";
-import { Suspense } from "react";
 import { SparklesIcon, XCircleIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
 
+const SkeletonTable = lazy(() => import("../../elements/skeleton/table"))
 export default function FinishCBT() {
     const {start} = useParams()
     const nav = useNavigate();

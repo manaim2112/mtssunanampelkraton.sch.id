@@ -1,12 +1,9 @@
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { Button, Card, CardBody, CardFooter, CardHeader, Typography } from "@material-tailwind/react";
-import { useState } from "react";
-import { insertNewUser, install } from "../../service/install";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import useDocumentTitle from "../../elements/useDocumentTitle";
 
 export default function Install() {
-    useDocumentTitle("Instalasi Yami-sis")
     const [loading, setLoading] = useState(false)
     const [msg, setMsg] = useState("Menginstall peserta didik ... (1)")
     const [admin, setAdmin] = useState(false)
@@ -16,103 +13,109 @@ export default function Install() {
     const [cMateri, setMateri] = useState(false)
     const [cPage, setPage] = useState(false)
     const [ckegiatan, setKegiatan] = useState(false)
+
+    useEffect(() => {
+        document.title = "Instalasi yami sistem sekolah"
+    }, [])
+
     const handleInstalation = () => {
         setLoading(true)
-
-        install("user").then(r => {
-            if(r.status === 201) {
-                setMsg("Berhasil menambahkan peserta didik")
-                setTimeout(() => {
-                    setMsg("Menginstall kelas ... (2)")
-                    install("kelas").then(r => {
-                        if(r.status === 201) {
-                            setMsg("Berhasil menambahkan kelas")
-                            setTimeout(() => {
-                                setMsg("Menginstall guru ... (3)")
-                                install("guru").then(r => {
-                                    if(r.status === 201) {
-                                        setMsg("Berhasil menambahkan guru")
-                                        setCheckingSekolah(true)
-                                        setTimeout(() => {
-                                            setMsg("Menginstall Computer Based Test (CBT) ... (4)")
-                                            install("cbt").then(r => {
-                                                if(r.status === 201) {
-                                                    setMsg("Berhasil menambahkan Computer Based Test (CBT) ")
-                                                    setCCBT(true)
-                                                    setTimeout(() => {
-                                                        setMsg("Menginstall Halaman ... (5)")
-                                                        install("page").then(r => {
-                                                            if(r.status === 201) {
-                                                                setMsg("Berhasil menambahkan Halaman")
-                                                                setPage(true)
-                                                                setTimeout(() => {
-                                                                    setMsg("Menginstall e-learning ... (6)")
-                                                                    install("materi").then(r => {
-                                                                        if(r.status === 201) {
-                                                                            setMsg("Berhasil menambahkan e-learning")
-                                                                            setMateri(true)
-                                                                            setTimeout(() => {
-                                                                                setMsg("Menginstall kegiatan ... (7)")
-                                                                                install("kegiatan").then(r => {
-                                                                                    if(r.status === 201) {
-                                                                                        setMsg("Berhasil menambahkan kegiatan")
-                                                                                        setKegiatan(true)
-                                                                                        setTimeout(() => {
-                                                                                            setMsg("Menginstall perpus ... (8)")
-                                                                                            install("perpus").then(r => {
-                                                                                                if(r.status === 201) {
-                                                                                                    setMsg("Berhasil menambahkan perpustakaan digital")
-                                                                                                    setCPerpus(true)
-                                                                                                    setTimeout(() => {
-                                                                                                        setMsg("Membuat operator ... (9)")
-                                                                                                        insertNewUser().then(e => {
-                                                                                                            if(e) {
-                                                                                                                setMsg("Berhasil menambahkan operator")
-                                                                                                                setLoading(false)
-                                                                                                                setAdmin(true)
-                                                                                                            } else {
-                                                                                                                console.log(e)
-                                                                                                            }
-                                                                                                        })
-                                                                                                    }, 1000)
-                                                                                                } else {
-                                                                                                    console.log(r)
-                                                                                                }
-                                                                                            })
-                                                                                        }, 1000)
-                                                                                    }else {
-                                                                                        console.log(r)
-                                                                                    }
-                                                                                })
-                                                                            }, 1000)
-                                                                        } else {
-                                                                            console.log(r)
-                                                                        }
-                                                                    })
-                                                                }, 1000)
-                                                            } else {
-                                                                console.log(r)
-                                                            }
-                                                        })
-                                                    }, 1000)
-                                                }else {
-                                                    console.log(r)
-                                                }
-                                            })
-                                        }, 1000)
-                                    } else {
-                                        console.log(r)
-                                    }
-                                })
-                            }, 1000)
-                        } else {
-                            console.log(r)
-                        }
-                    })
-                }, 1000)
-            } else {
-                console.log(r)
-            }
+        import("../../service/install").then(({install, insertNewUser}) => {
+            install("user").then(r => {
+                if(r.status === 201) {
+                    setMsg("Berhasil menambahkan peserta didik")
+                    setTimeout(() => {
+                        setMsg("Menginstall kelas ... (2)")
+                        install("kelas").then(r => {
+                            if(r.status === 201) {
+                                setMsg("Berhasil menambahkan kelas")
+                                setTimeout(() => {
+                                    setMsg("Menginstall guru ... (3)")
+                                    install("guru").then(r => {
+                                        if(r.status === 201) {
+                                            setMsg("Berhasil menambahkan guru")
+                                            setCheckingSekolah(true)
+                                            setTimeout(() => {
+                                                setMsg("Menginstall Computer Based Test (CBT) ... (4)")
+                                                install("cbt").then(r => {
+                                                    if(r.status === 201) {
+                                                        setMsg("Berhasil menambahkan Computer Based Test (CBT) ")
+                                                        setCCBT(true)
+                                                        setTimeout(() => {
+                                                            setMsg("Menginstall Halaman ... (5)")
+                                                            install("page").then(r => {
+                                                                if(r.status === 201) {
+                                                                    setMsg("Berhasil menambahkan Halaman")
+                                                                    setPage(true)
+                                                                    setTimeout(() => {
+                                                                        setMsg("Menginstall e-learning ... (6)")
+                                                                        install("materi").then(r => {
+                                                                            if(r.status === 201) {
+                                                                                setMsg("Berhasil menambahkan e-learning")
+                                                                                setMateri(true)
+                                                                                setTimeout(() => {
+                                                                                    setMsg("Menginstall kegiatan ... (7)")
+                                                                                    install("kegiatan").then(r => {
+                                                                                        if(r.status === 201) {
+                                                                                            setMsg("Berhasil menambahkan kegiatan")
+                                                                                            setKegiatan(true)
+                                                                                            setTimeout(() => {
+                                                                                                setMsg("Menginstall perpus ... (8)")
+                                                                                                install("perpus").then(r => {
+                                                                                                    if(r.status === 201) {
+                                                                                                        setMsg("Berhasil menambahkan perpustakaan digital")
+                                                                                                        setCPerpus(true)
+                                                                                                        setTimeout(() => {
+                                                                                                            setMsg("Membuat operator ... (9)")
+                                                                                                            insertNewUser().then(e => {
+                                                                                                                if(e) {
+                                                                                                                    setMsg("Berhasil menambahkan operator")
+                                                                                                                    setLoading(false)
+                                                                                                                    setAdmin(true)
+                                                                                                                } else {
+                                                                                                                    console.log(e)
+                                                                                                                }
+                                                                                                            })
+                                                                                                        }, 1000)
+                                                                                                    } else {
+                                                                                                        console.log(r)
+                                                                                                    }
+                                                                                                })
+                                                                                            }, 1000)
+                                                                                        }else {
+                                                                                            console.log(r)
+                                                                                        }
+                                                                                    })
+                                                                                }, 1000)
+                                                                            } else {
+                                                                                console.log(r)
+                                                                            }
+                                                                        })
+                                                                    }, 1000)
+                                                                } else {
+                                                                    console.log(r)
+                                                                }
+                                                            })
+                                                        }, 1000)
+                                                    }else {
+                                                        console.log(r)
+                                                    }
+                                                })
+                                            }, 1000)
+                                        } else {
+                                            console.log(r)
+                                        }
+                                    })
+                                }, 1000)
+                            } else {
+                                console.log(r)
+                            }
+                        })
+                    }, 1000)
+                } else {
+                    console.log(r)
+                }
+            })
         })
     }
     return(

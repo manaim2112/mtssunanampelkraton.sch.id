@@ -1,7 +1,5 @@
 import { Card, CardBody, CardHeader, Typography } from "@material-tailwind/react";
-import { useEffect } from "react";
-import { useState } from "react";
-import { getAuthorize } from "../../service/constant";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function HomeDashboard() {
@@ -11,7 +9,9 @@ export default function HomeDashboard() {
     const [countPegawai, setCountPegawai] = useState("")
     const [countKegiata, setCountkegiatan] = useState("")
     useEffect(() => {
-            setName(getAuthorize().name)
+            import("../../service/constant").then(({getAuthorize}) => {
+                setName(getAuthorize().name)
+            })
             import("../../service/dashboard/users").then(({CountUser}) => {
                 CountUser().then(e => {
                     setCountUser(e)

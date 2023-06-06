@@ -1,17 +1,17 @@
-import { Suspense, useEffect, useState } from "react"
-import { deleteGuru, getGuru, updateGuru } from "../../../service/dashboard/guru"
+import { Suspense, useEffect, useState, lazy } from "react"
 import { Button, Card, CardBody, CardFooter, CardHeader, Checkbox, Dialog, Input, Option, Select, Typography } from "@material-tailwind/react"
-import { getKelasAll } from "../../../service/dashboard/kelas"
 import { useNavigate } from "react-router-dom"
-import { SkeletonTable } from "../../../elements/skeleton/table"
 
-export function TableGuruElement() {
+const SkeletonTable = lazy(() => import("../../../elements/skeleton/table"))
+export default function TableGuruElement() {
     const [user, setUser] = useState([])
     const [data, setData] = useState({})
     const [open, setOpen] = useState(false)
     useEffect(() => {
-        getGuru().then(d => {
-            setUser(d)
+        import("../../../service/dashboard/guru").then(({getGuru}) => {
+            getGuru().then(d => {
+                setUser(d)
+            })
         })
     }, [])
     const [actionRemove, setActionRemove] = useState([])
@@ -21,11 +21,13 @@ export function TableGuruElement() {
             h[k] = true
             setActionRemove(h)
         } else {
-            deleteGuru(id).then(e => {
-                if(!e) return;
-                setActionRemove([])
-                getGuru().then(d => {
-                    setUser(d)
+            import("../../../service/dashboard/guru").then(({deleteGuru, getGuru}) => {
+                deleteGuru(id).then(e => {
+                    if(!e) return;
+                    setActionRemove([])
+                    getGuru().then(d => {
+                        setUser(d)
+                    })
                 })
             })
         }
@@ -115,17 +117,20 @@ export function EditGuru({data, opened, setOpened}) {
     const navigate = useNavigate()
     const handleUpdate = (id) => {
         setLoading(true)
-        updateGuru({id, pegId, name, pass, walikelas, jabatan}).then(e => {
-            setLoading(false)
-            if(!e) return;
-            navigate(0)
-
+        import("../../../service/dashboard/guru").then(({updateGuru}) => {
+            updateGuru({id, pegId, name, pass, walikelas, jabatan}).then(e => {
+                setLoading(false)
+                if(!e) return;
+                navigate(0)
+            })
         })
     }
 
     useEffect(() => {
-        getKelasAll().then(e => {
-            setKelas(e)
+        import("../../../service/dashboard/kelas").then(({getKelasAll}) => {
+            getKelasAll().then(e => {
+                setKelas(e)
+            })
         })
     }, [])
     useEffect(() => {

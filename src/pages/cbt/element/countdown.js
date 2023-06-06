@@ -1,6 +1,5 @@
 import { Typography } from '@material-tailwind/react';
 import React, { useState, useEffect } from 'react';
-import { finishingCBT } from '../../../service/cbt/result';
 import { useNavigate } from 'react-router-dom';
 
 function Countdown({time, data, user, list, start}) {
@@ -8,10 +7,11 @@ function Countdown({time, data, user, list, start}) {
   const [intervalId, setIntervalId] = useState(null);
     const nav = useNavigate();
     const finishing = () => {
-
+      import("../../../service/cbt/result").then(({finishingCBT}) => {
         finishingCBT({idlist : list.id, iduser : user.id, answer : JSON.stringify(data)}).then(e => {
             nav("/cbt/finish/"+ start)
         })
+      })
     }
   useEffect(() => {
     if (remainingTime <= 0) {

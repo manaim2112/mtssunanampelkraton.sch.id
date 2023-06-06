@@ -1,16 +1,15 @@
 import { useRef, useState } from "react"
 import { useEffect } from "react"
 import { Link, useParams } from "react-router-dom"
-import { RemoveResultWithId} from "../../../service/dashboard/cbt"
-import { SkeletonTable } from "../../../elements/skeleton/table"
 import { Suspense } from "react"
 import { Chip, IconButton, SpeedDial, SpeedDialAction, SpeedDialContent, SpeedDialHandler, Tooltip, Typography } from "@material-tailwind/react"
 import Swal from "sweetalert2"
-import jsPDF from "jspdf"
 import { JSONParse } from "../../../service/constant"
 import { Cog8ToothIcon, PrinterIcon, SignalIcon} from "@heroicons/react/24/outline"
 import { ExcelIcon } from "../../../icons/excelIcon"
+import { lazy } from "react"
 
+const SkeletonTable = lazy(() => import("../../../elements/skeleton/table"))
 export default function ResultCBT() {
     const {id} = useParams()
     const [creator, setCreator] = useState(false)
@@ -367,22 +366,24 @@ export default function ResultCBT() {
             "confirmButtonColor" : "red"
         }).then(e => {
             if(e.isConfirmed) {
-                RemoveResultWithId(result[index].id).then(r => {
-                    if(!r) return Swal.fire({
-                        title : "Gagal Hapus",
-                        icon : "error",
-                        showConfirmButton : false
+                import("../../../service/dashboard/cbt").then(({RemoveResultWithId}) => {
+                    RemoveResultWithId(result[index].id).then(r => {
+                        if(!r) return Swal.fire({
+                            title : "Gagal Hapus",
+                            icon : "error",
+                            showConfirmButton : false
+                        })
+                        setWaiting(true)
+                        setV(v)
+    
+                        Swal.fire({
+                            title : "Berhasil di Reset",
+                            icon : "success",
+                            text : "Silahkan refresh kembali untuk bisa melakukan pengujian",
+                            showConfirmButton : false
+                        })
+                        return processData();
                     })
-                    setWaiting(true)
-                    setV(v)
-
-                    Swal.fire({
-                        title : "Berhasil di Reset",
-                        icon : "success",
-                        text : "Silahkan refresh kembali untuk bisa melakukan pengujian",
-                        showConfirmButton : false
-                    })
-                    return processData();
                 })
             }
         })
@@ -397,26 +398,28 @@ export default function ResultCBT() {
 
     const handleSaveAsPDF = () => {
         const element = HtmlRef.current;
-        const pdf  = new jsPDF({
-            orientation: 'p',
-            unit: 'pt',
-            format: 'legal',
-            putOnlyUsedFonts:true,
-            floatPrecision: 16, // or "smart", default is 16,
-            compress : true,
-           })
-           pdf.setFont("helvetica");
-            pdf.setFontSize(12);
-            pdf.context2d.scale(.5, .6)
-           pdf.html(element, {
-            margin : .5,
-            width : pdf.internal.pageSize.getWidth(),
-            callback: function (doc) {
-              doc.save(list.name + "_" + v + "_" + Date.now());
-            },
-            x: 10,
-            y: 10
-         });
+        import("jspdf").then(jsPDF => {
+            const pdf  = new jsPDF.default({
+                orientation: 'p',
+                unit: 'pt',
+                format: 'legal',
+                putOnlyUsedFonts:true,
+                floatPrecision: 16, // or "smart", default is 16,
+                compress : true,
+               })
+               pdf.setFont("helvetica");
+                pdf.setFontSize(12);
+                pdf.context2d.scale(.5, .6)
+               pdf.html(element, {
+                margin : .5,
+                width : pdf.internal.pageSize.getWidth(),
+                callback: function (doc) {
+                  doc.save(list.name + "_" + v + "_" + Date.now());
+                },
+                x: 10,
+                y: 10
+             });
+        })
         // var opt = {
         //     filename:     'myfile-'+ Date.now() +'.pdf',
         //     margin : 2.5,

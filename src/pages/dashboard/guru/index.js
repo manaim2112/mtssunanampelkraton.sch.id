@@ -1,16 +1,18 @@
 
-import { JumbrotonElement } from "../../../elements/jumbroton";
-import { HrElement } from "../../../elements/hr";
-import { TableGuruElement } from "./table_guru";
-import useDocumentTitle from "../../../elements/useDocumentTitle";
+
 import { Button, Card, CardBody, CardFooter, CardHeader, Checkbox, Dialog, Input, Typography } from "@material-tailwind/react";
-import { useState } from "react";
-import { insertGuru } from "../../../service/dashboard/guru";
+import { useState, lazy, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
+const JumbrotonElement = lazy(() => import("../../../elements/jumbroton"))
+const HrElement = lazy(() => import("../../../elements/hr"))
+const TableGuruElement = lazy(() => import("./table_guru"))
 
 export default function IndexGuruDashboard() {
     
-    useDocumentTitle("Pegawai - Dashboard")
+    useEffect(() => {
+        document.title = "Pegawai - Dashboard"
+    }, [])
     
     
     return(
@@ -42,11 +44,13 @@ export function AddGuru() {
     const handleAdd = () => {
         if(!checklist) return;
         setLoading(true)
-        insertGuru({pegId, name, pass}).then(e => {
-            
-            handleOpen();
-            setLoading(false)
-            navigate(0)
+        import("../../../service/dashboard/guru").then(({insertGuru}) => {
+            insertGuru({pegId, name, pass}).then(e => {
+                
+                handleOpen();
+                setLoading(false)
+                navigate(0)
+            })
         })
     }
     return(

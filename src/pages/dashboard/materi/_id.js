@@ -1,4 +1,6 @@
-import { JumbrotonElement } from "../../../elements/jumbroton";
+import { lazy } from "react";
+
+const JumbrotonElement = lazy(() => import("../../../elements/jumbroton"))
 
 export default function IdMateriDashboard() {
     return(

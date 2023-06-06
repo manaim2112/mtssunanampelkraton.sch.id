@@ -1,23 +1,18 @@
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { JSONParse } from "../../service/constant";
 import { Button, Card, CardBody, Checkbox, Chip,Input, Radio, Textarea, Tooltip, Typography } from "@material-tailwind/react";
 import { CheckIcon, XCircleIcon } from "@heroicons/react/24/outline";
-import { Suspense } from "react";
-import { SkeletonTable } from "../../elements/skeleton/table";
-import useDocumentTitle from "../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
-import renderMathInElement from "katex/contrib/auto-render";
 
 
 import "./start.css"
 import { usePageVisibility } from "../../elements/useVisibility";
  
+const SkeletonTable = lazy(() => import("../../elements/skeleton/table"))
 export default function StartCBT() {
     const {start} = useParams()
     const nav = useNavigate();
-    useDocumentTitle("Selamat Mengerjakan soal")
     
     const [waitingLoad, setWaitingLoad] = useState(null)
     
@@ -41,6 +36,7 @@ export default function StartCBT() {
     const [err, setErr] = useState(false)
 
     useEffect( () => {
+        document.title("Selamat mengerjakan Soal");
         const at = atob(start)
         const [nisn, idlist] = at.split("@")
         if(!localStorage.getItem("hidden_date_"+ idlist + "_"+ nisn) && !isVisible) {
@@ -127,7 +123,7 @@ export default function StartCBT() {
                     setRemainingTime(timeDifferent)
         
                     setWaitingLoad(true)
-    
+                    import("../../service/katex/auto-render").then((renderMathInElement) => {
                         renderMathInElement.default(document.body, {
                             // customised options
                             // • auto-render specific keys, e.g.:
@@ -140,6 +136,7 @@ export default function StartCBT() {
                             // • rendering keys, e.g.:
                             throwOnError : false
                         });
+                    })
                 })
             })
 
@@ -150,19 +147,20 @@ export default function StartCBT() {
     }, [start, nav])
 
     useEffect(() => {
-
-        renderMathInElement(document.body, {
-            // customised options
-            // • auto-render specific keys, e.g.:
-            delimiters: [
-                {left: '$$', right: '$$', display: true},
-                {left: '$', right: '$', display: false},
-                {left: '\\(', right: '\\)', display: false},
-                {left: '\\[', right: '\\]', display: true}
-            ],
-            // • rendering keys, e.g.:
-            throwOnError : false
-    })
+        import("../../service/katex/auto-render").then((renderMathInElement) => {
+            renderMathInElement.default(document.body, {
+                // customised options
+                // • auto-render specific keys, e.g.:
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                // • rendering keys, e.g.:
+                throwOnError : false
+            });
+        })
     }, [active])
 
     const checkingButtonFinish = () => {

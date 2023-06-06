@@ -1,4 +1,4 @@
-export function SkeletonTable() {
+export default function SkeletonTable() {
     return(
         
 <div role="status" className="space-y-2.5 animate-pulse max-w-lg mt-11">

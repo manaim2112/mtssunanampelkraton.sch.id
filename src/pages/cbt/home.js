@@ -1,12 +1,9 @@
 import { CheckBadgeIcon, PowerIcon } from "@heroicons/react/24/outline";
 import { Button, Card, CardBody, CardFooter, CardHeader, Dialog, DialogBody, DialogFooter, DialogHeader, IconButton, Input, Typography } from "@material-tailwind/react";
-import { useEffect, useState } from "react";
-import { JSONParse } from "../../service/constant";
-import { HrElement } from "../../elements/hr";
-import { checkingCodeWithIdList, listSoalWithKelas } from "../../service/cbt/list";
-import { getResultWithUserId, startingCBT } from "../../service/cbt/result";
+import { useEffect, useState, lazy } from "react";
 import { useNavigate } from "react-router-dom";
-import { getSoalWithIdList } from "../../service/cbt/soal";
+
+const HrElement = lazy(() => import("../../elements/hr"))
 
 export default function HomeCBT() {
     const [user, setUser] = useState({})
@@ -21,17 +18,22 @@ export default function HomeCBT() {
     useEffect(() => {
         
         const h = window.sessionStorage.getItem("refresh-token")
-
-        const j = JSONParse(atob(h))
-        listSoalWithKelas(j.kelas).then(e => {
-            setList(e)
+        import("../../service/constant").then(({JSONParse}) => {
+            const j = JSONParse(atob(h))
+            import("../../service/cbt/list").then(({listSoalWithKelas}) => {
+                listSoalWithKelas(j.kelas).then(e => {
+                    setList(e)
+                })
+            })
+    
+            import("../../service/cbt/result").then(({getResultWithUserId}) => {
+                getResultWithUserId(j.id).then(r => {
+                    setResult(r)
+                })
+            })
+    
+            setUser(j)
         })
-
-        getResultWithUserId(j.id).then(r => {
-            setResult(r)
-        })
-
-        setUser(j)
     }, [])
 
     const handleStart = (id) => {
@@ -44,42 +46,48 @@ export default function HomeCBT() {
         nav(0)
     }
     const setNewStart = (act) => {
-        getSoalWithIdList(Number(active)).then(e => {
-            let sort = e;
-            if(act.acak) {
-                sort = e.sort((a,b) => Math.random() - .5);
-            }
-            window.localStorage.setItem("refresh@"+ user.nisn +"@"+ active, JSON.stringify(sort))
-            window.localStorage.setItem("timing@"+ user.nisn + "@" + active, new Date())
-            window.localStorage.setItem("list@"+ user.nisn + "@" + active, JSON.stringify(act))
-            if(!window.localStorage.getItem("data@"+ user.nisn + "@" + active)) {
-                window.localStorage.setItem("data@"+ user.nisn + "@" + active, JSON.stringify(sort.map(y => [y.id, []])))
-            }
-            
-            setLoading(false)
-            nav("/cbt/start/"+ btoa(user.nisn+"@"+active))
+        import("../../service/cbt/soal").then(({getSoalWithIdList}) => {
+            getSoalWithIdList(Number(active)).then(e => {
+                let sort = e;
+                if(act.acak) {
+                    sort = e.sort((a,b) => Math.random() - .5);
+                }
+                window.localStorage.setItem("refresh@"+ user.nisn +"@"+ active, JSON.stringify(sort))
+                window.localStorage.setItem("timing@"+ user.nisn + "@" + active, new Date())
+                window.localStorage.setItem("list@"+ user.nisn + "@" + active, JSON.stringify(act))
+                if(!window.localStorage.getItem("data@"+ user.nisn + "@" + active)) {
+                    window.localStorage.setItem("data@"+ user.nisn + "@" + active, JSON.stringify(sort.map(y => [y.id, []])))
+                }
+                
+                setLoading(false)
+                nav("/cbt/start/"+ btoa(user.nisn+"@"+active))
+            })
         })
     }
 
     const newStart = (act) => {
-        startingCBT({idlist : Number(active), iduser : Number(user.id)}).then(e => {
-            if(!e) return setLoading(false)
-            return setNewStart(act)
+        import("../../service/cbt/result").then(({startingCBT}) => {
+            startingCBT({idlist : Number(active), iduser : Number(user.id)}).then(e => {
+                if(!e) return setLoading(false)
+                return setNewStart(act)
+            })
         })
     }
     const handleNext = () => {
         setLoading(true)
-        checkingCodeWithIdList(active).then(e => {
-            const l = list.findIndex(O => O.id === active);
-            if(l === -1) return setLoading(false);
-            const act = list[l];
-            if(e.code !== code) return setLoading(false)
-            const use = result.findIndex(O => O.idlist === active);
-            if(use === -1) {
-                return newStart(act)
-            } 
-
-            return setNewStart(act) 
+        import("../../service/cbt/list").then(({checkingCodeWithIdList}) => {
+            checkingCodeWithIdList(active).then(e => {
+                const l = list.findIndex(O => O.id === active);
+                if(l === -1) return setLoading(false);
+                const act = list[l];
+                if(e.code !== code) return setLoading(false)
+                const use = result.findIndex(O => O.idlist === active);
+                if(use === -1) {
+                    return newStart(act)
+                } 
+    
+                return setNewStart(act) 
+            })
         })
     }
     

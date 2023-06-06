@@ -1,7 +1,9 @@
-import useDocumentTitle from "../../elements/useDocumentTitle"
+import { useEffect } from "react"
 
 export default function IndexBerita() {
-    useDocumentTitle("Berita terkini")
+    useEffect(() => {
+        document.title = "Berita Terkini"
+    })
     return (
         <>
             

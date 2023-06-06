@@ -1,21 +1,22 @@
-import { useEffect, useState } from "react"
-import { BeritaNew } from "../service/berita"
+import { useEffect, useState, lazy } from "react"
 import { Link } from "react-router-dom"
-import { SkeletonBerita } from "./skeleton/berita"
 
 
-export function BeritaElement() {
+const SkeletonBerita = lazy(() => import("./skeleton/berita"))
+export default function BeritaElement() {
     const [berita, setBerita] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     useEffect(()=> {
-        BeritaNew().then(d => {
-            setTimeout(() => {
-                setIsLoading(true)
-                setBerita(d)
-
-            }, 3000)
-        }, [])
-    })
+        import("../service/berita").then(({BeritaNew}) => {
+            BeritaNew().then(d => {
+                setTimeout(() => {
+                    setIsLoading(true)
+                    setBerita(d)
+    
+                }, 3000)
+            })
+        })
+    }, [])
     return(
         <div className="mt-8 text-left px-8">
             <h2 className="text-4xl font-bold text-slate-700 mb-5">Berita terkini</h2>

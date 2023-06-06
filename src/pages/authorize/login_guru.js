@@ -1,32 +1,30 @@
-import { useState } from "react";
-import useDocumentTitle from "../../elements/useDocumentTitle";
+import { useEffect, useState, lazy, Suspense, startTransition } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { lazy } from "react";
-import { Suspense } from "react";
-import { startTransition } from "react";
+
 
 
 const NavbarElement = lazy(() => import("../../elements/navbar"))
 
 export default function IndexLoginAdmin() {
-    useDocumentTitle("Masuk sebagai Admin")
     const [nisn, setNisn] = useState("")
     const [sandi, setSandi] = useState("")
+    const nav = useNavigate()
     const [isLoading, setLoading] = useState(false)
     const [alert, setAlert] = useState(false)
     let [searchParams] = useSearchParams();
-    const nav = useNavigate()
-    const getToken = window.sessionStorage.getItem("refresh-admin")
-    if(getToken) {
-            const redirect = searchParams.get("redirect")
-            // const json = JSON.parse(atob(getToken))
-            if (redirect == null) {
-                nav("/dashboard")
-            } else {
-                nav(redirect)
-            }
-
-    }
+    useEffect(() => {
+        const getToken = window.sessionStorage.getItem("refresh-admin")
+        if(getToken) {
+                const redirect = searchParams.get("redirect")
+                // const json = JSON.parse(atob(getToken))
+                if (redirect == null) {
+                    nav("/dashboard")
+                } else {
+                    nav(redirect)
+                }
+        }
+        document.title = "Login Sebagai pegawai"
+    }, [nav, searchParams])
     
     const LoginButton = () => {
         setLoading(true)
