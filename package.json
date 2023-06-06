@@ -32,6 +32,7 @@
     "start": "react-scripts start",
     "terser": "terser ./build/static/js/*.js -m --mangle-props regex=/_$/ -o ./minified/ --overwrite",
     "build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build && compress-cra",
+    "buildlinux": "export GENERATE_SOURCEMAP=false && react-scripts build && compress-cra",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
