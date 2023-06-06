@@ -8,6 +8,7 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
+    "compress-create-react-app": "^1.4.2",
     "compressorjs": "^1.2.1",
     "html2pdf.js": "^0.10.1",
     "jspdf": "^2.5.1",
@@ -23,12 +24,14 @@
     "sort-by": "^1.2.0",
     "sweetalert2": "^11.7.3",
     "sweetalert2-react-content": "^5.0.7",
+    "terser": "^5.17.7",
     "web-vitals": "^2.1.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "terser": "terser ./build/static/js/*.js -m --mangle-props regex=/_$/ -o ./minified/ --overwrite",
+    "build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build && compress-cra",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

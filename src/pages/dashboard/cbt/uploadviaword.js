@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import { saveWithUploadWordCBT } from "../../../service/dashboard/cbt";
 import { useNavigate, useParams } from "react-router-dom";
 import { BASE_URL, dataURLtoFile, uuidv4 } from "../../../service/constant";
-import renderMathInElement from "../../../service/auto";
 // import Compressor from "compressorjs";
 import useDocumentTitle from "../../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
-import { SkeletonTable } from "../../../elements/skeleton/table";
+// import { SkeletonTable } from "../../../elements/skeleton/table";
+import renderMathInElement from "katex/contrib/auto-render"
+
+
+const { SkeletonTable } = lazy(() => import("../../../elements/skeleton/table"))
 
 export default function UploadWordCBTDashboard() {
     
@@ -19,18 +22,18 @@ export default function UploadWordCBTDashboard() {
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        renderMathInElement(document.body, {
-            // customised options
-            // • auto-render specific keys, e.g.:
-            delimiters: [
-                {left: '$$', right: '$$', display: true},
-                {left: '$', right: '$', display: false},
-                {left: '\\(', right: '\\)', display: false},
-                {left: '\\[', right: '\\]', display: true}
-            ],
-            // • rendering keys, e.g.:
-            throwOnError : false
-        });
+            renderMathInElement(document.body, {
+                // customised options
+                // • auto-render specific keys, e.g.:
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                // • rendering keys, e.g.:
+                throwOnError : false
+            });
     }, [htmlContent])
     const handleFileUpload = async (event) => {
         setLoading(true)

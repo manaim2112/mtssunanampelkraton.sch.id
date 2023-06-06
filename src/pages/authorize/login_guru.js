@@ -3,8 +3,8 @@ import useDocumentTitle from "../../elements/useDocumentTitle";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { lazy } from "react";
 import { Suspense } from "react";
-import { SkeletonTable } from "../../elements/skeleton/table";
 import { startTransition } from "react";
+
 
 const NavbarElement = lazy(() => import("../../elements/navbar"))
 
@@ -54,7 +54,7 @@ export default function IndexLoginAdmin() {
         })
     }
     return (
-        <Suspense fallback={<SkeletonTable/>}>
+        <Suspense fallback={"Tunggu sebentart"}>
             <NavbarElement/>
             
             <div className="w-64 mx-auto mt-11">    

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { RemoveSoalWithId, getDataWithIdCBT, updateStartEndCBT } from "../../../service/dashboard/cbt";
 import {  useNavigate, useParams } from "react-router-dom";
 import { Button, Chip, IconButton, Input, Switch, Typography } from "@material-tailwind/react";
 import { ArrowPathIcon, CheckIcon, PencilSquareIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -7,10 +6,7 @@ import useDocumentTitle from "../../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { JSONParse, randomText } from "../../../service/constant";
-import renderMathInElement from "../../../service/auto";
-
-
-
+import renderMathInElement from "katex/contrib/auto-render";
 export default function IdCBTDashboard() {
     const [xid, setXid] = useState("")
     const {id} = useParams()
@@ -27,18 +23,18 @@ export default function IdCBTDashboard() {
             })
         })
         
-        renderMathInElement(document.body, {
-            // customised options
-            // • auto-render specific keys, e.g.:
-            delimiters: [
-                {left: '$$', right: '$$', display: true},
-                {left: '$', right: '$', display: false},
-                {left: '\\(', right: '\\)', display: false},
-                {left: '\\[', right: '\\]', display: true}
-            ],
-            // • rendering keys, e.g.:
-            throwOnError : false
-        });
+            renderMathInElement(document.body, {
+                // customised options
+                // • auto-render specific keys, e.g.:
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                // • rendering keys, e.g.:
+                throwOnError : false
+            });
     }, [])
 
     const ChangeCode = (id) => {
@@ -187,8 +183,10 @@ export function DataIdCBTDashboardElement({xid}) {
     const Myswal = withReactContent(Swal)
 
     useEffect(() => {
-        getDataWithIdCBT(xid).then(d => {
-            setList(d)
+        import("../../../service/dashboard/cbt").then(({getDataWithIdCBT}) => {
+            getDataWithIdCBT(xid).then(d => {
+                setList(d)
+            })
         })
     }, [xid])
     const removeSoal = (id, k) => {
@@ -197,24 +195,26 @@ export function DataIdCBTDashboardElement({xid}) {
             hh[k] = true
             setSureDelete(hh)
         } else {
-            RemoveSoalWithId(id).then(e => {
-                if(e) {
-                    const hh = [...sureDelete]
-                    hh[k] = false;
-                    setSureDelete(hh)
-                    const index = list.findIndex(Obj => Obj.id === id)
-                    const l = list;
-                    l.splice(index, 1)
-                    setList(l)
-
-                    Myswal.fire({
-                        "title" : "Berhasil",
-                        "icon" : "success",
-                        "showConfirmButton" : false,
-                        "timer" : 1500,
-                        "position" : "top-end",
-                    })
-                }
+            import("../../../service/dashboard/cbt").then(({RemoveSoalWithId}) => {
+                RemoveSoalWithId(id).then(e => {
+                    if(e) {
+                        const hh = [...sureDelete]
+                        hh[k] = false;
+                        setSureDelete(hh)
+                        const index = list.findIndex(Obj => Obj.id === id)
+                        const l = list;
+                        l.splice(index, 1)
+                        setList(l)
+    
+                        Myswal.fire({
+                            "title" : "Berhasil",
+                            "icon" : "success",
+                            "showConfirmButton" : false,
+                            "timer" : 1500,
+                            "position" : "top-end",
+                        })
+                    }
+                })
             })
         }
 

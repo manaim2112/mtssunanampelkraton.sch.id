@@ -3,7 +3,6 @@ import { useEffect, useState } from "react"
 import { PlayIcon, SignalIcon} from "@heroicons/react/24/outline"
 import { JSONParse } from "../../../service/constant";
 import { ExcelIcon } from "../../../icons/excelIcon";
-import XLSX from "xlsx"
 
 export const render = async (kelas, c) => {
     const resource = c
@@ -207,17 +206,18 @@ export default function ExportNilaiCBTDashboard() {
         })
     }
     const handleExportToXLS = async () => {
-        
-        const workbook =  XLSX.utils.book_new()
-
-        for (const k of kelas) {
-            const a = await render(k, resultAll)
-            const header = ["No.Absen", "NISN", "NAMA LENGKAP", "KELAS", ...listChecked.map(e => e.name)]
-            const h = [header, ...a]
-            const worksheet = XLSX.utils.aoa_to_sheet(h);
-            XLSX.utils.book_append_sheet(workbook, worksheet, k)            
-        }
-        XLSX.writeFile(workbook, "_RekapNilaiAkhir_"+ Date.now() +".xlsx", { compression: true });
+        import("xlsx").then(async XLSX => {
+            const workbook =  XLSX.utils.book_new()
+    
+            for (const k of kelas) {
+                const a = await render(k, resultAll)
+                const header = ["No.Absen", "NISN", "NAMA LENGKAP", "KELAS", ...listChecked.map(e => e.name)]
+                const h = [header, ...a]
+                const worksheet = XLSX.utils.aoa_to_sheet(h);
+                XLSX.utils.book_append_sheet(workbook, worksheet, k)            
+            }
+            XLSX.writeFile(workbook, "_RekapNilaiAkhir_"+ Date.now() +".xlsx", { compression: true });
+        })
     }
 
     if(!creator) return ("Tidak punya akses")

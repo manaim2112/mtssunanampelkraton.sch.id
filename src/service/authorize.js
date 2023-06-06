@@ -1,14 +1,12 @@
-import { BASE_URL } from "./constant"
+import { pathAutorizeGuru, pathAutorizeUser } from "./path_rebuild"
 
 export function LoginWithUser(nisn, pass) {
     return new Promise((resolve, reject) => {
-        fetch(BASE_URL + "/authorize/login_user", {
+        fetch(pathAutorizeUser, {
             method :"POST",
-            // credentials: "include",
             headers : {"Content-type" : "application/json"},
             body : JSON.stringify({nisn, pass})
         }).then(res => res.json()).then(e => {
-            console.log(e)
             if(e.status === 201) {
                 resolve(e.session)
             } else {
@@ -20,9 +18,8 @@ export function LoginWithUser(nisn, pass) {
 
 export function LoginWithAdmin(pegId, pass) {
     return new Promise((resolve, reject) => {
-        fetch(BASE_URL + "/authorize/login_guru", {
+        fetch(pathAutorizeGuru, {
             method :"POST",
-            // credentials: "include",
             headers : {"Content-type" : "application/json"},
             body : JSON.stringify({pegId, pass})
         }).then(res => res.json()).then(e => {

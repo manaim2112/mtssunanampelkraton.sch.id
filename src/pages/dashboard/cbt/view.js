@@ -6,8 +6,8 @@ import { Card, CardBody, Checkbox, Chip, IconButton, Input, Tooltip, Typography 
 import { JSONParse } from "../../../service/constant"
 import { BookmarkSquareIcon, CheckIcon, PrinterIcon, SignalIcon, UserGroupIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import Swal from "sweetalert2"
-import renderMathInElement from "../../../service/auto";
 import html2pdf from "html2pdf.js"
+import renderMathInElement from "katex/contrib/auto-render"
 
 
 export default function ViewResultCBT() {
@@ -101,8 +101,8 @@ export default function ViewResultCBT() {
                                             ],
                                             // • rendering keys, e.g.:
                                             throwOnError : false
-                                        });
-                
+                                        });                            
+                                        
                                         
                 
                                         getStudent(u.kelas).then(us => {
@@ -144,7 +144,6 @@ export default function ViewResultCBT() {
         const s = soal[key].id
         const ranw = resultC
         const index = ranw.findIndex(Obj => Obj[0] === s);
-        console.log(index)
         if(ranw[index] && ranw[index].length === 3) {
             ranw[index][2] = false;
         } else if(ranw[index] && ranw[index].length === 2) {

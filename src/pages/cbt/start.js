@@ -4,12 +4,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { JSONParse } from "../../service/constant";
 import { Button, Card, CardBody, Checkbox, Chip,Input, Radio, Textarea, Tooltip, Typography } from "@material-tailwind/react";
 import { CheckIcon, XCircleIcon } from "@heroicons/react/24/outline";
-import { checkingResult, finishingCBT } from "../../service/cbt/result";
 import { Suspense } from "react";
 import { SkeletonTable } from "../../elements/skeleton/table";
 import useDocumentTitle from "../../elements/useDocumentTitle";
 import Swal from "sweetalert2";
-import renderMathInElement from "../../service/auto";
+import renderMathInElement from "katex/contrib/auto-render";
 
 
 import "./start.css"
@@ -25,7 +24,7 @@ export default function StartCBT() {
     const [user, setUser] = useState([])
     const [list, setList] = useState([])
     const [soal, setSoal] = useState([])
-    const [timing, setTiming] = useState("")
+    // const [timing, setTiming] = useState("")
     const [data, setData] = useState([])
     
 
@@ -62,7 +61,7 @@ export default function StartCBT() {
             setErr(true)
         }
          
-    }, [isVisible])
+    }, [isVisible, start])
 
     useEffect(() => {
         const at = atob(start)
@@ -82,11 +81,11 @@ export default function StartCBT() {
         }, 1000*60*5)
 
         return () => clearTimeout(remove)
-    }, [err])
+    }, [err, start])
 
     useEffect(()=> {
-        const at = atob(start)
-        const [nisn, idlist] = at.split("@")
+        // const at = atob(start)
+        // const [nisn, idlist] = at.split("@")
         try {
             const at = atob(start)
             const [nisn, idlist] = at.split("@")
@@ -94,62 +93,64 @@ export default function StartCBT() {
             const decode = JSONParse(atob(local))
             const iduser = decode.id
             setUser(decode)
-
-            checkingResult({idlist, iduser}).then(r => {
-                if(r.process === "finish") {
-                    nav("/cbt/finish/"+ start)
-                    return;
-                }
-                if(r.length < 1) {
-                    return nav("/cbt")
-                }
-                const result = r[0]
-                
-                const l = window.localStorage.getItem("list@"+ nisn +"@"+ idlist)
-                const decode_l  = JSONParse(l)
-                setList(decode_l)
-                
-                const s = window.localStorage.getItem("refresh@"+ nisn + "@" + idlist)
-                const decode_s = JSONParse(s)
-                setSoal(decode_s)
-                
-                const d = window.localStorage.getItem("data@"+ nisn + "@"+ idlist)
-                const decode_d = JSONParse(d)
-                setData(decode_d)
-                
-                
-                const timeNow = Date.now()
-                const timeStart = Date.parse(new Date(atob(result.created_at)))
-                const durasi = Number(decode_l.durasi);
-
-                const timeFlush = timeStart + durasi*60*1000;
-                let timeDifferent = Math.floor((timeFlush - timeNow)/1000);
-                setTiming(timeDifferent)
-                setRemainingTime(timeDifferent)
+            import("../../service/cbt/result").then(({checkingResult}) => {
+                checkingResult({idlist, iduser}).then(r => {
+                    if(r.process === "finish") {
+                        nav("/cbt/finish/"+ start)
+                        return;
+                    }
+                    if(r.length < 1) {
+                        return nav("/cbt")
+                    }
+                    const result = r[0]
+                    
+                    const l = window.localStorage.getItem("list@"+ nisn +"@"+ idlist)
+                    const decode_l  = JSONParse(l)
+                    setList(decode_l)
+                    
+                    const s = window.localStorage.getItem("refresh@"+ nisn + "@" + idlist)
+                    const decode_s = JSONParse(s)
+                    setSoal(decode_s)
+                    
+                    const d = window.localStorage.getItem("data@"+ nisn + "@"+ idlist)
+                    const decode_d = JSONParse(d)
+                    setData(decode_d)
+                    
+                    
+                    const timeNow = Date.now()
+                    const timeStart = Date.parse(new Date(atob(result.created_at)))
+                    const durasi = Number(decode_l.durasi);
     
-                setWaitingLoad(true)
-
-                renderMathInElement(document.body, {
-                    // customised options
-                    // • auto-render specific keys, e.g.:
-                    delimiters: [
-                        {left: '$$', right: '$$', display: true},
-                        {left: '$', right: '$', display: false},
-                        {left: '\\(', right: '\\)', display: false},
-                        {left: '\\[', right: '\\]', display: true}
-                    ],
-                    // • rendering keys, e.g.:
-                    throwOnError : false
-                });
+                    const timeFlush = timeStart + durasi*60*1000;
+                    let timeDifferent = Math.floor((timeFlush - timeNow)/1000);
+                    // setTiming(timeDifferent)
+                    setRemainingTime(timeDifferent)
+        
+                    setWaitingLoad(true)
+    
+                        renderMathInElement.default(document.body, {
+                            // customised options
+                            // • auto-render specific keys, e.g.:
+                            delimiters: [
+                                {left: '$$', right: '$$', display: true},
+                                {left: '$', right: '$', display: false},
+                                {left: '\\(', right: '\\)', display: false},
+                                {left: '\\[', right: '\\]', display: true}
+                            ],
+                            // • rendering keys, e.g.:
+                            throwOnError : false
+                        });
+                })
             })
 
         } catch (error) {
             
         }
 
-    }, [])
+    }, [start, nav])
 
     useEffect(() => {
+
         renderMathInElement(document.body, {
             // customised options
             // • auto-render specific keys, e.g.:
@@ -161,7 +162,7 @@ export default function StartCBT() {
             ],
             // • rendering keys, e.g.:
             throwOnError : false
-        });
+    })
     }, [active])
 
     const checkingButtonFinish = () => {
@@ -228,9 +229,10 @@ export default function StartCBT() {
                 "text" : "ada beberapa soal belum di isi, segera lengkapi untuk dapat menyelesaikan soal"
             })
         }
-
-        finishingCBT({idlist : list.id, iduser : user.id, answer : JSON.stringify(data)}).then(e => {
-            nav("/cbt/finish/"+ start)
+        import("../../service/cbt/result").then(({finishingCBT}) => {
+            finishingCBT({idlist : list.id, iduser : user.id, answer : JSON.stringify(data)}).then(e => {
+                nav("/cbt/finish/"+ start)
+            })
         })
     }
 
@@ -242,9 +244,10 @@ export default function StartCBT() {
 
     
     const finishing = () => {
-
-        finishingCBT({idlist : list.id, iduser : user.id, answer : JSON.stringify(data)}).then(e => {
-            nav("/cbt/finish/"+ start)
+        import("../../service/cbt/result").then(({finishingCBT}) => {
+            finishingCBT({idlist : list.id, iduser : user.id, answer : JSON.stringify(data)}).then(e => {
+                nav("/cbt/finish/"+ start)
+            })
         })
     }
    

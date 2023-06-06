@@ -1,8 +1,8 @@
-import { BASE_URL } from "../constant"
+import { pathCheckingResult, pathFinishCBT, pathGetCBTResultWithListId, pathGetResultWithId, pathGetResultWithUserId, pathGetResultWithUserIdAndListId, pathStartCBT } from "../path_rebuild"
 
 export function getResultWithUserId(id) {
     return new Promise((resolve, reject) => {
-        fetch(BASE_URL + "/cbt/result/user/"+ id).then(r => r.json()).then(r => {
+        fetch(pathGetResultWithUserId).then(r => r.json()).then(r => {
             if(r.status === 200) {
                 resolve(r.data)
             } else {
@@ -13,7 +13,7 @@ export function getResultWithUserId(id) {
 }
 export function getResultWithUserIdAndListId(id, listid) {
     return new Promise((resolve, reject) => {
-        fetch(BASE_URL + "/cbt/result/list/"+ listid + "/user/"+ id).then(r => r.json()).then(r => {
+        fetch(pathGetResultWithUserIdAndListId).then(r => r.json()).then(r => {
             if(r.status === 200) {
                 resolve(r.data)
             } else {
@@ -24,7 +24,7 @@ export function getResultWithUserIdAndListId(id, listid) {
 }
 export function getResultWIthid(id) {
     return new Promise((resolve, reject) => {
-        fetch(BASE_URL + "/cbt/result/id/"+ id).then(r => r.json()).then(e => {
+        fetch(pathGetResultWithId).then(r => r.json()).then(e => {
             if(e.status === 200) {
                 resolve(e.data)
             } else {
@@ -36,7 +36,7 @@ export function getResultWIthid(id) {
 
 export function startingCBT({idlist, iduser}) {
     return new Promise((resolve, reject) => {
-        fetch(BASE_URL + "/cbt/result/create", {
+        fetch(pathStartCBT, {
             method : "POST",
             headers : {"Content-Type" : "application/json"},
             body : JSON.stringify({
@@ -50,7 +50,7 @@ export function startingCBT({idlist, iduser}) {
 
 export function finishingCBT({iduser, idlist, answer}) {
     return new Promise((resolve, reject) => {
-        fetch(BASE_URL + "/cbt/result/update", {
+        fetch(pathFinishCBT, {
             method : "PUT",
             headers : {"Content-Type" : "application/json"},
             body : JSON.stringify({idlist, iduser, answer})
@@ -63,8 +63,7 @@ export function finishingCBT({iduser, idlist, answer}) {
 export function checkingResult({iduser, idlist}) {
     return new Promise((resolve, reject) => {
         
-        console.log(idlist, iduser)
-        fetch(BASE_URL + "/cbt/result/list/"+ idlist + "/user/"+ iduser).then(r => r.json()).then(r => {
+        fetch(pathCheckingResult(iduser, idlist)).then(r => r.json()).then(r => {
             if(r.status === 200) {
                 resolve(r.data)
             } else {
@@ -76,7 +75,7 @@ export function checkingResult({iduser, idlist}) {
 
 export function getCBTResultWIthListId(id) {
     return new Promise((resolve, reject) => {
-        fetch(BASE_URL + "/cbt/result/list/"+ id).then(r => r.json()).then(r => {
+        fetch(pathGetCBTResultWithListId).then(r => r.json()).then(r => {
             if(r.status === 200) {
                 resolve(r.data)
             } else {

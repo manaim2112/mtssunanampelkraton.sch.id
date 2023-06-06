@@ -1,9 +1,9 @@
-import { BASE_URL } from "../constant"
+import { pathCountKelas, pathDeletekelasWithId, pathGetKelasAll, pathInsertKelas } from "../path"
 
 export function getKelasAll() {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/kelas/all").then(r=>r.json()).then(e => {
+            fetch(pathGetKelasAll).then(r=>r.json()).then(e => {
                 if(e.status === 200) {
                     resolve(e.data)
                 } else {
@@ -19,7 +19,7 @@ export function getKelasAll() {
 export function countKelas() {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/kelas/count").then(r=>r.json()).then(e => {
+            fetch(pathCountKelas).then(r=>r.json()).then(e => {
                 if(e.status === 200) {
                     resolve(e.count)
                 } else {
@@ -35,7 +35,7 @@ export function countKelas() {
 export function insertKelas(kelas) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/kelas/create", {
+            fetch(pathInsertKelas, {
                 method : "POST",
                 headers : {"Content-Type" : "application/json"},
                 body : JSON.stringify({name:kelas, kode:kelas})
@@ -51,7 +51,7 @@ export function insertKelas(kelas) {
 export function deleteKelas(id) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL +"/kelas/id/"+id, {
+            fetch(pathDeletekelasWithId(id), {
                 method : "DELETE",
                 headers : {"Content-Type" :"application/json"},
                 body : JSON.stringify({})

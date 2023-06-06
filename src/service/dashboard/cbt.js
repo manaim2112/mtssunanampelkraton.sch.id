@@ -1,9 +1,9 @@
-import { BASE_URL } from "../constant"
+import { pathCBTListAll, pathChangeCodeCBTList, pathChangePriorityCBTList, pathCountCBTList, pathCreateManySoal, pathGetCBTListWithId, pathGetSoalWithIdList, pathInsertCBTList, pathRemoveListId, pathRemoveResultWithId, pathRemoveResultWithListID, pathRemoveSoalWithId, pathRemoveSoalWithListId, pathSwitchAcakCBTList, pathUpdateCBTList, pathUpdateResultAnswerWithId, pathUpdateStartAndEndCBTList } from "../path_rebuild"
 
 export function getCBT() {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/list/all").then(res => res.json()).then(e => {
+            fetch(pathCBTListAll).then(res => res.json()).then(e => {
                 if(e.status === 200) {
                     resolve(e.data)
                 } else {
@@ -19,7 +19,7 @@ export function getCBT() {
 export function CountCBT_list() {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/list/count").then(res => res.json()).then(e => {
+            fetch(pathCountCBTList).then(res => res.json()).then(e => {
                 if(e.status === 200) {
                     resolve(e.count)
                 } else {
@@ -35,7 +35,7 @@ export function CountCBT_list() {
 export function changePriorityCBT_list(id, priority) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/list/update_priority", {
+            fetch(pathChangePriorityCBTList, {
                 method :"PUT",
                 headers : {"Content-type" : "application/json"},
                 body : JSON.stringify({id, priority})
@@ -53,7 +53,7 @@ export function changePriorityCBT_list(id, priority) {
 export function insertCBT_list(data) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/list/create", {
+            fetch(pathInsertCBTList, {
                 method : "POST",
                 headers : {"Content-Type" : "application/json"},
                 body : JSON.stringify(data)
@@ -74,7 +74,7 @@ export function getWithIdCBT(id) {
     return new Promise((resolve, reject) => {
         
         try {
-            fetch(BASE_URL + "/cbt/list/id/"+ id).then(r=>r.json()).then(e => {
+            fetch(pathGetCBTListWithId(id)).then(r=>r.json()).then(e => {
                 if(e.status === 200) {
                     resolve(e.data)
                 } else {
@@ -91,7 +91,7 @@ export function getWithIdCBT(id) {
 export function updateCBT_list({id, name, jenis, durasi, min_durasi, tokelas}) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/list/update", {
+            fetch(pathUpdateCBTList, {
                 method : "PUT",
                 headers : {"Content-Type" : "application/json"},
                 body : JSON.stringify({id, name, jenis, durasi, min_durasi, tokelas})
@@ -107,7 +107,7 @@ export function updateCBT_list({id, name, jenis, durasi, min_durasi, tokelas}) {
 export function getDataWithIdCBT(id) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/soal?listid="+ id).then(r=>r.json()).then(e => {
+            fetch(pathGetSoalWithIdList(id)).then(r=>r.json()).then(e => {
                 if(e.status === 200) {
                     resolve(e.data)
                 } else {
@@ -124,7 +124,7 @@ export function getDataWithIdCBT(id) {
 export function swithAcakCBT_list({id, acak}) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/list/update_acak", {
+            fetch(pathSwitchAcakCBTList, {
                 method : "PUT",
                 headers : {"Content-Type" : "application/json"},
                 body : JSON.stringify({id, acak})
@@ -139,7 +139,7 @@ export function swithAcakCBT_list({id, acak}) {
 export function changeCodeCBT_list({id, code}) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/list/update_code", {
+            fetch(pathChangeCodeCBTList, {
                 method : "PUT",
                 headers : {"Content-Type" : "application/json"},
                 body : JSON.stringify({id, code})
@@ -155,7 +155,7 @@ export function changeCodeCBT_list({id, code}) {
 export function updateStartEndCBT({id, mulai, berakhir}) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/list/update_start_end", {
+            fetch(pathUpdateStartAndEndCBTList, {
                 method : "PUT",
                 headers : {"Content-Type" : "application/json"},
                 body : JSON.stringify({id, mulai : `${mulai}`, berakhir : `${berakhir}`})
@@ -171,7 +171,7 @@ export function updateStartEndCBT({id, mulai, berakhir}) {
 export function RemoveSoalWithListId(id) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/soal/withlist/id/"+ id, {
+            fetch(pathRemoveSoalWithListId(id), {
                 method : "DELETE",
                 headers : {"Content-Type" : "application/json"},
                 body : JSON.stringify({})
@@ -187,7 +187,7 @@ export function RemoveSoalWithListId(id) {
 export function removeListWIthId(id) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/list/id/"+ id, {
+            fetch(pathRemoveListId(id), {
                 method : "DELETE",
             }).then(r => r.json()).then(r => {
                 resolve(r.status === 201)
@@ -200,7 +200,7 @@ export function removeListWIthId(id) {
 export function RemoveResultWIthListId(id) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/result/withlist/id/"+ id, {
+            fetch(pathRemoveResultWithListID(id), {
                 method : "DELETE",
                 headers : {"Content-Type" : "application/json"},
                 body : JSON.stringify({})
@@ -216,7 +216,7 @@ export function RemoveResultWIthListId(id) {
 export function RemoveSoalWithId(id) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/soal/id/"+ id, {
+            fetch(pathRemoveSoalWithId(id), {
                 method : "DELETE",
                 headers : {"Content-Type": "application/json"},
                 body : JSON.stringify({id})
@@ -232,7 +232,7 @@ export function RemoveSoalWithId(id) {
 export function RemoveResultWithId(id) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/result/id/"+ id, {
+            fetch(pathRemoveResultWithId(id), {
                 method : "DELETE"
             }).then(r => r.json()).then(r => {
                 resolve(r.status === 201)
@@ -246,7 +246,7 @@ export function RemoveResultWithId(id) {
 export function UpdateResultAnswerWIthId({id, answer}) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/result/update/withId", {
+            fetch(pathUpdateResultAnswerWithId, {
                 method : "PUT",
                 headers : {"Content-Type" : "application/json"},
                 body : JSON.stringify({id, answer})
@@ -291,7 +291,7 @@ export function saveWithUploadWordCBT(data, id) {
     });
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/cbt/soal/create_many", {
+            fetch(pathCreateManySoal, {
                 method : "POST",
                 headers : {"Content-Type": "application/json"},
                 body : JSON.stringify(oi)

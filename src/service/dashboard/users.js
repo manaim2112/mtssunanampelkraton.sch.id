@@ -12,12 +12,12 @@
  * })
  */
 
-import { BASE_URL } from "../constant"
+import { pathCountUsers, pathGetUserWithId, pathGetUserWithKelas, pathInsertManyUsers, pathInsertUser } from "../path"
 
 export function CountUser() {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/user/count").then(r => r.json()).then(e => {
+            fetch(pathCountUsers).then(r => r.json()).then(e => {
                 if(e.status === 200) {
                     resolve(e.count)
                 } else {resolve(0)}
@@ -32,7 +32,7 @@ export function CountUser() {
 export function getUserWithId(id) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/user/id/"+id).then(r => r.json()).then(r => {
+            fetch(pathGetUserWithId(id)).then(r => r.json()).then(r => {
                 if(r.status === 200) {
                     resolve(r.data)
                 }
@@ -46,7 +46,7 @@ export function getUserWithId(id) {
 export function getStudent(kelas) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/user/kelas/"+ kelas).then(r => r.json()).then(e => {
+            fetch(pathGetUserWithKelas(kelas)).then(r => r.json()).then(e => {
                 if(e.status === 200) {
                     resolve(e.data)
                 } else {
@@ -62,7 +62,7 @@ export function getStudent(kelas) {
 export function insertUser({nisn, name, kelas, sandi}) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/user/create", {
+            fetch(pathInsertUser, {
                 method : "POST",
                 headers : {"Content-Type" : "application/json"},
                 body : JSON.stringify({nisn, name, kelas, sandi})
@@ -78,7 +78,7 @@ export function insertUser({nisn, name, kelas, sandi}) {
 export function insertManyUser(data) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/user/createmany", {
+            fetch(pathInsertManyUsers, {
                 method : "POST",
                 headers : {"Content-Type" : "application/json"},
                 body : JSON.stringify(data)

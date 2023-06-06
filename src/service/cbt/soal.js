@@ -1,8 +1,8 @@
-import { BASE_URL } from "../constant"
+import { pathGetSoalWithIdList } from "../path"
 
 export function getSoalWithIdList(id) {
     return new Promise((resolve, reject) => {
-        fetch(BASE_URL + "/cbt/soal?listid="+ id).then(r => r.json()).then(e => {
+        fetch(pathGetSoalWithIdList).then(r => r.json()).then(e => {
             if(e.status === 200) {
                 resolve(e.data)
             } else {

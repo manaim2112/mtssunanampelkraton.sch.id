@@ -1,8 +1,8 @@
-import { BASE_URL } from "../constant"
+import { pathCheckingKode, pathListSoalWithKelas } from "../path"
 
 export function listSoalWithKelas(kelas) {
     return new Promise((resolve, reject) => {
-        fetch(BASE_URL + "/cbt/list/kelas/"+ kelas).then(r=>r.json()).then(r => {
+        fetch(pathListSoalWithKelas(kelas)).then(r=>r.json()).then(r => {
             if(r.status === 200) {
                 resolve(r.data)
             } else {
@@ -14,7 +14,7 @@ export function listSoalWithKelas(kelas) {
 
 export function checkingCodeWithIdList(id) {
     return new Promise((resolve, reject) => {
-        fetch(BASE_URL + "/cbt/list/code/id/"+ id).then(r => r.json()).then(r => {
+        fetch(pathCheckingKode).then(r => r.json()).then(r => {
             if(r.status === 200) {
                 resolve(r.data)
             } else {

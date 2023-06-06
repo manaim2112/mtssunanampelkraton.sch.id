@@ -1,9 +1,9 @@
-import { BASE_URL } from "../constant"
+import { pathCountGuru, pathDeleteGuru, pathGetGuruAll, pathGetGuruWithId, pathInsertGuru, pathUpdateGuru } from "../path"
 
 export function getGuru() {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/guru/all").then(r => r.json()).then(e => {
+            fetch(pathGetGuruAll).then(r => r.json()).then(e => {
                 if(e.status === 200) {
                     resolve(e.data)
                 } else {
@@ -19,7 +19,7 @@ export function getGuru() {
 export function getGuruWithId(id) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/guru/id/"+ id).then(r => r.json()).then(e => {
+            fetch(pathGetGuruWithId(id)).then(r => r.json()).then(e => {
                 if(e.status === 200) {
                     resolve(e.data)
                 } else {resolve({})}
@@ -34,7 +34,7 @@ export function getGuruWithId(id) {
 export function insertGuru({pegId, name, pass}) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/guru/create", {
+            fetch(pathInsertGuru, {
                 method :"POST",
                 headers : {"Content-type" : "application/json"},
                 body : JSON.stringify({pegId, name, pass})
@@ -51,7 +51,7 @@ export function insertGuru({pegId, name, pass}) {
 export function updateGuru({id, pegId, name, pass, walikelas, jabatan}) {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/guru/update", {
+            fetch(pathUpdateGuru, {
                 method : "PUT",
                 headers : {"Content-Type" : "application/json"},
                 body : JSON.stringify({id, pegId, name, pass, walikelas, jabatan})
@@ -67,7 +67,7 @@ export function updateGuru({id, pegId, name, pass, walikelas, jabatan}) {
 export function deleteGuru(id) {
     return new Promise((resolve, reject)=> {
         try {
-            fetch(BASE_URL + "/guru/id/" + id, {
+            fetch(pathDeleteGuru(id), {
                 method : "DELETE",
                 headers : {"Content-Type" : "application/json"},
                 body : JSON.stringify({id})
@@ -83,7 +83,7 @@ export function deleteGuru(id) {
 export function countGuru() {
     return new Promise((resolve, reject) => {
         try {
-            fetch(BASE_URL + "/guru/count").then(r => r.json()).then(e => {
+            fetch(pathCountGuru).then(r => r.json()).then(e => {
                 if(e.status === 200) {
                     resolve(e.count)
                 } else {

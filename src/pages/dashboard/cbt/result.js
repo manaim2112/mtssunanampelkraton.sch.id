@@ -9,7 +9,6 @@ import Swal from "sweetalert2"
 import jsPDF from "jspdf"
 import { JSONParse } from "../../../service/constant"
 import { Cog8ToothIcon, PrinterIcon, SignalIcon} from "@heroicons/react/24/outline"
-import XLSX from "xlsx"
 import { ExcelIcon } from "../../../icons/excelIcon"
 
 export default function ResultCBT() {
@@ -144,77 +143,79 @@ export default function ResultCBT() {
         setLoadExportToExcel(true)
         const ll = list.tokelas.split(",").map(e => e.trim())
         import("../../../service/cbt/user").then(({getUserWithKelas}) => {
-            getUserWithKelas(ll).then(response => {
-                const workbook =  XLSX.utils.book_new()
-                response.forEach((user, keyUser) => {
-                    // Check Score
-                    const myscore = []
-                    user.forEach(element => {
-                        const index = result.findIndex(Obj => Obj.iduser === element.id)
-                        if(index === -1) return myscore.push(0)
-                        const ans = JSONParse(result[index].answer)
-                        if(ans.length === 0) {
-                            myscore.push(0)
-                        } else {
-                            const scoreItem = [];
-                            soal.forEach(sss => {
-                                const indexAns = ans.findIndex(OO => OO[0] === sss.id);
-                                if(indexAns === -1) {
-                                    return scoreItem.push(0)
-                                }
-                                if(!ans[indexAns][1]) {
-                                    return scoreItem.push(0)
-                                }
-                                if(ans[indexAns][1].length === 0) {
-                                    return scoreItem.push(0)
-                                }
-                                switch(sss.tipe) {
-                                    case "pilgan" : 
-                                        if(JSON.stringify(ans[indexAns][1].sort((a,b) => a-b)) === JSON.stringify(JSONParse(sss.answer).sort((a,b) => a-b))) {
-                                            scoreItem.push(sss.score)
-                                        } else {
+            import("xlsx").then(XLSX => {
+                getUserWithKelas(ll).then(response => {
+                    const workbook =  XLSX.utils.book_new()
+                    response.forEach((user, keyUser) => {
+                        // Check Score
+                        const myscore = []
+                        user.forEach(element => {
+                            const index = result.findIndex(Obj => Obj.iduser === element.id)
+                            if(index === -1) return myscore.push(0)
+                            const ans = JSONParse(result[index].answer)
+                            if(ans.length === 0) {
+                                myscore.push(0)
+                            } else {
+                                const scoreItem = [];
+                                soal.forEach(sss => {
+                                    const indexAns = ans.findIndex(OO => OO[0] === sss.id);
+                                    if(indexAns === -1) {
+                                        return scoreItem.push(0)
+                                    }
+                                    if(!ans[indexAns][1]) {
+                                        return scoreItem.push(0)
+                                    }
+                                    if(ans[indexAns][1].length === 0) {
+                                        return scoreItem.push(0)
+                                    }
+                                    switch(sss.tipe) {
+                                        case "pilgan" : 
+                                            if(JSON.stringify(ans[indexAns][1].sort((a,b) => a-b)) === JSON.stringify(JSONParse(sss.answer).sort((a,b) => a-b))) {
+                                                scoreItem.push(sss.score)
+                                            } else {
+                                                scoreItem.push(0)
+                                            }
+                                        break;
+                                        case "isian_singkat" :
+                                            if(ans[indexAns][1] === JSONParse(sss.answer)[0]) {
+                                                scoreItem.push(sss.score)
+                                            }else {
+                                                scoreItem.push(0)
+                                            }
+                                        break;
+                                        case "isian_panjang" :
+                                            if(ans[indexAns][2]) {
+                                                scoreItem.push(sss.score)
+                                            } else {
+                                                scoreItem.push(0)
+                                            }
+                                        break;
+                                        default : 
                                             scoreItem.push(0)
-                                        }
-                                    break;
-                                    case "isian_singkat" :
-                                        if(ans[indexAns][1] === JSONParse(sss.answer)[0]) {
-                                            scoreItem.push(sss.score)
-                                        }else {
-                                            scoreItem.push(0)
-                                        }
-                                    break;
-                                    case "isian_panjang" :
-                                        if(ans[indexAns][2]) {
-                                            scoreItem.push(sss.score)
-                                        } else {
-                                            scoreItem.push(0)
-                                        }
-                                    break;
-                                    default : 
-                                        scoreItem.push(0)
-                                    
-                                }
+                                        
+                                    }
+                                })
+                                myscore.push(scoreItem.reduce((a,b) => Number(a) + Number(b)))
+                            }
+                        });
+                        // End score    
+                        const rows = [];
+                        user.forEach((u, k) => {
+                            rows.push({
+                                Absen : k+1,
+                                Nisn : u.nisn,
+                                Nama : u.name,
+                                Kelas : u.kelas,
+                                Progress : status(u.id) === "start" ? "Sedang mengerjakan" : status(u.id) === "finish" ? "Tuntas" : "Belum Absen",
+                                "Nilai Sementara" : myscore[k],
                             })
-                            myscore.push(scoreItem.reduce((a,b) => Number(a) + Number(b)))
-                        }
-                    });
-                    // End score    
-                    const rows = [];
-                    user.forEach((u, k) => {
-                        rows.push({
-                            Absen : k+1,
-                            Nisn : u.nisn,
-                            Nama : u.name,
-                            Kelas : u.kelas,
-                            Progress : status(u.id) === "start" ? "Sedang mengerjakan" : status(u.id) === "finish" ? "Tuntas" : "Belum Absen",
-                            "Nilai Sementara" : myscore[k],
                         })
+                        const worksheet = XLSX.utils.json_to_sheet(rows);
+                        XLSX.utils.book_append_sheet(workbook, worksheet, ll[keyUser])
                     })
-                    const worksheet = XLSX.utils.json_to_sheet(rows);
-                    XLSX.utils.book_append_sheet(workbook, worksheet, ll[keyUser])
+                    XLSX.writeFile(workbook, list.name + "_RekapNilaiSementara_"+ Date.now() +".xlsx", { compression: true });
+                    setLoadExportToExcel(false)
                 })
-                XLSX.writeFile(workbook, list.name + "_RekapNilaiSementara_"+ Date.now() +".xlsx", { compression: true });
-                setLoadExportToExcel(false)
             })
         })
         // writeXLSX
@@ -223,80 +224,82 @@ export default function ResultCBT() {
         setLoadExportToExcelEnd(true)
         const ll = list.tokelas.split(",").map(e => e.trim())
         import("../../../service/cbt/user").then(({getUserWithKelas}) => {
-            getUserWithKelas(ll).then(response => {
-                const workbook =  XLSX.utils.book_new()
-                response.forEach((user, keyUser) => {
-                    // Check Score
-                    const myscore = []
-                    user.forEach(element => {
-                        const index = result.findIndex(Obj => Obj.iduser === element.id)
-                        if(index === -1) return myscore.push(0)
-                        const ans = JSONParse(result[index].answer)
-                        if(ans.length === 0) {
-                            myscore.push(0)
-                        } else {
-                            const scoreItem = [];
-                            soal.forEach(sss => {
-                                const indexAns = ans.findIndex(OO => OO[0] === sss.id);
-                                if(indexAns === -1) {
-                                    return scoreItem.push(0)
-                                }
-                                if(!ans[indexAns][1]) {
-                                    return scoreItem.push(0)
-                                }
-                                if(ans[indexAns][1].length === 0) {
-                                    return scoreItem.push(0)
-                                }
-                                switch(sss.tipe) {
-                                    case "pilgan" : 
-                                        if(JSON.stringify(ans[indexAns][1].sort((a,b) => a-b)) === JSON.stringify(JSONParse(sss.answer).sort((a,b) => a-b))) {
-                                            scoreItem.push(sss.score)
-                                        } else {
+            import("xlsx").then(XLSX => {
+                getUserWithKelas(ll).then(response => {
+                    const workbook =  XLSX.utils.book_new()
+                    response.forEach((user, keyUser) => {
+                        // Check Score
+                        const myscore = []
+                        user.forEach(element => {
+                            const index = result.findIndex(Obj => Obj.iduser === element.id)
+                            if(index === -1) return myscore.push(0)
+                            const ans = JSONParse(result[index].answer)
+                            if(ans.length === 0) {
+                                myscore.push(0)
+                            } else {
+                                const scoreItem = [];
+                                soal.forEach(sss => {
+                                    const indexAns = ans.findIndex(OO => OO[0] === sss.id);
+                                    if(indexAns === -1) {
+                                        return scoreItem.push(0)
+                                    }
+                                    if(!ans[indexAns][1]) {
+                                        return scoreItem.push(0)
+                                    }
+                                    if(ans[indexAns][1].length === 0) {
+                                        return scoreItem.push(0)
+                                    }
+                                    switch(sss.tipe) {
+                                        case "pilgan" : 
+                                            if(JSON.stringify(ans[indexAns][1].sort((a,b) => a-b)) === JSON.stringify(JSONParse(sss.answer).sort((a,b) => a-b))) {
+                                                scoreItem.push(sss.score)
+                                            } else {
+                                                scoreItem.push(0)
+                                            }
+                                        break;
+                                        case "isian_singkat" :
+                                            if(ans[indexAns][1] === JSONParse(sss.answer)[0]) {
+                                                scoreItem.push(sss.score)
+                                            }else {
+                                                scoreItem.push(0)
+                                            }
+                                        break;
+                                        case "isian_panjang" :
+                                            if(ans[indexAns][2]) {
+                                                scoreItem.push(sss.score)
+                                            } else {
+                                                scoreItem.push(0)
+                                            }
+                                        break;
+                                        default : 
                                             scoreItem.push(0)
-                                        }
-                                    break;
-                                    case "isian_singkat" :
-                                        if(ans[indexAns][1] === JSONParse(sss.answer)[0]) {
-                                            scoreItem.push(sss.score)
-                                        }else {
-                                            scoreItem.push(0)
-                                        }
-                                    break;
-                                    case "isian_panjang" :
-                                        if(ans[indexAns][2]) {
-                                            scoreItem.push(sss.score)
-                                        } else {
-                                            scoreItem.push(0)
-                                        }
-                                    break;
-                                    default : 
-                                        scoreItem.push(0)
-                                    
-                                }
+                                        
+                                    }
+                                })
+                                myscore.push(scoreItem.reduce((a,b) => Number(a) + Number(b)))
+                            }
+                        });
+                        // End score
+                        const endScore = mapToRange(myscore, Number(list.mulai), Number(list.berakhir));
+        
+                        const rows = [];
+                        user.forEach((u, k) => {
+                            rows.push({
+                                Absen : k+1,
+                                Nisn : u.nisn,
+                                Nama : u.name,
+                                Kelas : u.kelas,
+                                Progress : status(u.id) === "start" ? "Sedang mengerjakan" : status(u.id) === "finish" ? "Tuntas" : "Belum Absen",
+                                "Nilai Sementara" : myscore[k],
+                                "Nilai Akhir" : endScore[k]
                             })
-                            myscore.push(scoreItem.reduce((a,b) => Number(a) + Number(b)))
-                        }
-                    });
-                    // End score
-                    const endScore = mapToRange(myscore, Number(list.mulai), Number(list.berakhir));
-    
-                    const rows = [];
-                    user.forEach((u, k) => {
-                        rows.push({
-                            Absen : k+1,
-                            Nisn : u.nisn,
-                            Nama : u.name,
-                            Kelas : u.kelas,
-                            Progress : status(u.id) === "start" ? "Sedang mengerjakan" : status(u.id) === "finish" ? "Tuntas" : "Belum Absen",
-                            "Nilai Sementara" : myscore[k],
-                            "Nilai Akhir" : endScore[k]
                         })
+                        const worksheet = XLSX.utils.json_to_sheet(rows);
+                        XLSX.utils.book_append_sheet(workbook, worksheet, ll[keyUser])
                     })
-                    const worksheet = XLSX.utils.json_to_sheet(rows);
-                    XLSX.utils.book_append_sheet(workbook, worksheet, ll[keyUser])
+                    XLSX.writeFile(workbook, list.name + "_RekapNilaiAkhir_"+ Date.now() +".xlsx", { compression: true });
+                    setLoadExportToExcelEnd(false)
                 })
-                XLSX.writeFile(workbook, list.name + "_RekapNilaiAkhir_"+ Date.now() +".xlsx", { compression: true });
-                setLoadExportToExcelEnd(false)
             })
         })
         // writeXLSX
@@ -305,41 +308,43 @@ export default function ResultCBT() {
         setLoadExportToExcelKehadiran(true)
         const ll = list.tokelas.split(",").map(e => e.trim())
         import("../../../service/cbt/user").then(({getUserWithKelas}) => {
-            getUserWithKelas(ll).then(response => {
-                const workbook =  XLSX.utils.book_new()
-                response.forEach((user, keyUser) => {
-                    // End score
-                    const rows = [];
-                    console.log(user)
-                    user.forEach((u, k) => {
-                        const ind = result.findIndex(Obj => Obj.iduser === u.id)
-                        if(ind === -1) return;
-                        console.log(result[ind])
-                        rows.push({
-                            No : k+1,
-                            Nisn : u.nisn,
-                            Nama : u.name,
-                            Kelas : u.kelas,
-                            KEHADIRAN : status(u.id) === "start" ? "HADIR" : status(u.id) === "finish" ? "HADIR" : "HADIR",
-                            Masuk : atob(result[ind].created_at ? result[ind].created_at : ""),
-                            // Selesai : atob(result[ind].updated_at)
+            import("xlsx").then(XLSX => {
+                getUserWithKelas(ll).then(response => {
+                    const workbook =  XLSX.utils.book_new()
+                    response.forEach((user, keyUser) => {
+                        // End score
+                        const rows = [];
+                        console.log(user)
+                        user.forEach((u, k) => {
+                            const ind = result.findIndex(Obj => Obj.iduser === u.id)
+                            if(ind === -1) return;
+                            console.log(result[ind])
+                            rows.push({
+                                No : k+1,
+                                Nisn : u.nisn,
+                                Nama : u.name,
+                                Kelas : u.kelas,
+                                KEHADIRAN : status(u.id) === "start" ? "HADIR" : status(u.id) === "finish" ? "HADIR" : "HADIR",
+                                Masuk : atob(result[ind].created_at ? result[ind].created_at : ""),
+                                // Selesai : atob(result[ind].updated_at)
+                            })
                         })
+                        const worksheet = XLSX.utils.json_to_sheet(rows);
+                        var wscols = [
+                            {wch:3},
+                            {wch:13},
+                            {wch:25},
+                            {wch:3},
+                            {wch:10},
+                            {wch:20},
+                        ];
+                        
+                        worksheet['!cols'] = wscols;
+                        XLSX.utils.book_append_sheet(workbook, worksheet, ll[keyUser])
                     })
-                    const worksheet = XLSX.utils.json_to_sheet(rows);
-                    var wscols = [
-                        {wch:3},
-                        {wch:13},
-                        {wch:25},
-                        {wch:3},
-                        {wch:10},
-                        {wch:20},
-                    ];
-                    
-                    worksheet['!cols'] = wscols;
-                    XLSX.utils.book_append_sheet(workbook, worksheet, ll[keyUser])
+                    XLSX.writeFile(workbook, list.name + "_RekapKehadiran_"+ Date.now() +".xlsx", { compression: true });
+                    setLoadExportToExcelKehadiran(false)
                 })
-                XLSX.writeFile(workbook, list.name + "_RekapKehadiran_"+ Date.now() +".xlsx", { compression: true });
-                setLoadExportToExcelKehadiran(false)
             })
         })
         // writeXLSX
