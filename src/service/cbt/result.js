@@ -1,4 +1,4 @@
-import { pathCheckingResult, pathFinishCBT, pathGetCBTResultWithListId, pathGetResultWithId, pathGetResultWithUserId, pathGetResultWithUserIdAndListId, pathStartCBT } from "../path_rebuild"
+import { pathCheckingResult, pathFinishCBT, pathGetCBTResultWithListId, pathGetResultWithId, pathGetResultWithUserId, pathGetResultWithUserIdAndListId, pathStartCBT } from "../path"
 
 export function getResultWithUserId(id) {
     return new Promise((resolve, reject) => {

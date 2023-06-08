@@ -1,4 +1,4 @@
-import { pathCBTListAll, pathChangeCodeCBTList, pathChangePriorityCBTList, pathCountCBTList, pathCreateManySoal, pathGetCBTListWithId, pathGetSoalWithIdList, pathInsertCBTList, pathRemoveListId, pathRemoveResultWithId, pathRemoveResultWithListID, pathRemoveSoalWithId, pathRemoveSoalWithListId, pathSwitchAcakCBTList, pathUpdateCBTList, pathUpdateResultAnswerWithId, pathUpdateStartAndEndCBTList } from "../path_rebuild"
+import { pathCBTListAll, pathChangeCodeCBTList, pathChangePriorityCBTList, pathCountCBTList, pathCreateManySoal, pathGetCBTListWithId, pathGetSoalWithIdList, pathInsertCBTList, pathRemoveListId, pathRemoveResultWithId, pathRemoveResultWithListID, pathRemoveSoalWithId, pathRemoveSoalWithListId, pathSwitchAcakCBTList, pathUpdateCBTList, pathUpdateResultAnswerWithId, pathUpdateStartAndEndCBTList } from "../path"
 
 export function getCBT() {
     return new Promise((resolve, reject) => {

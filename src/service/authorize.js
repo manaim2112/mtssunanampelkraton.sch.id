@@ -1,4 +1,4 @@
-import { pathAutorizeGuru, pathAutorizeUser } from "./path_rebuild"
+import { pathAutorizeGuru, pathAutorizeUser } from "./path"
 
 export function LoginWithUser(nisn, pass) {
     return new Promise((resolve, reject) => {
