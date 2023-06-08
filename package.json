@@ -34,9 +34,9 @@
   "scripts": {
     "start": "react-scripts start",
     "terser": "terser ./build/static/js/*.js -m --mangle-props regex=/_$/ -o ./minified/ --overwrite",
-    "build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build && compress-cra",
+    "build": "cross-env GENERATE_SOURCEMAP=false && react-scripts build",
     "buildlinux": "export GENERATE_SOURCEMAP=false && react-scripts build && compress-cra",
-    "buildOBS": "set \"GENERATE_SOURCEMAP=false\" && react-app-rewired build",
+    "buildOBS": "cross-env GENERATE_SOURCEMAP=false && react-app-rewired build",
     "buildOBSlinux": "export GENERATE_SOURCEMAP=false && react-app-rewired build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -60,6 +60,8 @@
     ]
   },
   "devDependencies": {
-    "tailwindcss": "^3.3.1"
+    "cross-env": "^7.0.3",
+    "tailwindcss": "^3.3.1",
+    "terser-webpack-plugin": "^5.3.9"
   }
 }
