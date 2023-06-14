@@ -38,6 +38,7 @@ const HomeKegiatanDashboard = lazy(() => import("./pages/dashboard/kegiatan/home
 const EditKegiatanDashboard = lazy(() => import("./pages/dashboard/kegiatan/_id"))
 const CreateNewKegiatanDashboard = lazy(() => import("./pages/dashboard/kegiatan/create"))
 const ExportNilai = lazy(() => import("../src/pages/dashboard/cbt/export_nilai"))
+const ExportNilaiAsli = lazy(() => import("../src/pages/dashboard/cbt/export_nilai_asli"))
 
 function App() {
 
@@ -93,6 +94,7 @@ function App() {
             <Route path='penugasan' element={<IndexPenugasanDashboard/>}/>
             <Route path='cbt' element={<IndexCBTDashboard/>}/>
             <Route path='cbt/export_nilai' element={<ExportNilai/>}/>
+            <Route path='cbt/export_nilai_asli' element={<ExportNilaiAsli/>}/>
             <Route path='cbt/id/:id' element={<IdCBTDashboard/>}/>
             <Route path='cbt/id/:id/result' element={<ResultCBT/>}/>
             <Route path='cbt/id/:id/result/:userid/view' element={<ViewResultCBT/>}/>
