@@ -219,17 +219,16 @@ export default function ExportNilaiAsliCBTDashboard() {
                 XLSX.utils.book_append_sheet(workbook, worksheet, k)            
             }
             const flatU = u.flat().map(e => {
-                const r = e.reduce((prev, next, index) => {
-                    if(index > 3) {
-                        return next+prev;
-                    }
-                })
-                e.push(r)
-                return e
-            })
-            const h = [header, ...flatU]
+
+                const p = e.filter(Obj => typeof Obj !== "string").reduce((a,b) => a+b);
+                e.push(p)
+                return e;
+            });
+            const RankU = flatU.sort((a,b) => b[b.length-1] - a[a.length -1])
+            header.push("JUMLAH NILAI")
+            const h = [header, ...RankU]
             const worksheet = XLSX.utils.aoa_to_sheet(h)
-            XLSX.utils.book_append_sheet(workbook, worksheet, h)
+            XLSX.utils.book_append_sheet(workbook, worksheet, "RANGKING")
             XLSX.writeFile(workbook, "_RekapNilaiAkhir_"+ Date.now() +".xlsx", { compression: true });
         })
     }
